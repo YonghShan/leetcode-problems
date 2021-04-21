@@ -1,12 +1,11 @@
 /**
  * @author YonghShan
- * @date 4/18/21 - 17:23
+ * @date 4/20/21 - 16:37
  */
-public class Solution1 {
-    // 这是在写[0153]之前写的解法，更好理解的见Advanced
-    // 先Binary Search找出smallest element，将数组分为两个部分；在确定target位于哪半边后，在该半边再使用Binary Search找到target
+public class Solution1Advanced {
+    // 根据[0033]写的改进版
     /* Runtime: 0ms (faster than 100.00%)    O(logn)
-       Memory: 39.2MB (less than 5.64%)      O(1)
+       Memory: 38MB (less than 89.24%)       O(1)
      */
     public int search(int[] nums, int target) {
         if (nums.length == 1) return nums[0] == target ? 0 : -1;
@@ -15,15 +14,14 @@ public class Solution1 {
         int left = 0;
         int right = nums.length - 1;
         int idx = 0;
-        while (left <= right) {
+        while (left < right) {
             int mid = left + (right - left) / 2;
-            if (mid == nums.length - 1) break; // 此时array是顺序的，即rotated at 0
             if (nums[mid] > nums[mid+1]) {
                 idx = mid + 1;
                 break;
             } else {
                 if (nums[mid] < nums[left]) {
-                    right = mid - 1;  // 这里不太好：在这种情况下，mid还是有可能成为target index的，不应该将right赋为mid-1
+                    right = mid;
                 } else {
                     left = mid + 1;
                 }
