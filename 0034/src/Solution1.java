@@ -3,7 +3,7 @@
  * @date 4/22/21 - 23:41
  */
 public class Solution1 {
-    // Binary Search to find the leftmost and rightmost target, respectively
+    // Binary Search Template I to find the leftmost and rightmost target, respectively
     /* Runtime: 0ms                        O(logn)
        Memory: 42.3MB (less than 29.65%)   O(1)
      */
