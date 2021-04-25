@@ -3,7 +3,7 @@
  * @date 4/20/21 - 11:40
  */
 public class Solution1 {
-    // Binary Search with two clever tricks: see the notes
+    // Binary Search with two clever tricks: see the notes: Template 2
     // 也可以写成Recursion版本
     /* Runtime: 0ms    O(log_2 n)
        Memory: 38.8MB (less than 18.93%)   O(1)
