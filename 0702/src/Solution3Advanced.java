@@ -34,6 +34,4 @@ public class Solution3Advanced {
 
         return -1;
     }
-
-}
 }
