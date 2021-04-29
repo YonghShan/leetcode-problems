@@ -5,6 +5,7 @@
 public class Solution1Advanced2 {
     // Fast Power Algorithm Recursive: exponentiation by squaring平方求幂
     // 通过引入辅助函数，实现tail recursion
+    // 没必要。。。不引入辅助函数也能尾递归
     private double fastPow(double x, long n) {
         if (n == 0) {
             return 1.0;

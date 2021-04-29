@@ -3,6 +3,7 @@
  * @date 3/12/21 - 16:38
  */
 public class Solution2Advanced {
+    // Binary Search的另类应用
     // Fast Power Algorithm Iterative: exponentiation by squaring平方求幂
     // O(log n) O(1)
     public double myPow(double x, int n) {
