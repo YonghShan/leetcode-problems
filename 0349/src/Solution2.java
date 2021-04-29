@@ -5,6 +5,9 @@ import java.util.HashSet;
  * @date 4/8/21 - 16:28
  */
 public class Solution2 {
+    /* Runtime: O(n+m) in the average case and O(n×m) in the worst case when load factor is high enough.
+       Memory: O(n+m) in the worst case when all elements in the arrays are different.
+     */
     public int[] intersection(int[] nums1, int[] nums2) {
         HashSet<Integer> set1 = new HashSet<>();
         HashSet<Integer> set2 = new HashSet<>();

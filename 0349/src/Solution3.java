@@ -7,6 +7,7 @@ import java.util.Set;
  * @date 4/9/21 - 23:24
  */
 public class Solution3 {
+    // Two Pointers
     // Facebook Interview Question with the following constrains:
     // 1. O(n) time and O(1) space (the resulting array of intersections is not taken into consideration).
     // 2. The lists are sorted.
