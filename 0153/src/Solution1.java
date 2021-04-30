@@ -14,7 +14,7 @@ public class Solution1 {
         while (left < right) {
             int mid = left + (right - left) / 2;
             if (nums[mid] > nums[mid+1]) return nums[mid+1];
-            if (nums[mid] < nums[left]) {
+            if (nums[mid] < nums[left]) {  // 这里因为nums中无duplicates，nums[mid]和nums[left]/nums[right]比较都可
                 right = mid;  // 这种情况，mid还是有可能为smallest element的，所以right赋为mid
             } else {
                 left = mid + 1;
