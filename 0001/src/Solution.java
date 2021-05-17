@@ -3,6 +3,7 @@
  * @date 1/18/21 - 23:53
  */
 class Solution {
+    // O(n^2)
     public int[] twoSum(int[] nums, int target) {
         int[] result = new int[2];
 
