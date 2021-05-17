@@ -23,7 +23,7 @@
 
   + Solution 1: word层面
 
-    + 正则表达式的写法
+    + 正则表达式的写法: 双斜杠转义
 
     + 判断word是否在String[] banned时: Arrays.asList(banned).contains(word)  // 有点蠢，asList大概率takes O(m), contains takes O(m), for循环n次，则takes O(nm), 不如提前用banned建立一个HashSet.
 

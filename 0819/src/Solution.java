@@ -11,7 +11,7 @@ class Solution {
      */
     public String mostCommonWord(String paragraph, String[] banned) {
         //Step1: 对传进来的文本预处理（包括：1.将标点符号替换为空格；2.全部变成小写）
-        String normalizedParagragh = paragraph.replaceAll("\\!|\\?|\\'|\\,|\\;|\\.", " ").toLowerCase();
+        String normalizedParagragh = paragraph.replaceAll("\\!|\\?|\\'|\\,|\\;|\\.", " ").toLowerCase();   // 双斜杠转义
         // String normalizedParagragh = paragraph.replaceAll("[^a-zA-Z0-9 ]", " ").toLowerCase();
 
         //Step2: 对文本进行分割
