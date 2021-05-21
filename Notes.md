@@ -29,7 +29,7 @@
 
     + 自定义
 
-      Collections.sort(, new Comparator<>() {
+      Collections.sort(要sort的对象, new Comparator<>() {
 
       ​		@Override
 
@@ -40,3 +40,19 @@
       })
 
   + Solution 2: char层面
+
++ [142]：典型的Floyd's Algorithm
+
+  Floyd's Algorithm: 
+
+  + Phase 1: tortoise 一步一node；hare 一步二nodes    --->    两者在intersection相遇
+  + Phase 2: 因为intersection并不一定是the entrance of the cycle，所以还需要Phase 2: tortoise 回到起点一步一node；hare 待在intersection一步一node    --->    两者在entrance相遇                
+
+  + Solution2Abbr: 写得好
+
++ [287]：参考[0142]: Linked List Cycle II
+
+  + 如何将array转化为linked list：f(x) = mums[x]
+  + Floyd's Algorithm: 
+    + Phase 1: tortoise 一步一node；hare 一步二nodes    --->    两者在intersection相遇
+    + Phase 2: 因为intersection并不一定是the entrance of the cycle，所以还需要Phase 2: tortoise 回到起点一步一node；hare 待在intersection一步一node    --->    两者在entrance相遇                
