@@ -10,21 +10,25 @@ public class Solution2 {
        Memory: O(1)
      */
     public int smallestDistancePair(int[] nums, int k) {
-        Arrays.sort(nums);    // O(NlogN)
+        Arrays.sort(nums);
 
-        int lo = 0;
-        int hi = nums[nums.length - 1] - nums[0];
-        while (lo < hi) {      // O(logW)
-            int mi = (lo + hi) / 2;
-            int count = 0, left = 0;
-            for (int right = 0; right < nums.length; ++right) {     // O(N)
-                while (nums[right] - nums[left] > mi) left++;
-                count += right - left;
+        int left = 0;
+        int right = nums[nums.length - 1] - nums[0];
+        while (left < right) {
+            int mid = left + (right - left) / 2;
+            int num = 0;
+            int src = 0;
+            for (int end = 0; end < nums.length; end++) {
+                while (nums[end] - nums[src] > mid) src++;
+                num += end - src;
             }
-            //count = number of pairs with distance <= mi
-            if (count >= k) hi = mi;
-            else lo = mi + 1;
+            if (num < k) {
+                left = mid + 1;
+            } else {
+                right = mid;
+            }
         }
-        return lo;
+
+        return left;
     }
 }

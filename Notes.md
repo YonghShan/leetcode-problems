@@ -91,5 +91,8 @@
 
       upperBond: 利用Binary Search快速返回在[src, end]范围内，nums中第一个大于nums[i]+mid (i.e. target) 的值的index
 
-  + Leetcode Approach #3：相当于上面的简化版（尤指对如何找到difference ≤ mid的pair的数量部分的简化）
+  + Leetcode Approach #3：相当于上面的简化版
+
+    + main Binary Search的left直接定为0
+    + 简化如何找到difference ≤ mid的pair的数量部分
 
