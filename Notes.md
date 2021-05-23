@@ -96,3 +96,10 @@
     + main Binary Search的left直接定为0
     + 简化如何找到difference ≤ mid的pair的数量部分
 
++ [410]：
+
+  + DP: 长度为n，subarray数为m，建立dp二维数组dp\[n+1][m+1]
+    + dp\[i][j]: 将长度为i的array分割为j个subarray后，得到的minimum largest subarray sum
+    + dp\[i][j] 由 max(dp\[k][j-1], nums[k+1]+...+nums[i])（解释：当长度为i时，从0～k的范围内分割出(j-1)个subarray后，从k+1～i组成第j个subarray）决定，而$k \in [0, i)$，所以更准确地说，dp\[i][j] = min[max(dp\[k][j-1], nums[k+1]+...+nums[i])]
+  + Binary Search + Greedy:
+
