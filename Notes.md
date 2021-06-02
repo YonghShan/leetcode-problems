@@ -101,5 +101,22 @@
   + DP: 长度为n，subarray数为m，建立dp二维数组dp\[n+1][m+1]
     + dp\[i][j]: 将长度为i的array分割为j个subarray后，得到的minimum largest subarray sum
     + dp\[i][j] 由 max(dp\[k][j-1], nums[k+1]+...+nums[i])（解释：当长度为i时，从0～k的范围内分割出(j-1)个subarray后，从k+1～i组成第j个subarray）决定，而$k \in [0, i)$，所以更准确地说，dp\[i][j] = min[max(dp\[k][j-1], nums[k+1]+...+nums[i])]
+    
   + Binary Search + Greedy:
+  
+    + 定义函数F(x)，表示：当存在一种分法使得各subarray的the maximum largest sum不超过x时，F(x)为true
+  
+    + $x \in [left, right]$ (left为nums最大值，right为nums所有元素之和)， F(x)一开始为false，直到$x=x_0$时，F(x)变为true，此后F(x)一直保持为true => $x_0$即为answer
+  
+    + 利用BS寻找$x_0$:
+  
+      ```java
+      if F(mid) == false, then search [mid+1, right]
+      if F(mid) == true, then search [left, mid-1]
+      ```
+  
+    + F(mid)的值（true/false）由下面两个条件共同得出：
+      + the maximum largest sum of each subarray doesn't exceed the mid. Once the sum exceeds the mid, split it and begin a new subarray   => 定义变量sum记录当前元素之和
+      + the number of subarrays doesn't exceed m => 定义变量cnt记录subarray的数量
+      + 同时满足上述两个条件，则F(mid) == true.
 
