@@ -9,8 +9,8 @@ public class Solution3 {
     // 利用BS寻找x_0， if F(mid) == false, then search [mid+1, right]
     //               if F(mid) == true, then search [left, mid-1]
     // F(mid)的值通过2.1.1和2.1.2共同得出
-    /* Runtime: 1ms (faster than 57.41%)
-       Memory: 36.5MB (less than 68.31%)
+    /* Runtime: 1ms (faster than 57.41%)     BS costs O(log(right)),每一次BS时要判断F(mid) which costs O(n) => O(nlog(right))
+       Memory: 36.5MB (less than 68.31%)     O(1)
      */
     public int splitArray(int[] nums, int m) {
         int left = nums[0];   // nums中元素最大值
@@ -25,14 +25,14 @@ public class Solution3 {
 
         // Step 2: Binary Search
         int ans = 0;
-        while (left <= right) {
+        while (left <= right) {    // O(log(right))
             // System.out.println("left: " + left + "right: " + right);
             int mid = left + (right - left) / 2;
             int sum = 0;
             int cnt = 1; // 初始即为一个array
             // 2.1 determine whether F(mid) is true or false
             // 2.1.1 利用变量sum保证到目前为止subarray的元素和不超过mid
-            for (int i = 0; i < len; i++) {
+            for (int i = 0; i < len; i++) {    // O(n)
                 if (sum + nums[i] > mid) { // 该分subarray了
                     cnt++;
                     sum = nums[i];
