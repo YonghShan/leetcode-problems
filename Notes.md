@@ -42,6 +42,14 @@
 
 *****
 
+[0173]：
+
++ Solution 1: next()参考了[0285] Solution 3: 每次执行next()，都需要O(n)，不好
++ Solution 2: 先执行一遍Inorder Traversal，再对遍历结果编写Iterator，最容易理解
++ Solution 3: ==Clever Trick==  总的过程相当于iterative inorder traversal，但是一开始只进行最左边的遍历，之后只有在调用next()时才继续剩下（向右）的遍历  ==Amortized O(1)==
+
+******
+
 [0285]：
 
 + Solution 1: 并没有利用BST inorder traversal得到的结果为升序的特性
