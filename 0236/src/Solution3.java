@@ -13,7 +13,7 @@ class Solution3 {
         TreeNode right = lowestCommonAncestor(root.right,p,q);
 
         if(left!=null && right!=null) return root; // 此时，说明p和q分别处于root的左子树和右子树中
-        else if(left!=null) return left; // p和q都处于root的左子树中
-        else return right;
+        else if(left!=null) return left; // 在当前root的左子树中发现了p或q
+        else return right; // // 在当前root的右子树中发现了p或q （不可能left和right都为null）
     }
 }

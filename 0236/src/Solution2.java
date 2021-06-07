@@ -15,7 +15,7 @@ class Solution2 {
     public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
         // PART I: Get the HashSet parent while traversing the tree
         // Stack for tree traversal
-        Deque<TreeNode> stack = new ArrayDeque<>();
+        Deque<TreeNode> stack = new ArrayDeque<>();  // 用的是deque作stack，肯定是DFS，但因为下面iterate时，先push left再push right，相当于镜像版的preorder traversal
         // HashMap for parent pointers
         Map<TreeNode, TreeNode> parent = new HashMap<>();
         parent.put(root, null);

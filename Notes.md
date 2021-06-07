@@ -2,6 +2,84 @@
 
 *****
 
+***Binary Search Tree的三个基本operations:***
+
+ ==TC都为O(heights), heights可以为n也可以为logn==
+
++ [0700] Search: Interation & Recursion
+
+  从root开始，相等则返回；不等则利用BST的大小分布特性，选择进入哪一个subtree
+
++ [0701] Insertion: Interation & Recursion
+
+  因为插入新node后，依旧要维持BST的property，所以第一步从root开始，做search操作，直到找到合适的空位
+
++ [0450] Deletion: Recursion
+
+  1. If the target node has ***no child***, we can simply remove the node.
+  2. If the target node has ***one child***, we can use its child to replace itself.
+  3. If the target node has ***two children***, replace the node with its in-order successor or predecessor node and delete that node.
+
+*****
+
+***Floyd's Algorithm:***
+
++ Phase 1: tortoise 一步一node；hare 一步二nodes    $\implies$    两者在intersection相遇
++ Phase 2: ==因为intersection并不一定是the entrance of the cycle，所以还需要Phase 2== tortoise 回到起点一步一node；hare 待在intersection一步一node    $\implies$    两者在entrance相遇
+
+*****
+
+***关于ArrayList和LinkedList的选用：***
+
++ Search by value - ==indexOf():== Time complexity都为O(n)，但是ArrayList将元素连续地存放在一起，而LinkedList则是在内存中随机存放，所以ArrayList实际运行会更快；
++ Get element by index - ==get():== ArrayList只需O(1) as the array has random access property, 可以直接访问任意index而不需要从头遍历（也是因为ArrayList在内存中是连续存储），但是LinkedList需要O(n)，it needs to iterate through each element to reach a given index。
+
+*****
+
+***PriorityQueue & Min/Max Heap：***
+
++ PriorityQueue: 从队首获取元素时，总是获取优先级最高的元素
+
+  + 创建：`PriorityQueue<> pq = new PriorityQueue<>();`
+
+  + Common Method Summary:
+
+    + add() / offer()
+    + clear()
+    + contains()
+    + remove() / poll()：==返回的总是优先级最高的元素== 对于min heap，最返回最小的元素，反之亦然
+    + toArray()
+    + peek()
+    + size()
+
+  + `Comparator`自定义排序算法：==默认升序排列，即维护了一个min heap==
+
+    ```java
+    Queue<Object> priorityQueue = new PriorityQueue<>((optional)size, new Comparator<Object>(){
+      @Override
+      public int compare(Object o1, Object o2) {
+        return o2.val-o1.val; // 当o2.val > o1.val时，return一个正数，即交换o1和o2的顺序，故实现max heap
+      }
+    });
+    ```
+
++ Min/Max Heap:
+
+  + Min Heap: a complete binary tree in which the value in each internal node is smaller than or equal to the values in the children of that node. （即：越小，优先级越高）
+  + Max Heap: a complete binary tree in which the value in each internal node is bigger than or equal to the values in the children of that node. （即：越大，优先级越高）
+
+******
+
+
+
+
+
+
+
+
+
+**********
+
 [0001]：Solution2 - Trick: 如何one pass同时完成对HashMap的insert和search
 
 *******
@@ -136,7 +214,14 @@ if (s != null) {
 
 *****
 
-[719]：
+[0709]：
+
++ Solution 1: PriorityQueue 构建min heap  ==最简单，也最容易想到==
++ Solution 2: https://leetcode.com/explore/learn/card/introduction-to-data-structure-binary-search-tree/142/conclusion/1009/ 是个有趣的思路，但没必要且不好理解
+
+******
+
+[0719]：
 
 + Naive method: 找到所有pair的difference $(O(n^2))$ $\rightarrow$ sort the differences $(O(n^2log(n^2)))$ $\rightarrow$ 找到第kth小的value.
 

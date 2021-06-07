@@ -8,7 +8,7 @@ import java.util.HashMap;
  */
 
 class Solution1 {
-    // Algorithm: 首先判断p和q是否在同一个subtree中，如果不在，则判断p.parent和q是否在一个树中
+    // Algorithm: 首先判断q是否在以p为root的subtree中，如果不在，则判断q是否在以p.parent为root的subtree中
     /* Runtime： 4ms (faster than 100%)
        Memory: 39.8MB (less than 96.16%)
      */
