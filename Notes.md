@@ -31,8 +31,8 @@
 
 ***关于ArrayList和LinkedList的选用：***
 
-+ Search by value - ==indexOf():== Time complexity都为O(n)，但是ArrayList将元素连续地存放在一起，而LinkedList则是在内存中随机存放，所以ArrayList实际运行会更快；
-+ Get element by index - ==get():== ArrayList只需O(1) as the array has random access property, 可以直接访问任意index而不需要从头遍历（也是因为ArrayList在内存中是连续存储），但是LinkedList需要O(n)，it needs to iterate through each element to reach a given index。
++ Search by value - `indexOf()`: Time complexity都为O(n)，但是ArrayList将元素连续地存放在一起，而LinkedList则是在内存中随机存放，所以ArrayList实际运行会更快；
++ Get element by index - `get()`: ArrayList只需O(1) as the array has random access property, 可以直接访问任意index而不需要从头遍历（也是因为ArrayList在内存中是连续存储），但是LinkedList需要O(n)，it needs to iterate through each element to reach a given index。
 
 *****
 
@@ -126,6 +126,50 @@
 + Solution 2: 先执行一遍Inorder Traversal，再对遍历结果编写Iterator，最容易理解
 + Solution 3: ==Clever Trick==  总的过程相当于iterative inorder traversal，但是一开始只进行最左边的遍历，之后只有在调用next()时才继续剩下（向右）的遍历  ==Amortized O(1)==
 
+*****
+
+[0235]：利用[0236] Solution 3的思路
+
++ 区别：与[0236] Solution 3不同的是，在确定p和q是否位于当前node的子树中时，可以利用val的大小来判断
+
+*****
+
+[0236]：三种方法都算得上巧妙
+
++ Solution 1: 理论上复杂度应该较高 (> O(n))，但实际performance不错（?）
+
+  + 首先判断q是否在以p为root的subtree中 (`isInTheTree(p, q)`)，如果不在，则判断q是否在以p.parent (循环`findParent()`) 为root的subtree中    ==最容易想到和理解==
+  + `isInTheTree()`和`findParent()`两个方法的实现可以参考，非常简洁 
+
++ Solution 2: Iteration with pointer parent   ==“笨“方法==
+
+  + 首先，从root向下遍历，并且将tree中每个node和其parent作为一对放入HashSet parent中；
+  + 然后，利用HashSet parent中的内容，得到p的ancestors (即：p的父节点，以及父节点的父节点...)；
+  + 最后，判断q是否出现在p的ancestors中，如果没有，则q置为q的parent，继续判断
+
++ Solution 3: Recursion "Top-down"   ==代码最简练且performance优秀，但是较难理解==
+
+  + 如果root不是p和q的LCA，那就判断root.left或者root.right是不是p和q的LCA
+
+  + （从下往上的角度）更具体地解释代码，其实是从root开始，向下recursion的过程，为每个node都赋予left和right属性。如果left或者right不为null，则说明该node的左子树或者右子树中有p或者q（或者两者都有）。因此，当left child的left或者right不为null时，作为parent其left即不为null，同理，当right child的left或者right不为null时，其right即不为null。直到发现一个parent，它的left和right都不null，即这个node为p和q的LCA。
+
+  + （从上往下的角度）
+
+    + Start traversing the tree from the root node.
+    + If both the nodes p and q are in the right subtree, then continue the search with right subtree starting step 1.
+    + If both the nodes p and q are in the left subtree, then continue the search with left subtree starting step 1.
+    + If both step 2 and step 3 are not true, this means we have found the node which is common to node p's and q's subtrees. and hence we return this common node as the LCA.
+
+    *e.g.* node A有左孩子B和右孩子C，此时：
+
+    ​       B的left不为null，但right为null，即B的左子树中有p / q $\implies$ A的left不为null
+
+    ​       C的left不为null，但right为null，即C的左子树中有q / p $\implies$ A的right不为null
+
+    ​      $\implies$ A是一个left和right都不为null的node $\implies$ A为LCA
+
++ [0235] & [0236]都是规定了p和q都存在于BST中，如果==不清楚p和q是否存在==时，最简单的方法是先在BST中搜索两者，takes O(n) in worst case，并不会提高复杂度。
+
 ******
 
 [0285]：
@@ -139,8 +183,8 @@
 + Solution 2: 并没有利用BST inorder traversal得到的结果为升序的特性 （采用ArrayList）==可以为任一Binary Tree中的node寻找successor==
 
   + ==Tips: 关于ArrayList和LinkedList的选用==
-    + Search by value - ==indexOf():== Time complexity都为O(n)，但是ArrayList将元素连续地存放在一起，而LinkedList则是在内存中随机存放，所以ArrayList实际运行会更快；
-    + Get element by index - ==get():== ArrayList只需O(1) as the array has random access property, 可以直接访问任意index而不需要从头遍历（也是因为ArrayList在内存中是连续存储），但是LinkedList需要O(n)，it needs to iterate through each element to reach a given index。
+    + Search by value - `indexOf()`: Time complexity都为O(n)，但是ArrayList将元素连续地存放在一起，而LinkedList则是在内存中随机存放，所以ArrayList实际运行会更快；
+    + Get element by index - `get()`: ArrayList只需O(1) as the array has random access property, 可以直接访问任意index而不需要从头遍历（也是因为ArrayList在内存中是连续存储），但是LinkedList需要O(n)，it needs to iterate through each element to reach a given index。
 
 + Solution 3: ==最佳== 利用了BST的特性
 
