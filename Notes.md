@@ -4,7 +4,7 @@
 
 ***Binary Search Tree的三个基本operations:***
 
- ==TC都为O(heights), heights可以为n也可以为logn==
+ ==TC都为$O(heights)$, $heights$可以为$n$也可以为$logn$==
 
 + [0700] Search: Interation & Recursion
 
@@ -20,6 +20,8 @@
   2. If the target node has ***one child***, we can use its child to replace itself.
   3. If the target node has ***two children***, replace the node with its in-order successor or predecessor node and delete that node.
 
+In Java, you may use a ==TreeSet== or a ==TreeMap== as a self-balancing BST.
+
 *****
 
 ***Floyd's Algorithm:***
@@ -31,8 +33,8 @@
 
 ***关于ArrayList和LinkedList的选用：***
 
-+ Search by value - `indexOf()`: Time complexity都为O(n)，但是ArrayList将元素连续地存放在一起，而LinkedList则是在内存中随机存放，所以ArrayList实际运行会更快；
-+ Get element by index - `get()`: ArrayList只需O(1) as the array has random access property, 可以直接访问任意index而不需要从头遍历（也是因为ArrayList在内存中是连续存储），但是LinkedList需要O(n)，it needs to iterate through each element to reach a given index。
++ Search by value - `indexOf()`: Time complexity都为$O(n)$，但是ArrayList将元素连续地存放在一起，而LinkedList则是在内存中随机存放，所以ArrayList实际运行会更快；
++ Get element by index - `get()`: ArrayList只需$O(1)$ as the array has random access property, 可以直接访问任意index而不需要从头遍历（也是因为ArrayList在内存中是连续存储），但是LinkedList需要$O(n)$，it needs to iterate through each element to reach a given index。
 
 *****
 
@@ -68,6 +70,10 @@
   + Min Heap: a complete binary tree in which the value in each internal node is smaller than or equal to the values in the children of that node. （即：越小，优先级越高）
   + Max Heap: a complete binary tree in which the value in each internal node is bigger than or equal to the values in the children of that node. （即：越大，优先级越高）
 
+*****
+
+
+
 ******
 
 
@@ -96,7 +102,7 @@
 
 + Solution3：Solution2的Iteration实现
 
-+ Solution4：==推荐== 利用对于valid BST来说，其inorder traversal的结果是an ascending order的特性来判断是否为valid BST，关键判断为
++ Solution4：==***推荐***== 利用对于valid BST来说，其inorder traversal的结果是an ascending order的特性来判断是否为valid BST，关键判断为
 
   ```java
   if (prev != null && root.val <= prev) {  // recursion: root
@@ -122,9 +128,71 @@
 
 [0173]：
 
-+ Solution 1: next()参考了[0285] Solution 3: 每次执行next()，都需要O(n)，不好
++ Solution 1: next()参考了[0285] Solution 3: 每次执行next()，都需要$O(n)$，不好
 + Solution 2: 先执行一遍Inorder Traversal，再对遍历结果编写Iterator，最容易理解
-+ Solution 3: ==Clever Trick==  总的过程相当于iterative inorder traversal，但是一开始只进行最左边的遍历，之后只有在调用next()时才继续剩下（向右）的遍历  ==Amortized O(1)==
++ Solution 3: ==***Clever Trick***==  总的过程相当于iterative inorder traversal，但是一开始只进行最左边的遍历，之后只有在调用next()时才继续剩下（向右）的遍历  ==Amortized $O(1)$==
+
+******
+
+[0217]：Contains Duplicate
+
++ Solution 1 & 2: 最intuitive的思路：用HashSet $O(n)$，两种判断方法：
+
+  + `set.contains()`
+  + `set.size() == 原数组的长度 ?`
+
++ Solution 3: 先sort $O(nlogn)$，然后`nums[i] == nums[i+1] ?`
+
+  当待判定的数组的长度不是很大(not sufficiently large)时，Solution 3会比Solution 1快
+
+  ==The Big-O notation only tells us that for sufficiently large input, one will be faster than the other.==
+
+*******
+
+[0219]：Contains Duplicate II：在索引值差k的范围内，有两数相同（`nums[i]==nums[j] && |i-j|≤k`）
+
++ Solution 1: 将每个数依次与其后的k个数（注意别超限）比较（是否相同） $\implies$ $O(n^2$)
+
++ Solution 2 & 3: 都采用==滑动窗口==，但是一个用==HashSet==作为窗口，一个用==TreeSet (BST)==作为窗口 
+
+  + 代码：
+
+    ```java
+    for (int i = 0; i < nums.length; i++) {    // O(n)
+      	if (set.contains(nums[i])) return true;      // Search
+      	set.add(nums[i]);                            // Insert/Add
+      	if (set.size() > k) set.remove(nums[i-k]);   // Delete
+    }
+    return false;
+    ```
+
+  + 区别：
+
+    + 对于HashSet，Search / Insert / Delete all takes $O(1)$；
+    + 对于TreeSet，Search / Insert / Delete all takes $O(logk$).
+
+*****
+
+[0220]：Contains Duplicate III：在索引值差k的范围内，有两数相差t（`|nums[i]-nums[j]|≤t && |i-j|≤k`）
+
++ Solution 1: 将每个数依次与其后的k个数（注意别超限）比较（是否相差t以内） $\implies$ $O(n^2$)
+
++ Solution 2: TreeSet (BST) as Sliding Window  $\implies$ $O(nlog(min(n,k)))$
+
+  1. 维护一个长度为k的BST，在将每个值`nums[i]`放入BST之前，利用TreeSet的`ceiling()`和`floor()`方法分别寻找到当前BST中大于或等于`nums[i]`的最小值ceiling，以及小于或等于`nums[i]`的最大值floor；==注意：这两个值可能不存在== 
+
+  2. 如果ceiling或floor与`nums[i]`相差t，则找到duplicate。
+
+  如果在k的范围内，存在一个大于`nums[i]`的数与其相差t，那么ceiling也一定与`nums[i]`相差t；同理，如果在k的范围内，存在一个小于`nums[i]`的数与其相差t，那么floor也一定与`nums[i]`相差t。
+
++ Solution 3: ==***Clever Trick***== Inspired by Bucket Sort $\implies O(n)$
+
+  假设每个桶的宽度为t+1，则原数组中的每个数都可以放进相应的桶中。用一个`HashMap(bucketID, nums[i]) buckets`记录每个桶中所放的`nums[i]`。当出现以下三种情况之一时，找到duplicate：
+
+  + `nums[i]`对应的桶中已有值：`buckets.containsKey(bucketID)`;
+
+  + `nums[i]`对应的桶中无值，但前一个桶中有值，且与其相差t：`buckets.containsKey(bucketID - 1) && Math.abs(buckets.get(bucketID-1)-nums[i]) <= t`;
+  + `nums[i]`对应的桶中无值，但后一个桶中有值，且与其相差t：`buckets.containsKey(bucketID + 1) && Math.abs(buckets.get(bucketID+1)-nums[i]) <= t`.
 
 *****
 
@@ -136,7 +204,7 @@
 
 [0236]：三种方法都算得上巧妙
 
-+ Solution 1: 理论上复杂度应该较高 (> O(n))，但实际performance不错（?）
++ Solution 1: 理论上复杂度应该较高 (> $O(n)$)，但实际performance不错（?）
 
   + 首先判断q是否在以p为root的subtree中 (`isInTheTree(p, q)`)，如果不在，则判断q是否在以p.parent (循环`findParent()`) 为root的subtree中    ==最容易想到和理解==
   + `isInTheTree()`和`findParent()`两个方法的实现可以参考，非常简洁 
@@ -168,7 +236,7 @@
 
     ​      $\implies$ A是一个left和right都不为null的node $\implies$ A为LCA
 
-+ [0235] & [0236]都是规定了p和q都存在于BST中，如果==不清楚p和q是否存在==时，最简单的方法是先在BST中搜索两者，takes O(n) in worst case，并不会提高复杂度。
++ [0235] & [0236]都是规定了p和q都存在于BST中，如果==不清楚p和q是否存在==时，最简单的方法是先在BST中搜索两者，takes $O(n)$ in worst case，并不会提高复杂度。
 
 ******
 
@@ -183,8 +251,8 @@
 + Solution 2: 并没有利用BST inorder traversal得到的结果为升序的特性 （采用ArrayList）==可以为任一Binary Tree中的node寻找successor==
 
   + ==Tips: 关于ArrayList和LinkedList的选用==
-    + Search by value - `indexOf()`: Time complexity都为O(n)，但是ArrayList将元素连续地存放在一起，而LinkedList则是在内存中随机存放，所以ArrayList实际运行会更快；
-    + Get element by index - `get()`: ArrayList只需O(1) as the array has random access property, 可以直接访问任意index而不需要从头遍历（也是因为ArrayList在内存中是连续存储），但是LinkedList需要O(n)，it needs to iterate through each element to reach a given index。
+    + Search by value - `indexOf()`: Time complexity都为$O(n)$，但是ArrayList将元素连续地存放在一起，而LinkedList则是在内存中随机存放，所以ArrayList实际运行会更快；
+    + Get element by index - `get()`: ArrayList只需$O(1)$ as the array has random access property, 可以直接访问任意index而不需要从头遍历（也是因为ArrayList在内存中是连续存储），但是LinkedList需要$O(n)$，it needs to iterate through each element to reach a given index。
 
 + Solution 3: ==最佳== 利用了BST的特性
 
@@ -312,7 +380,7 @@ if (s != null) {
 
   + 正则表达式的写法: 双斜杠转义
 
-  + 判断word是否在String[] banned时: `Arrays.asList(banned).contains(word)`  有点蠢，asList大概率takes O(m), contains takes O(m), for循环n次，则takes O(nm), 不如提前用banned建立一个HashSet.
+  + 判断word是否在String[] banned时: `Arrays.asList(banned).contains(word)`  有点蠢，asList大概率takes $O(m)$, contains takes $O(m)$, for循环n次，则takes $O(nm)$, 不如提前用banned建立一个HashSet.
 
   + 自定义
 
