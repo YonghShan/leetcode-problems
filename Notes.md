@@ -156,6 +156,27 @@ The essential difference between the hash set and the tree set is that ==keys in
 
 ******
 
+[0108]：Convert (strictly increrasing) Sorted Array to (height-balanced) Binary Search Tree
+
+题目关键是：height-balanced BST，所以root必须要选取array中排在中间的值。而root的左右子树则可以通过recursion的方式取得。
+
+```java
+public TreeNode helper(int left, int right) {
+  	if (left > right) return null;
+
+  	int rootIdx = left + (right - left) / 2;
+  	TreeNode root = new TreeNode(nums[rootIdx]);
+  	// root的左子树由[left, rootIdx-1]范围内的数组构成
+  	root.left = helper(left, rootIdx-1);
+  	// root的右子树由[rootIdx+1, right]范围内的数组构成
+  	root.right = helper(rootIdx+1, right);
+
+  	return root;
+}
+```
+
+******
+
 [0110]：
 
 + Solution 1: Top-down
@@ -272,7 +293,7 @@ The essential difference between the hash set and the tree set is that ==keys in
   }
   ```
 
-  | mums[i] | bucketID |
+  | nums[i] | bucketID |
   | :-----: | :------: |
   |   -9    |    -3    |
   |   -5    |    -2    |
@@ -458,6 +479,33 @@ if (s != null) {
 
   + main Binary Search的left直接定为0
   + 简化如何找到difference $\le$ mid的pair的数量部分
+
+******
+
+[0724]：Find Pivot Index
+
+惟一要注意的点是：pivot index可以为0或者nums.length-1，只要剩余部分之和为0即可。Two pointers一首一尾向中间逼近的做法并不能满足这个条件。
+
+Solution1 / 2相同，只是Solution1中要不断更新rightSum和leftSum两个值，而Solution2只要更新leftSum。
+
+```java
+int leftSum = 0;
+for (int i = 0; i < nums.length; i++) {     // O(n)
+  	if (leftSum == totalSum - leftSum - nums[i]) return i;
+  	leftSum += nums[i];
+}
+```
+
+*******
+
+[0747]：Largest Number At Least Twice of Others
+
+定义maxIdx和secondMaxIdx（==secondMaxIdx不能和maxIdx一样从0开始==，可初始化为除0以外的任意值），最终比较`nums[maxIdx] >= 2 * nums[secondMaxIdx]` 。
+
+在从左到右遍历元素的过程中，需要注意的点是：
+
++ 如果maxIdx变动，则secondMaxIdx变为原本的maxIdx；
++ 如果maxIdx不变，依旧需要判断需不需要更新secondMaxIdx。
 
 *****
 
