@@ -131,6 +131,35 @@ The essential difference between the hash set and the tree set is that ==keys in
 
 [0021]：无论是Iteration还是Recursion，关键都是比较l1.val和l2.val
 
+*******
+
+[0066]：Plus One (==操作对象是array==)
+
+一个数组表示一个数字，*e.g.* [1,2,3]表示数123，现在需对该数+1变为124，返回相应的数组[1,2,4]
+
+注意的点：
+
+1. 当前位的值为9，+1后存在进位；
+
+   ```java
+   for (int i = len-1; i >= 0; i--) {
+       if (digits[i] == 9) {
+           digits[i] = 0;
+       } else {
+           digits[i] += 1;
+           return digits;
+       }
+   }
+   ```
+
+2. 从最低位至最高位全都存在进位，原数组长度需+1。
+
+   ```java
+   digits = new int[len+1];
+   digits[0] = 1;
+   return digits;
+   ```
+
 *****
 
 [0098]：一共5种方法
