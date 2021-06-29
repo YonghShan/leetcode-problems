@@ -115,6 +115,76 @@ The essential difference between the hash set and the tree set is that ==keys in
 
 ******
 
+***Integer:***
+
++ `Integer.parseInt(String s, int radix)` - 输出一个十进制数，其中`int radix `表示`String s`的进制
+
+  *e.g.* `Integer.parseInt("1011", 2)` - 输出二进制数"1011"在十进制下的数，即11
+
++ `Integer.toBinaryString` - 输出一个二进制字符串（即字符串的内容是二进制数，如"1011"）
+
+******
+
+***异或 XOR (exclusive OR) :***
+
++ 表示：$\bigoplus$（数学符号）、^（程序符号）
+
++ 性质：
+
+  1. 如果a、b两个值不相同，则异或结果为1。如果a、b两个值相同，异或结果为0。
+
+     $0$ ^ $0=0$          $0$ ^ $1=1$          $1$ ^ $1=0$           助记: ==不带进位的加法==
+
+  2. 交换律：$a$ ^ $b=b$ ^ $a$
+
+  3. 结合律：$a$ ^ $b$ ^ $c=a$ ^ $(b$ ^ $c)=(a$ ^ $b)$ ^ $c$
+
+  4. ==归零律：$x$ ^ $x=0$==
+
+  5. ==恒等律：$x$ ^ $0=x$==
+
+  6. ==自反性：$a$ ^ $b$ ^ $a=b$==
+
++ 应用：
+
+  1. 在不引入中间变量的情况下，交换两个变量的值：
+
+     ```java
+     int a = 5, b = 10;
+     a = a ^ b;   
+     b = a ^ b;   // b = a ^ b ^ b = a
+     a = a ^ b;   // a = a ^ b ^ a = b
+     ```
+
+  2. 一个数组中包含从1~1000共1001个元素，只有一个元素值重复，其他均只出现一次。每个数组元素只能访问一次，且不用辅助存储空间，找出该元素？
+
+     *Algorithm:* 将所有数异或后，得到的结果与$1$ ^ $2$ ^ $...$ ^ $999$ ^ $1000$ 的结果 $T$ 进行异或，得到的结果即为重复元素。
+
+     *Analysis:* 假设第$n$个数重复，则数组中所有数的异或结果为$1$ ^ $2$ ^ $...$ ^ $n$ ^ $n$ ^ $...$ ^ $999$ ^ $1000$ $=$ $T$ ^ $n$。再与 $T$ 进行异或：$T$ ^ $n$ ^ $T$ $=n$。
+
+  3. Google面试题的变形：一个数组存放若干整数，一个数出现奇数次，其余数均出现偶数次，找出这个出现奇数次的数？
+
+     ```java
+     public void fun() {
+         int a[] = { 22, 38,38, 22,22, 4, 4, 11, 11 };
+         int temp = 0;
+         for (int i = 0; i < a.length; i++) {
+             temp ^= a[i];
+         }
+         System.out.println(temp);
+     }
+     ```
+
++ LeetCode中的相关题目：
+
+  [0067]     [0137]     [0187]     [0260]     [0318]      [0421]     
+
+******
+
+
+
+
+
 
 
 
@@ -159,6 +229,67 @@ The essential difference between the hash set and the tree set is that ==keys in
    digits[0] = 1;
    return digits;
    ```
+
+********
+
+[0067]：Add Binary (==将两个binary strings相加==)
+
+*e.g.* Sting a = "11", String b = "1" $\rightarrow$ a + b = "11" + "1" = "100" (二进制数相加)
+
++ 最简单的做法：将a和b都转换为二进制数字，相加后在转化为二进制字符串：
+
+  ```java
+  return Integer.toBinaryString(Integer.parseInt(a, 2) + Integer.parseInt(b, 2));
+  ```
+
+  Drawbacks:
+
+  + a和b所表示的二进制数很长时，其对应的十进制数可能超过Integer / Long / BigInteger的范围；
+
+    如果字符串超过 3333 位，不能转化为 Integer；
+    如果字符串超过 6565 位，不能转化为 Long；
+    如果字符串超过 500000001 位，不能转化为 BigInteger。
+
+  + quite low performance ($\mathcal{O}(n+m)$, where $n$ and $m$ are the lengths of the input binary strings a and b) in the case of large input numbers.
+
++ 最intuitive的做法：从最低位逐位相加，注意进位即可
+
+  *LeetCode Approach 1: Bit-by-Bit Computation就是这个思路，但是解释和代码都写得吊诡。*
+
+  ```java
+  public String addBinary(String a, String b) {
+      StringBuffer ans = new StringBuffer();
+  
+    	int i = a.length() - 1;
+    	int j = b.length() - 1;
+      int carry = 0;
+      for(; i >= 0 || j >= 0; i--, j--) {  // 从最低位开始相加，同时决定了TC为O(max(n, m))
+        	// a和b的长度不一定相等，较短的用0补齐
+          carry += i >= 0 ? a.charAt(i) - '0' : 0;
+          carry += j >= 0 ? b.charAt(j) - '0' : 0;
+        	// 至此，carry的值是由上一位的进位、a和b当前位的值，一共三个数相加后得到的
+        	// 一共有3种可能：0（三个数都为0），1（有一个数为1），2（有两个数为1），3（全为1）
+        	// 如果此时为0，则ans中记0，carry为0；
+        	// 如果此时为1，则ans中记1，carry为0；
+        	// 如果此时为2，则ans中记0，carry为1；
+        	// 如果此时为3，则ans中记1，carry为1.
+          ans.append(carry % 2);
+          carry = carry / 2;
+      }
+    
+  		// 最后如果有进位，则在前方进行字符串拼接添加进位
+      ans.append(carry == 1 ? carry : "");
+      return ans.reverse().toString();
+  }
+  ```
+
++ 如果要求不可以addition，则使用bit manipulation实现：
+
+  ==此方法的对象不仅可以是binary strings，也可以是Integers==（facebook面试题：不使用加法运算的情况下，两数相加）
+
+  
+
+  
 
 *****
 
