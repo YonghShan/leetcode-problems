@@ -4,8 +4,8 @@
  */
 public class Solution1 {
     // 从最低位逐位相加，注意进位即可
-    /* Runtime: 2ms (faster than 74.66%)    O(max(n, m)), where n = a.size(), m = b.size()
-       Memory: 37.8MB (less than 79.07%)    O(
+    /* Runtime: 2ms (faster than 74.66%)    O(max(n,m)), where n = a.size(), m = b.size()
+       Memory: 37.8MB (less than 79.07%)    O(max(n,m)) to keep the answer
      */
     public String addBinary(String a, String b) {
         StringBuffer ans = new StringBuffer();

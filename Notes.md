@@ -125,25 +125,47 @@ The essential difference between the hash set and the tree set is that ==keys in
 
 ******
 
+***Bitwise Operators：***
+
++ $-x=\neg x+1$ : Two's complement 补码
+
+  ![](/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/bitwiseOperators_1.png)
+
++ $x \& (-x)$ : Get / isolate the rightmost 1-bit
+
+  ![](/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/bitwiseOperators_2.png)
+
++ $x \& (x-1)$ : Turn off (= set to 0) the rightmost 1-bit
+
+  ![](/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/bitwiseOperators_3.png)
+
++ LeetCode中的相关题目：
+
+  [0231]      [0260]
+
+******
+
 ***异或 XOR (exclusive OR) :***
 
 + 表示：$\bigoplus$（数学符号）、^（程序符号）
 
 + 性质：
 
-  1. 如果a、b两个值不相同，则异或结果为1。如果a、b两个值相同，异或结果为0。
+  1. $p \bigoplus q = (p \and \neg q) \or (\neg p \and q)$
+
+  2. 如果a、b两个值不相同，则异或结果为1。如果a、b两个值相同，异或结果为0。
 
      $0$ ^ $0=0$          $0$ ^ $1=1$          $1$ ^ $1=0$           助记: ==不带进位的加法==
 
-  2. 交换律：$a$ ^ $b=b$ ^ $a$
+  3. 交换律：$a$ ^ $b=b$ ^ $a$
 
-  3. 结合律：$a$ ^ $b$ ^ $c=a$ ^ $(b$ ^ $c)=(a$ ^ $b)$ ^ $c$
+  4. 结合律：$a$ ^ $b$ ^ $c=a$ ^ $(b$ ^ $c)=(a$ ^ $b)$ ^ $c$
 
-  4. ==归零律：$x$ ^ $x=0$==
+  5. ==归零律：$x$ ^ $x=0$==
 
-  5. ==恒等律：$x$ ^ $0=x$==
+  6. ==恒等律：$x$ ^ $0=x$==
 
-  6. ==自反性：$a$ ^ $b$ ^ $a=b$==
+  7. ==自反性：$a$ ^ $b$ ^ $a=b$==
 
 + 应用：
 
@@ -175,9 +197,11 @@ The essential difference between the hash set and the tree set is that ==keys in
      }
      ```
 
+  4. Facebook面试题：不使用加法运算的情况下，两数相加   [0067]  
+
 + LeetCode中的相关题目：
 
-  [0067]     [0137]     [0187]     [0260]     [0318]      [0421]     
+  [0067]     [0136]     [0137]     [0187]     [0260]     [0318]      [0421]     
 
 ******
 
@@ -203,7 +227,7 @@ The essential difference between the hash set and the tree set is that ==keys in
 
 *******
 
-[0066]：Plus One (==操作对象是array==)
+[0066]：Plus One (==操作对象是array==)      [0369]
 
 一个数组表示一个数字，*e.g.* [1,2,3]表示数123，现在需对该数+1变为124，返回相应的数组[1,2,4]
 
@@ -252,7 +276,7 @@ The essential difference between the hash set and the tree set is that ==keys in
 
   + quite low performance ($\mathcal{O}(n+m)$, where $n$ and $m$ are the lengths of the input binary strings a and b) in the case of large input numbers.
 
-+ 最intuitive的做法：从最低位逐位相加，注意进位即可
++ 最intuitive的做法：从最低位逐位相加，注意进位即可      $\mathcal{O}(max(n,m))$
 
   *LeetCode Approach 1: Bit-by-Bit Computation就是这个思路，但是解释和代码都写得吊诡。*
 
@@ -283,13 +307,23 @@ The essential difference between the hash set and the tree set is that ==keys in
   }
   ```
 
-+ 如果要求不可以addition，则使用bit manipulation实现：
++ 如果要求不可以addition，则使用bit manipulation实现：   $\mathcal{O}(n+m)$
 
-  ==此方法的对象不仅可以是binary strings，也可以是Integers==（facebook面试题：不使用加法运算的情况下，两数相加）
+  ==此方法的对象不仅可以是binary strings，也可以是Integers==（Facebook面试题：不使用加法运算的情况下，两数相加）
 
+  *依据：*
+
+  1. 不带进位的加法：异或
+  2. 进位：与操作后左移一位
   
-
+  *Algorithm:*
   
+  - Convert a and b into integers x and y, x will be used to keep an answer, and y for the carry.
+  - While carry is nonzero: `y != 0`:
+    - Current answer without carry is XOR of x and y: `answer = x^y`.
+    - Current carry is left-shifted AND of x and y: `carry = (x & y) << 1`.
+    - Job is done, prepare the next loop: `x = answer`, `y = carry`.
+  - Return x in the binary form.
 
 *****
 
@@ -363,6 +397,81 @@ public TreeNode helper(int left, int right) {
 + Solution 2: Bottom-up    ==***Clever Trick***==
 
   Since the height of a tree is always greater than or equal to 0, we use -1 as a flag to indicate if the subtree is not balanced. 在`getHeight()`中增加判断，以决定是否return -1. 因此，`isBalanced(node)`中不再需要recursion.    $\implies \mathcal{O}(n)$
+
+******
+
+[0136]：Single Number：数组中除了一个数只出现1次，其他都出现2次。在==liner time==和==no extra space==的情况下，找出该数字。
+
+```java
+public int singleNumber(int[] nums) {
+    int a = 0;
+    for (int i : nums) a ^= i;
+    return a;
+}
+```
+
+******
+
+[0137]：Single Number II：数组中除了一个数只出现1次，其他都出现3次。在==liner time==和==no extra space==的情况下，找出该数字。
+
+如果没有linear time和no extra space的限制：
+
++ HashSet：将数组中的元素放入HashSet中，比较数组元素之和和HashSet之和  -  linear time & extra space
++ HashMap：记录数组中每个元素及其对应的出现次数  -  linear time & extra space
++ Sort：排序原数组后，寻找`nums[i] != nums[i+1]`  -  nonlinear time & no extra space
+
+为了满足限制，只能Bit Manipulation：
+
++ Solution 1: 确定只出现一次的数字（即答案）的每一个二进制位值（是0还是1）      $\mathcal{O}(32n)=\mathcal{O}(n)$
+
+  *Algorithm:* 将数组中每一个元素的同一二进制位相加，得到的结果对3取余，即为答案在该位的二进制值
+
+  *Analysis:* 对于数组中非答案的元素，每一个元素都出现了 3 次，对应着第 $i$ 个二进制位的 3 个 0 或 3 个 1，无论是哪一种情况，它们的和都是 3 的倍数（即和为 0 或 3）。此时加上答案在第 $i$ 位的值后，得到总和。将总和除以3，得到的即为答案在在第 $i$ 位的二进制值。
+
+  ```java
+  public int singleNumber(int[] nums) {
+      int ans = 0;
+      for (int i = 0; i < 32; ++i) {  // 数组中的元素都在int（即32位整数）范围内: O(32)
+          int total = 0;
+          for (int num : nums) { // O(n)
+            	total += ((num >> i) & 1);  // 将num右移i位后和1与，即可得到该num在第i位的二进制值
+          }
+          if (total % 3 != 0) { // 如果取余结果为0，不需要更改ans中对应位的值，因为默认即为0
+            	// 但是取余结果若为1，则需要更改
+            	ans |= (1 << i);  // 将1向左移i位后，变为第i位为1，其余全为0的数；再与ans或，即可将ans的第i位置为1
+          }
+      }
+      return ans;
+  }
+  ```
+
++ Solution 2：
+
+  存在两个32位bitmaps `seen_once` & `seen_twice`：当某元第一次出现时，将其加入`seen_once`中；当该元素第二次出现时，将其从`seen_once`中删去，加入`seen_twice`中；当该元素第三次出现时，将其从`seen_twice`中删去。
+
+  $\implies$ 某元素只出现一次，其最终留在 `seen_once` 中；某元素出现三次，则两个bitmaps都无其值。
+
+  ![](/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/[0137].png)
+
+  由此可写出代码：  ==按位与的优先级大于异或，所以加括号==
+
+  ```java
+  public int singleNumber(int[] nums) {
+      int seenOnce = 0, seenTwice = 0;
+  
+      for (int num : nums) {
+        // first appearence: add num to seen_once 
+        // second appearance: remove num from seen_once, add num to seen_twice
+        // third appearance: remove num from seen_twice
+        seenOnce = ~seenTwice & (seenOnce ^ num);  
+        seenTwice = ~seenOnce & (seenTwice ^ num);
+      }
+  
+      return seenOnce;
+  }
+  ```
+
+  *Analysis:* https://leetcode-cn.com/problems/single-number-ii/solution/single-number-ii-mo-ni-san-jin-zhi-fa-by-jin407891/
 
 *****
 
@@ -506,6 +615,61 @@ public TreeNode helper(int left, int right) {
 
 + [0235] & [0236]都是规定了p和q都存在于BST中，如果==不清楚p和q是否存在==时，最简单的方法是先在BST中搜索两者，takes $\mathcal{O}(n)$ in worst case，并不会提高复杂度。
 
+*****
+
+[0260]：Single NUmber III：数组中除了两个数（$x$、$y$）只出现1次，其他都出现2次。在==liner time==和==no extra space==的情况下，找出这两个数字，顺序随意。
+
++ 区分出现奇数次和偶次数的数：XOR
+
+  ```java
+  int bitmask = 0;
+  for (int num : nums) bitmask ^= num;   // 循环结束后，bitmask = x ^ y
+  ```
+
++ 剩下的任务是怎么将 $x$ 和 $y$ 分开：
+
+  + 利用 $bitmask \& (-bitmask)$ isolate the rightmost 1-bit in `bitmask`：==同样也是 $x$ 和 $y$ 存在区别的rightmost 1-bit==
+
+    ![](/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/[260].png)
+
+    ```java
+    // rightmost 1-bit diff between x and y
+    int diff = bitmask & (-bitmask);
+    ```
+
+    *补充：* 
+
+    Let $x=00000111$, $y=00010111$, then the rightmost 1-bit, which is different between $x$ and $y$ is: 
+    $$
+    \begin{aligned}
+    00000111 \\
+    \underline{XOR \quad 00010111} \\
+    00010000 \\ 
+    \underline{\ \ \quad \& \quad 11110000} \\
+    000\check{\check{1}}0000
+    \end{aligned}
+    $$
+
+  + 将该位上为1的元素全部异或：$y$ 因为该位上不为1，并没有被异或，此时最终的异或结果`x_bitmask`即为 $x$ （对于有些该位上同样不为1的，但出现两次的元素，也同样没有被异或，但并不影响）
+
+    ![](/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/[260]_2.png)
+
+    ```java
+    int x_bitmask = 0;
+    // bitmask which will contain only x
+    for (int num : nums) {
+      if ((num & diff) != 0) x_bitmask ^= num;
+    }  // 循环结束后，x_bitmask = x
+    ```
+
+  + 还剩下 $y$ 的值：
+
+    ```java
+    // 已知bitmask = x ^ y, x_bitmaskt = x,
+    // 则y = bitmask ^ x_bitmask = x ^ y ^ x = y
+    return new int[]{x_bitmask, bitmask^x_bitmask};
+    ```
+
 ******
 
 [0285]：
@@ -534,6 +698,84 @@ public TreeNode helper(int left, int right) {
 + Floyd's Algorithm: 
   + Phase 1: tortoise 一步一node；hare 一步二nodes    $\implies$    两者在intersection相遇
   + Phase 2: 因为intersection并不一定是the entrance of the cycle，所以还需要Phase 2: tortoise 回到起点一步一node；hare 待在intersection一步一node    $\implies$    两者在entrance相遇    
+
+******
+
+[0369]：Plus One Linked List   [0066]    ==操作对象是Linked List==
+
++ Solution 1: 因为所要操作的Linked List只给了作为head的ListNode，所以先将原Linked List reverse，再逐位+1，最后将结果reverse：      $\mathcal{O}(n)$
+
+  ```java
+  public ListNode plusOne(ListNode head) {
+      if (head == null) return head;
+  
+      ListNode list = reverse(head);  // reverse原linked list，此时list为翻转后的list的head
+      int carry = 1;  // carry初始为1，表示要对linked list加的1
+      ListNode cur = list;
+      while (cur != null && carry != 0) {  // 循环条件包括carry !=0 是为了无进位时提前结束循环
+          int val = cur.val + carry;
+          carry = val / 10;
+          cur.val = val % 10;
+          cur = cur.next;
+      }
+  
+      if (carry > 0) head.next = new ListNode(carry);
+  
+      return reverse(list);
+  }
+  ```
+
+  ```java
+  private ListNode reverse(ListNode node) {
+      ListNode head = null;
+      ListNode cur = node;
+  
+      while (cur != null) {
+          ListNode next = cur.next;
+          cur.next = head;
+          head = cur;
+          cur = next;
+      }
+  
+      return head;
+  }
+  ```
+
++ Solution 2:       $\mathcal{O}(n)$
+
+  + find the rightmost not-nine digit: 这一位之后的数字全都为9，如果不存在这种情况，则rightmost not-nine digit为最后一位；
+  + increase this rightmost not-nine digit by 1：
+    + 如果rightmost not-nine digit为最后一位，则加1后任务完成；
+    + 如果rightmost not-nine digit不为最后一位，则说明此后的所有位都要由9变为0；
+  + 要注意的一种情况是，Linked List初始值为99...99，此时结果应为100...00 $\implies$ rightmost not-nine digit要从head的前面（sentinel node）开始寻找。
+
+  ```java
+  public ListNode plusOne(ListNode head) {
+      // sentinel head
+      ListNode sentinel = new ListNode(0);
+      sentinel.next = head;
+      // 防止Linked List初始值为99...99的情况，not-nine要从sentinel开始寻找
+      ListNode notNine = sentinel;
+  
+      // find the rightmost not-nine digit
+      while (head != null) {
+          if (head.val != 9) notNine = head;
+          head = head.next;
+      }
+  
+      // increase this rightmost not-nine digit by 1
+      notNine.val++;
+      notNine = notNine.next;
+  
+      // rightmost not-nine digit不为最后一位：set all the following nines to zeros
+      while (notNine != null) {
+          notNine.val = 0;
+          notNine = notNine.next;
+      }
+  
+      return sentinel.val != 0 ? sentinel : sentinel.next;
+  }
+  ```
 
 *****
 
@@ -603,7 +845,7 @@ if (s != null) {
 
 [0719]：
 
-+ Naive method: 找到所有pair的difference $(\mathcal{O}(n^2))$ $\rightarrow$ sort the differences $(\mathcal{O}(n^2log(n^2)))$ $\rightarrow$ 找到第kth小的value.
++ Naive method: 找到所有pair的difference $(\mathcal{O}(n^2))$ $\rightarrow$ sort the differences $(\mathcal{O}(n^2log(n^2)))$ $\rightarrow$ 找到第 $k^{th}$ 小的value.
 
 + geekforgeeks (https://www.geeksforgeeks.org/k-th-smallest-absolute-difference-two-elements-array/)  比Leetcode Approach #2更好理解:
 
