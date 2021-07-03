@@ -573,6 +573,51 @@ public int singleNumber(int[] nums) {
 
 *****
 
+[0231] : Power of Two
+
++ $\mathcal{O}(logn)$ : 不停对2整除，看最后的商是否为1
+
+  ```java
+  public boolean isPowerOfTwo(int n) {
+      if (n == 0) return false;
+      while (n % 2 == 0) n /= 2;
+      return n == 1;
+  }
+  ```
+
++ $\mathcal{O}(1)$ : Bitwise Operators
+
+  已知一个数如果是2的次方，那么该数的二进制只有一位为1。
+  $$
+  \begin{aligned}
+  1=(00000001)_2 \quad\quad 3=(00000011)_2 \\
+  2=(00000010)_2 \quad\quad 5=(00000101)_2 \\
+  4=(00000100)_2 \quad\quad 6=(00000110)_2
+  \end{aligned}
+  $$
+
+  + $x \& (-x)$ : Get / isolate the rightmost 1-bit
+
+    ```java
+    public boolean isPowerOfTwo(int n) {
+        if (n == 0) return false;
+        long x = (long) n;
+        return (x & (-x)) == x;  // 二进制只有一位是1
+    }
+    ```
+
+  + $x \& (x-1)$ : Turn off (= set to 0) the rightmost 1-bit
+
+    ```java
+    public boolean isPowerOfTwo(int n) {
+        if (n == 0) return false;
+        long x = (long) n;
+        return (x & (x - 1)) == 0;  // 二进制中只有一位是1，且被set to 0
+    }
+    ```
+
+*****
+
 [0235]：利用[0236] Solution 3的思路
 
 + 区别：与[0236] Solution 3不同的是，在确定p和q是否位于当前node的子树中时，可以利用val的大小来判断
