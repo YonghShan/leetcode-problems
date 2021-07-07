@@ -1,4 +1,4 @@
-***Time Complexity:*** $1 < klogn < log^kn < n< nlogn = log(n!) < n^k < k^n < n! < n^n$
+Time Complexity:*** $1 < klogn < log^kn < n< nlogn = log(n!) < n^k < k^n < n! < n^n$
 
 *****
 
@@ -115,27 +115,98 @@ The essential difference between the hash set and the tree set is that ==keys in
 
 ******
 
-***Integer:***
+***Integer 与 Binary String 相互转换:***
 
 + `Integer.parseInt(String s, int radix)` - 输出一个十进制数，其中`int radix `表示`String s`的进制
 
-  *e.g.* `Integer.parseInt("1011", 2)` - 输出二进制数"1011"在十进制下的数，即11
+  *e.g.* `Integer.parseInt("1011", 2)` - 输出二进制字符串"1011"在十进制下的数，即11
 
-+ `Integer.toBinaryString` - 输出一个二进制字符串（即字符串的内容是二进制数，如"1011"）
++ `Integer.toBinaryString(int i)` - 输出一个二进制字符串（即字符串的内容是二进制数，如"1011"）
+
+  *e.g.* `Integer.toBinaryString(11)` - 输出十进制数11在二进制下的字符串，即"1011"
+
+  ==注意：输出的二进制字符串的位数不定，原则是除十进制数0外，二进制首位都为1==
+
+  | 十进制数 | 二进制字符串 |
+  | :------: | :----------: |
+  |    0     |      0       |
+  |    3     |      11      |
+  |    10    |     1010     |
 
 ******
 
-***Bitwise Operators：***
+***Bitwise Operators 位运算：***
 
-+ $-x=\neg x+1$ : Two's complement 补码
++ Two's complement 补码: 
 
-  ![](/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/bitwiseOperators_1.png)
+  + 表示：$-x=\neg x+1$ 
 
-+ $x \& (-x)$ : Get / isolate the rightmost 1-bit
+    ![](/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/bitwiseOperators_1.png)
+
+  + 负数的补码：两种理解方式
+
+    + 将==其对应正数==按位取反加1（此时的取反加一是<u>所有位</u>都取反且接受进位，包括符号位由 $0$ 变为 $1$）
+
+      *e.g.* $-128$ 对应的正数为 $128$ : $128=(10000000)_2 \rightarrow 01111111 \rightarrow 10000000$
+
+    + $2^{n-1}$ ($n$ 为位数) 与该负数绝对值的差值。
+
+      *e.g.* $-128 = 2^{8-1}-|-128|=256-128=128$，所以它的补码为10000000。
+
+  + 与有符号数 (signed binary number) 的区别: ==因为正数和 $0$ 的补码和其原码相同，只考虑负数==
+
+    + Signed binary number的读法：
+
+      第一位为符号位，其余位正常读：
+
+      ![](/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/SignedBinaryNum.gif)
+
+    + 补码的读法：依据==补码的补码为原码==
+
+      已知是某负数的补码，直接取反加一（此时的取反加一同样是<u>所有位</u>都取反且接受进位，包括符号位由 $1$ 变为 $0$）即得原码。但要注意，*就像依据负数写出其补码时，是根据其对应的正数取反加一*，这里<u>得到的原码所表示的数同样是指原负数所对应的正数</u>，即还需再加上负号。
+      $$
+      \begin{gathered}
+      10110101 \rightarrow 01001010 \rightarrow 01001011 = (75)_{10} \implies 原负数为-75 \\
+      100 \rightarrow 011 \rightarrow 100 = (4)_{10} \implies 原负数为-4
+      \end{gathered}
+      $$
+
++ Bit Shifts 移位：
+
+  + [Arithmetic shift](https://en.wikipedia.org/wiki/Arithmetic_shift)
+
+    + arithmetic left shift: ==整体左移，左侧原数字不会移走，最右边补 $0$== 
+
+      *e.g.* $0 <<1 \rightarrow 0$    ( $0$ 乘以或除以 $2^n$ 仍为0  $\implies$ 对 $0$ 左移右移 $n$ 位仍为 $0$ )
+
+      ​	   $10111 << 1 \rightarrow 10111\underline{0}$
+
+      Shifting left by $n$ bits on a <u>signed or unsigned</u> binary number has the effect of multiplying it by $2^n$.
+
+    + arithmetic right shift: ==整体右移，但右侧原数字会移走，最左边空出来的位数由原符号位补齐==
+
+      *e.g.* $0 >> 1 \rightarrow 0$
+
+      ​       $10010111 >> 2 \rightarrow \underline{11}100101{1\mkern-9mu/}{1\mkern-9mu/}$
+
+      Shifting right by $n$ bits on a <u>two's complement signed</u> binary number (我的理解是，计算机中无论正数还是负数都用其补码表示) has the effect of dividing it by $2^n$, but it always rounds down (towards negative infinity). 
+
+  + Logical shift
+
+    In a logical shift, zeros are shifted in to replace the discarded bits. Therefore, the logical and arithmetic left-shifts are exactly the same.
+
+  + 对应Java中的运算符：
+    + `<<` : arithmetic / logical left shift
+    + `>>` : arithmetic right shift
+    + `>>>` : logical right shift
+
++ Useful operations:
+
+  + $x \& (-x)$ : Get / isolate the rightmost 1-bit
 
   ![](/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/bitwiseOperators_2.png)
 
-+ $x \& (x-1)$ : Turn off (= set to 0) the rightmost 1-bit
+  + $x \& (x-1)$ : Turn off (= set to 0) the rightmost 1-bit
 
   ![](/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/bitwiseOperators_3.png)
 
@@ -392,7 +463,7 @@ public TreeNode helper(int left, int right) {
 
   *缺点*：`isBalanced(node.left/right)`会对较低层的node重复调用`getHeight()`，类似Fibonacci Sequence的recursion.
 
-  *分析*：假设$f(h)$表示高度为h的balanced BST中最少节点数，则$f(h) = f(h-1) + f(h-2) + 1$ (如果左子树的高度为h-1，则右子树的高度最小为h-2，不然不符合balanced BST的property)。Therefore, the height $h$ of a balanced tree is bounded by $\mathcal{O}(\log_{1.5}(n))$. With this bound we can guarantee that `getHeight()` will be called on each node $\mathcal{O}(\log n)$ times.   $\implies \mathcal{O}(nlogn)$  https://leetcode.com/problems/balanced-binary-tree/solution/
+  *分析*：假设$f(h)$表示高度为h的balanced BST中最少节点数，则$f(h) = f(h-1) + f(h-2) + 1$ (如果左子树的高度为h-1，则右子树的高度最小为h-2，不然不符合balanced BST的property)。Therefore, the height $h$ of a balanced tree is bounded by $\mathcal{O}(\log_{1.5}(n))$. With this bound we can guarantee that `getHeight()` will be called on each node $\mathcal{O}(\log n)$ times.   $\implies \mathcal{O}(nlogn)$  [LeetCode Analysis](https://leetcode.com/problems/balanced-binary-tree/solution/)
 
 + Solution 2: Bottom-up    ==***Clever Trick***==
 
@@ -471,7 +542,7 @@ public int singleNumber(int[] nums) {
   }
   ```
 
-  *Analysis:* https://leetcode-cn.com/problems/single-number-ii/solution/single-number-ii-mo-ni-san-jin-zhi-fa-by-jin407891/
+  *Analysis:* [LeetCode Analysis](https://leetcode-cn.com/problems/single-number-ii/solution/single-number-ii-mo-ni-san-jin-zhi-fa-by-jin407891/)
 
 *****
 
@@ -849,6 +920,28 @@ public int singleNumber(int[] nums) {
     + the number of subarrays doesn't exceed m $\implies$ 定义变量cnt记录subarray的数量
     + 同时满足上述两个条件，则F(mid) == true.
 
+******
+
+[0421]：Maximum XOR of Two Numbers in an Array
+
++ 思路1：数组中两两相异或，保留最大值 $\implies$ $\mathcal{O}(n^2)$ for nested for loop.
+
++ 思路2：对于异或结果的大小，越高位的权重越大。且已知数组中的元素对应的二进制最大位数为 $L$ 位，则异或的最大可能值为 $\begin{matrix} \underbrace{ 111\ldots111 } \\ L\end{matrix}$ 。故==确定异或结果最大的位数后，从最高位开始，依次向下判断XOR结果的各位是否能为1==。
+
+  *e.g.*  nums = [3, 10, 5, 25, 2, 8]
+
+  ​		In binary form: $3=(11)_2 \quad 10=(1010)_2 \quad 5=(101)_2 \quad 25=(11001)_2 \quad 2=(10)_2 \quad 8=(1000)_2$
+
+   	  $\implies$ the length of the max number in the binary representation is $5$ 
+
+  ​	   $\implies$ the maximum XOR is no more than $11111$
+
+   
+
+  
+
+  
+
 *****
 
 [0572]：Recursion
@@ -884,7 +977,7 @@ if (s != null) {
 [0709]：
 
 + Solution 1: PriorityQueue 构建min heap  ==最简单，也最容易想到==
-+ Solution 2: https://leetcode.com/explore/learn/card/introduction-to-data-structure-binary-search-tree/142/conclusion/1009/ 是个有趣的思路，但没必要且不好理解
++ Solution 2: [LeetCode Analysis](https://leetcode.com/explore/learn/card/introduction-to-data-structure-binary-search-tree/142/conclusion/1009/) 是个有趣的思路，但没必要且不好理解
 
 ******
 
@@ -892,7 +985,7 @@ if (s != null) {
 
 + Naive method: 找到所有pair的difference $(\mathcal{O}(n^2))$ $\rightarrow$ sort the differences $(\mathcal{O}(n^2log(n^2)))$ $\rightarrow$ 找到第 $k^{th}$ 小的value.
 
-+ geekforgeeks (https://www.geeksforgeeks.org/k-th-smallest-absolute-difference-two-elements-array/)  比Leetcode Approach #2更好理解:
++ [geekforgeeks](https://www.geeksforgeeks.org/k-th-smallest-absolute-difference-two-elements-array/)  比Leetcode Approach #2更好理解:
 
   + Step 1: Sort the array
 
