@@ -6,6 +6,7 @@ import java.util.Set;
  * @date 7/7/21 - 22:17
  */
 public class Solution1 {
+    // HashSet + Greedy Algorithm
     /* Runtime: 117ms (faster than 50.68%)    O(n)
        Memory: 58.3MB (less than 51.80%)      O(n) for HashSet
      */
