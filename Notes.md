@@ -1,8 +1,24 @@
-Time Complexity:*** $1 < klogn < log^kn < n< nlogn = log(n!) < n^k < k^n < n! < n^n$
+### ***Concepts***
+
+#### ***Time Complexity***
+
+$1 < klogn < log^kn < n< nlogn = log(n!) < n^k < k^n < n! < n^n$
+
+******
 
 *****
 
-***Binary Search Tree的三个基本operations:***
+#### Tree
+
+##### ***Terminology used in trees***
+
+- Depth of node - the number of edges from the tree's root node to the node （从root到自己）
+- Height of node - the number of edges on the longest path between that node and a leaf （从自己到leaf）
+- Height of Tree - the height of its root node （从root到leaf）==决定了各operations的Time Complexity== 
+
+********
+
+##### ***Binary Search Tree的三个基本operations***
 
  ==TC都为$\mathcal{O}(heights)$, $heights$可以为$n$也可以为$logn$==
 
@@ -20,7 +36,9 @@ Time Complexity:*** $1 < klogn < log^kn < n< nlogn = log(n!) < n^k < k^n < n! < 
   2. If the target node has ***one child***, we can use its child to replace itself.
   3. If the target node has ***two children***, replace the node with its in-order successor or predecessor node and delete that node.
 
-***Height-balanced (or self-balancing) BST:***
+*******
+
+##### ***Height-balanced (or self-balancing) BST***
 
 + Definition: 
 
@@ -38,9 +56,13 @@ Time Complexity:*** $1 < klogn < log^kn < n< nlogn = log(n!) < n^k < k^n < n! < 
 
 In Java, you may use a ==TreeSet== or a ==TreeMap== as a self-balancing BST.
 
+******
+
 *****
 
-***TreeSet 和 HashSet的区别：***
+#### Data Structure
+
+##### ***TreeSet 和 HashSet的区别***
 
 + 对于HashSet，Search / Insert / Delete all takes $\mathcal{O}(1)$；
 
@@ -52,21 +74,14 @@ The essential difference between the hash set and the tree set is that ==keys in
 
 *****
 
-***Floyd's Algorithm:***
-
-+ Phase 1: tortoise 一步一node；hare 一步二nodes    $\implies$    两者在intersection相遇
-+ Phase 2: ==因为intersection并不一定是the entrance of the cycle，所以还需要Phase 2== tortoise 回到起点一步一node；hare 待在intersection一步一node    $\implies$    两者在entrance相遇
-
-*****
-
-***关于ArrayList和LinkedList的选用：***
+##### ***关于ArrayList和LinkedList的选用***
 
 + Search by value - `indexOf()`: Time complexity都为$\mathcal{O}(n)$，但是ArrayList将元素连续地存放在一起，而LinkedList则是在内存中随机存放，所以ArrayList实际运行会更快；
 + Get element by index - `get()`: ArrayList只需$\mathcal{O}(1)$ as the array has random access property, 可以直接访问任意index而不需要从头遍历（也是因为ArrayList在内存中是连续存储），但是LinkedList需要$\mathcal{O}(n)$，it needs to iterate through each element to reach a given index。
 
 *****
 
-***PriorityQueue & Min/Max Heap:***
+##### ***PriorityQueue & Min/Max Heap***
 
 + PriorityQueue: 从队首获取元素时，总是获取优先级最高的元素
 
@@ -74,13 +89,13 @@ The essential difference between the hash set and the tree set is that ==keys in
 
   + Common Method Summary:
 
-    + add() / offer()
-    + clear()
-    + contains()
-    + remove() / poll()：==返回的总是优先级最高的元素== 对于min heap，最返回最小的元素，反之亦然
-    + toArray()
-    + peek()
-    + size()
+    + `add()` / `offer()`
+    + `clear()`
+    + `contains()`
+    + `remove()` / `poll()`：==返回的总是优先级最高的元素== 对于min heap，最返回最小的元素，反之亦然
+    + `toArray()`
+    + `peek()`
+    + `size()`
 
   + `Comparator`自定义排序算法：==默认升序排列，即维护了一个min heap==
 
@@ -98,24 +113,35 @@ The essential difference between the hash set and the tree set is that ==keys in
   + Min Heap: a complete binary tree in which the value in each internal node is smaller than or equal to the values in the children of that node. （即：越小，优先级越高）
   + Max Heap: a complete binary tree in which the value in each internal node is bigger than or equal to the values in the children of that node. （即：越大，优先级越高）
 
+******
+
 *****
 
-***Terminology used in trees:***
+#### Algorithm
 
-- Depth of node - the number of edges from the tree's root node to the node （从root到自己）
-- Height of node - the number of edges on the longest path between that node and a leaf （从自己到leaf）
-- Height of Tree - the height of its root node （从root到leaf）==决定了各operations的Time Complexity== 
+##### ***Floyd's Algorithm***
+
++ Phase 1: tortoise 一步一node；hare 一步二nodes    $\implies$    两者在intersection相遇
++ Phase 2: ==因为intersection并不一定是the entrance of the cycle，所以还需要Phase 2== tortoise 回到起点一步一node；hare 待在intersection一步一node    $\implies$    两者在entrance相遇
 
 ******
 
-***关于Recursion的Top-down和Bottom-up:***
+******
+
+#### Iteration & Recursion
+
+##### ***关于Recursion的Top-down和Bottom-up***
 
 + If recursive calls before conditional check, then it's bottom up. 
 + If recursive calls after conditional check, then it's top down.
 
 ******
 
-***Integer 与 Binary String 相互转换:***
+******
+
+#### 基本数据类型 / 数据结构 / 数据对象 之间的相互转换 (Conversion)
+
+##### ***Integer 与 Binary String 相互转换***
 
 + `Integer.parseInt(String s, int radix)` - 输出一个十进制数，其中`int radix `表示`String s`的进制
 
@@ -135,88 +161,78 @@ The essential difference between the hash set and the tree set is that ==keys in
 
 ******
 
-***Bitwise Operators 位运算：***
+********
 
-+ Two's complement 补码: 
+#### Bitwise Operators 位运算
 
-  + 表示：$-x=\neg x+1$ 
+##### ***Two's complement 补码***
 
-    ![](/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/bitwiseOperators_1.png)
++ 表示：$-x=\neg x+1$ 
 
-  + 负数的补码：两种理解方式
+  ![](/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/bitwiseOperators_1.png)
 
-    + 将==其对应正数==按位取反加1（此时的取反加一是<u>所有位</u>都取反且接受进位，包括符号位由 $0$ 变为 $1$）
++ 负数的补码：两种理解方式
 
-      *e.g.* $-128$ 对应的正数为 $128$ : $128=(10000000)_2 \rightarrow 01111111 \rightarrow 10000000$
+  + 将==其对应正数==按位取反加1（此时的取反加一是<u>所有位</u>都取反且接受进位，包括符号位由 $0$ 变为 $1$）
 
-    + $2^{n-1}$ ($n$ 为位数) 与该负数绝对值的差值。
+    *e.g.* $-128$ 对应的正数为 $128$ : $128=(10000000)_2 \rightarrow 01111111 \rightarrow 10000000$
 
-      *e.g.* $-128 = 2^{8-1}-|-128|=256-128=128$，所以它的补码为10000000。
+  + $2^{n-1}$ ($n$ 为位数) 与该负数绝对值的差值。
 
-  + 与有符号数 (signed binary number) 的区别: ==因为正数和 $0$ 的补码和其原码相同，只考虑负数==
+    *e.g.* $-128 = 2^{8-1}-|-128|=256-128=128$，所以它的补码为10000000。
 
-    + Signed binary number的读法：
++ 与有符号数 (signed binary number) 的区别: ==因为正数和 $0$ 的补码和其原码相同，只考虑负数==
 
-      第一位为符号位，其余位正常读：
+  + Signed binary number的读法：
 
-      ![](/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/SignedBinaryNum.gif)
+    第一位为符号位，其余位正常读：
 
-    + 补码的读法：依据==补码的补码为原码==
+    ![](/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/SignedBinaryNum.gif)
 
-      已知是某负数的补码，直接取反加一（此时的取反加一同样是<u>所有位</u>都取反且接受进位，包括符号位由 $1$ 变为 $0$）即得原码。但要注意，*就像依据负数写出其补码时，是根据其对应的正数取反加一*，这里<u>得到的原码所表示的数同样是指原负数所对应的正数</u>，即还需再加上负号。
-      $$
-      \begin{gathered}
-      10110101 \rightarrow 01001010 \rightarrow 01001011 = (75)_{10} \implies 原负数为-75 \\
-      100 \rightarrow 011 \rightarrow 100 = (4)_{10} \implies 原负数为-4
-      \end{gathered}
-      $$
+  + 补码的读法：依据==补码的补码为原码==
 
-+ Bit Shifts 移位：
-
-  + [Arithmetic shift](https://en.wikipedia.org/wiki/Arithmetic_shift)
-
-    + arithmetic left shift: ==整体左移，左侧原数字不会移走，最右边补 $0$== 
-
-      *e.g.* $0 <<1 \rightarrow 0$    ( $0$ 乘以或除以 $2^n$ 仍为0  $\implies$ 对 $0$ 左移右移 $n$ 位仍为 $0$ )
-
-      ​	   $10111 << 1 \rightarrow 10111\underline{0}$
-
-      Shifting left by $n$ bits on a <u>signed or unsigned</u> binary number has the effect of multiplying it by $2^n$.
-
-    + arithmetic right shift: ==整体右移，但右侧原数字会移走，最左边空出来的位数由原符号位补齐==
-
-      *e.g.* $0 >> 1 \rightarrow 0$
-
-      ​       $10010111 >> 2 \rightarrow \underline{11}100101{1\mkern-9mu/}{1\mkern-9mu/}$
-
-      Shifting right by $n$ bits on a <u>two's complement signed</u> binary number (我的理解是，计算机中无论正数还是负数都用其补码表示) has the effect of dividing it by $2^n$, but it always rounds down (towards negative infinity). 
-
-  + Logical shift
-
-    In a logical shift, zeros are shifted in to replace the discarded bits. Therefore, the logical and arithmetic left-shifts are exactly the same.
-
-  + 对应Java中的运算符：
-    + `<<` : arithmetic / logical left shift
-    + `>>` : arithmetic right shift
-    + `>>>` : logical right shift
-
-+ Useful operations:
-
-  + $x \& (-x)$ : Get / isolate the rightmost 1-bit
-
-  ![](/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/bitwiseOperators_2.png)
-
-  + $x \& (x-1)$ : Turn off (= set to 0) the rightmost 1-bit
-
-  ![](/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/bitwiseOperators_3.png)
-
-+ LeetCode中的相关题目：
-
-  [0231]      [0260]
+    已知是某负数的补码，直接取反加一（此时的取反加一同样是<u>所有位</u>都取反且接受进位，包括符号位由 $1$ 变为 $0$）即得原码。但要注意，*就像依据负数写出其补码时，是根据其对应的正数取反加一*，这里<u>得到的原码所表示的数同样是指原负数所对应的正数</u>，即还需再加上负号。
+    $$
+    \begin{gathered}
+    10110101 \rightarrow 01001010 \rightarrow 01001011 = (75)_{10} \implies 原负数为-75 \\
+    100 \rightarrow 011 \rightarrow 100 = (4)_{10} \implies 原负数为-4
+    \end{gathered}
+    $$
 
 ******
 
-***异或 XOR (exclusive OR) :***
+##### ***Bit Shifts 移位***
+
++ [Arithmetic shift](https://en.wikipedia.org/wiki/Arithmetic_shift)
+
+  + arithmetic left shift: ==整体左移，左侧原数字不会移走，最右边补 $0$== 
+
+    *e.g.* $0 <<1 \rightarrow 0$    ( $0$ 乘以或除以 $2^n$ 仍为0  $\implies$ 对 $0$ 左移右移 $n$ 位仍为 $0$ )
+
+    ​	   $10111 << 1 \rightarrow 10111\underline{0}$
+
+    Shifting left by $n$ bits on a <u>signed or unsigned</u> binary number has the effect of multiplying it by $2^n$.
+
+  + arithmetic right shift: ==整体右移，但右侧原数字会移走，最左边空出来的位数由原符号位补齐==
+
+    *e.g.* $0 >> 1 \rightarrow 0$
+
+    ​       $10010111 >> 2 \rightarrow \underline{11}100101{1\mkern-9mu/}{1\mkern-9mu/}$
+
+    Shifting right by $n$ bits on a <u>two's complement signed</u> binary number (我的理解是，计算机中无论正数还是负数都用其补码表示) has the effect of dividing it by $2^n$, but it always rounds down (towards negative infinity). 
+
++ Logical shift
+
+  In a logical shift, zeros are shifted in to replace the discarded bits. Therefore, the logical and arithmetic left-shifts are exactly the same.
+
++ 对应Java中的运算符：
+  + `<<` : arithmetic / logical left shift
+  + `>>` : arithmetic right shift
+  + `>>>` : logical right shift
+
+*****
+
+##### ***XOR (exclusive OR) 异或***
 
 + 表示：$\bigoplus$（数学符号）、^（程序符号）
 
@@ -237,6 +253,8 @@ The essential difference between the hash set and the tree set is that ==keys in
   6. ==恒等律：$x$ ^ $0=x$==
 
   7. ==自反性：$a$ ^ $b$ ^ $a=b$==
+
+  8. ==If $a$ ^ $b=c$ , then $a$ ^ $c=b$  and  $b$ ^ $c=a$ .==  (Prove: 两边同时异或 $a/b/c$ 中任一即可)    [0421]
 
 + 应用：
 
@@ -276,6 +294,22 @@ The essential difference between the hash set and the tree set is that ==keys in
 
 ******
 
+##### ***Useful operations***
+
++ $x \& (-x)$ : Get / isolate the rightmost 1-bit
+
+![](/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/bitwiseOperators_2.png)
+
++ $x \& (x-1)$ : Turn off (= set to 0) the rightmost 1-bit
+
+![](/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/bitwiseOperators_3.png)
+
++ LeetCode中的相关题目：
+
+  [0231]      [0260]
+
+******
+
 
 
 
@@ -290,17 +324,230 @@ The essential difference between the hash set and the tree set is that ==keys in
 
 **********
 
-[0001]：Solution2 - Trick: 如何one pass同时完成对HashMap的insert和search
+### ***Problems***
+
+#### Design Data Structure
+
+##### [0208] Implement Trie (Prefix Tree)
+
+Trie (can be pronounced "try" or "tree") or prefix tree is a tree data structure, which is used for retrieval of a key in a dataset of strings.     ==快速查询「某个字符串/字符前缀」是否存在==
+
+图解一般表示为：使用「边」来代表有无字符，使用「点」来记录是否为「单词结尾」以及「其后续字符串的字符是什么」。如：
+
+![](/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/[0208]_2.png)
+
++ 利用TrieNode构建Trie：
+
+  但实际设计中，如果采用的是建立TrieNode结构节点，则是每个TrieNode有 $n$ 个空位（如下图，$n = 26$），每选择一个空位（如下图，root中的 $l$ 位被选择，而Node $l$ 中 $e$ 位继续被选择...）则在其中嵌入一个新的有 $n$ 个空位的TrieNode。
+
+  ![](/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/[0208].png)
+
+  由上图可知：
+
+  1. Trie由一个root作为起始；
+  2. Trie中每个node都有 $n$ 个空位，$n$ 的大小由实际存储的文本数据决定（可能除26个字母外，还需存储符号等）；
+  3. 设置属性 `isEnd` 作为辅助，表示该node中是否继续嵌套其他node，使得设计的Trie支持题目要求的以下操作：
+     + `search(String word)`：检查某word是否在Trie中；
+     + `startWith(String prefix)`：检查Trie中是否有以prefix开头的单词。
+
+  $\implies$ TrieNode的设计可以采用大小为 $n$ 的一维数组：
+
+  ```java
+  class TrieNode {
+      private TrieNode[] node;
+      private final int n = 26;
+      private boolean isEnd;
+  
+      public TrieNode() {
+          node = new TrieNode[n];
+      }
+  }
+  ```
+
+  $\implies$ 基于TrieNode的Trie：
+
+  ```java
+  class Trie {
+    	private TrieNode root;
+    
+      /** Initialize your data structure here. */
+      public Trie() {
+          root = new TrieNode();
+      }
+      
+      /** Inserts a word into the trie. */
+      public void insert(String word) {
+          TrieNode p = root;
+          for (int i = 0; i < word.length(); i++) {
+              char c = word.charAt(i);
+              int idx = c - 'a';
+              if (p.node[idx] == null) p.node[idx] = new TrieNode();
+              p = p.node[idx];
+          }
+          p.isEnd = true;
+      }
+  
+      /** Returns if the word is in the trie. */
+      public boolean search(String word) {
+          TrieNode p = root;
+          for (int i = 0; i < word.length(); i++) {
+              char c = word.charAt(i);
+              int idx = c - 'a';
+              if (p.node[idx] == null) return false;
+              p = p.node[idx];
+          }
+          return p.isEnd;
+      }
+  
+      /** Returns if there is any word in the trie that starts with the given prefix. */
+      public boolean startsWith(String prefix) {
+          TrieNode p = root;
+          for (int i = 0; i < prefix.length(); i++) {
+              char c = prefix.charAt(i);
+              int idx = c - 'a';
+              if (p.node[idx] == null) return false;
+              p = p.node[idx];
+          }
+          return true;
+      }
+  }
+  ```
+
+  $\implies$ *Time Complexity:* $\mathcal{O}(words以及prefixes的总长度)$
+
+  ​		  *Space Complexity:* 结点数量为 $n$，字符集大小为 $k(=26)$。复杂度为 $\mathcal{O}(nk)$
+
++ [利用二维数组构建Trie](https://leetcode-cn.com/problems/implement-trie-prefix-tree/solution/gong-shui-san-xie-yi-ti-shuang-jie-er-we-esm9/)：
+
+  还可以使用二维数组实现Trie，因为内层数组之间关系平行，<u>故并不存在*表面上的*嵌套关系</u>。
+
+  + 使用二维数组 `trie[行数][每行有多少种字符的可能，如26]` 来存储我们所有的单词字符，每一行相当于一个TrieNode。
+  + 使用 `index` 自增，记录已经使用了二维数组中的哪些行（而 `++index` 则指明了此时二维数组中第一个未使用的TrieNode位于哪一行）。
+  + 使用 `count[]` 数组记录某个格子被「被标记为结尾的次数」（当 `idx` 编号的格子被标记了 n 次，则有 `cnt[idx] = n`）。
+
+  ```java
+  class Trie {
+      // 以下 static 成员独一份，被创建的多个 Trie 共用  ([0421]中涉及多次创建Trie)
+      static int N = 100009; // 直接设置为十万级
+      static int[][] trie = new int[N][26];
+      static int[] count = new int[N];
+      static int index = 0;
+  
+      // 在构造方法中完成重置 static 成员数组的操作
+      // 这样做的目的是为减少 new 操作（无论有多少测试数据，上述 static 成员只会被 new 一次）
+      public Trie() {
+          for (int row = index; row >= 0; row--) { // 注意这里row=index，是因为index指示上一次Trie用了多少行
+              Arrays.fill(trie[row], 0);
+          }
+          Arrays.fill(count, 0);
+          index = 0;
+      }
+      
+      public void insert(String s) {
+          int p = 0;
+          for (int i = 0; i < s.length(); i++) {
+              int u = s.charAt(i) - 'a';
+              if (trie[p][u] == 0) trie[p][u] = ++index;  // 要嵌套插入新的TrieNode，而此时第一个还未使用的TrieNode位于二维数组中的哪一行由++index指定
+              p = trie[p][u];
+          }
+          count[p]++;
+      }
+      
+      public boolean search(String s) {
+          int p = 0;
+          for (int i = 0; i < s.length(); i++) {
+              int u = s.charAt(i) - 'a';
+              if (trie[p][u] == 0) return false;
+              p = trie[p][u];
+          }
+          return count[p] != 0;
+      }
+      
+      public boolean startsWith(String s) {
+          int p = 0;
+          for (int i = 0; i < s.length(); i++) {
+              int u = s.charAt(i) - 'a';
+              if (trie[p][u] == 0) return false;
+              p = trie[p][u];
+          }
+          return true;
+      }
+  }
+  ```
+
+  $\implies$ *Time Complexity:* $\mathcal{O}(words以及prefixes的总长度)$
+
+  ​		  *Space Complexity:* $\mathcal{O}(1e5)$
+
+  + *Analysis:*
+
+    假设插入字符串 abc ，前面三行会被占掉：
+
+    + 第 0 行 a 所对应的`trie[0][0] = ++0`，代表前缀 a 后面接的字符串会被记录在第 1 行；
+    + 第 1 行 b 所对应的`trie[1][1] = ++1`，代表前缀 ab 后面接的字符串会被记录在第 2 行；
+    + 第 2 行 c 所对应的`trie[2][2] = ++2`，代表前缀 abc 后面接的字符串会被记录在第 3 行。
+
+    当再插入 abcl 时，这时候会先定位到 abc 的前缀行（第 3 行），将 l 所对应的`trie[3][11] = ++3`，代表前缀 abcl 后面接的字符串会被记录在第 4 行。
+
+    紧接着，当插入 abl 时，则会定位到 ab 的前缀行（第 2 行），然后将 l 所对应的`trie[2][11] = ++4`，代表前缀 abl 后面接的字符串会被记录在第 5 行。
+
+    紧接着，当插入 abclm 时，则会定位到 abcl 的前缀行（第 4 行），然后将 m 所对应的`trie[4][12] = ++5`，代表前缀 abclm 后面接的字符串会被记录在第 6 行。
+
+    ... 
+
+    假如经过一系列操作，此时 `index = 20` ，下一个要插入的字符串为 abd：先定位到 ab 的前缀行（第 2 行），将 d 所对应的`trie[2][3] = ++20`，代表前缀 abd 后面接的字符串会被记录在第 21 行。
+
+  + *为什么行数估算是 1e5？*
+
+    已知调用次数为$10^4$，传入的字符串长度为$10^3$。假设每一次的调用都是 `insert`，并且每一次调用都会使用到新的$10^3$行。那么我们的行数需要开到$10^7$。但由于我们的字符集大小只有26，因此不太可能在$10^4$次调用中都用到新的$10^3$行。而且正常的测试数据应该是 `search` 和 `startsWith` 调用次数大于 `insert` 才有意义的，一个只有 `insert`调用的测试数据，任何实现方案都能 AC。因此设定行数为$10^5$，直接开到$10^6$也没有问题。
+
+  + *Summary:*
+
+    没有频繁 new 对象的开销。但是需要根据数据结构范围估算我们的「二维数组」应该开多少行，而且由于通常对行的估算会很大，导致使用的二维数组开得很大，使用的空间通常是「TrieNode」方式的数倍。
+
+    而且如果每次创建 Trie 对象时，都去创建数组的话，会比较慢，而且当样例多的时候甚至会触发 GC（因为 OJ 每测试一个样例会创建一个 Trie 对象）。That's why we used `static` to define the variables at the beginning.
+
++ [Application of Trie](https://leetcode-cn.com/problems/implement-trie-prefix-tree/solution/gong-shui-san-xie-yi-ti-shuang-jie-er-we-esm9/):
+
+  首先，在纯算法领域，前缀树算是一种较为常用的数据结构。不过如果在工程中，不考虑前缀匹配的话，基本上使用 hash 就能满足。如果考虑前缀匹配的话，工程也不会使用 Trie 。一方面是字符集大小不好确定（题目只考虑 26 个字母，字符集大小限制在较小的 26 内）因此可以使用 Trie，但是工程一般兼容各种字符集，一旦字符集大小很大的话，Trie 将会带来很大的空间浪费。
+
+  另外，对于个别的超长字符 Trie 会进一步变深。这时候如果 Trie 是存储在硬盘中，Trie 结构过深带来的影响是多次随机 IO，随机 IO 是成本很高的操作。同时 Trie 的特殊结构，也会为分布式存储将会带来困难。
+
+  因此在工程领域中 Trie 的应用面不广。至于一些诸如「联想输入」、「模糊匹配」、「全文检索」的典型场景在工程主要是通过 ES (ElasticSearch) 解决的。而 ES 的实现则主要是依靠「倒排索引」。
+
+******
+
+******
+
+
+
+
+
+
+
+
+
+*****
+
+#### Misc.
+
+##### [0001]
+
+Solution2 - Trick: 如何one pass同时完成对HashMap的insert和search
 
 *******
 
-[0021]：无论是Iteration还是Recursion，关键都是比较l1.val和l2.val
+##### [0021]
+
+无论是Iteration还是Recursion，关键都是比较l1.val和l2.val
 
 *******
 
-[0066]：Plus One (==操作对象是array==)      [0369]
+##### [0066] Plus One (==操作对象是array==)      
 
-一个数组表示一个数字，*e.g.* [1,2,3]表示数123，现在需对该数+1变为124，返回相应的数组[1,2,4]
+一个数组表示一个数字，*e.g.* [1,2,3]表示数123，现在需对该数+1变为124，返回相应的数组[1,2,4]   
+
+*和 [0369] 是类似题目*
 
 注意的点：
 
@@ -327,7 +574,7 @@ The essential difference between the hash set and the tree set is that ==keys in
 
 ********
 
-[0067]：Add Binary (==将两个binary strings相加==)
+##### [0067] Add Binary (==将两个binary strings相加==)
 
 *e.g.* Sting a = "11", String b = "1" $\rightarrow$ a + b = "11" + "1" = "100" (二进制数相加)
 
@@ -398,7 +645,9 @@ The essential difference between the hash set and the tree set is that ==keys in
 
 *****
 
-[0098]：一共5种方法
+##### [0098]
+
+一共5种方法：
 
 + Solution 1：利用recursion判断当前root.val比其左子树中的最大值要大，比其右子树中的最小值要小，同时其左右子树也都为valid BST。因为每次recursion时，对于当前的root都要利用while循环去寻找其左子树中的rightmost作为最大值和其右子树中的leftmost作为最小值，所以costs $\mathcal{O}(n^2)$.
 
@@ -421,7 +670,7 @@ The essential difference between the hash set and the tree set is that ==keys in
 
 ******
 
-[0108]：Convert (strictly increrasing) Sorted Array to (height-balanced) Binary Search Tree
+##### [0108] Convert (strictly increrasing) Sorted Array to (height-balanced) Binary Search Tree
 
 题目关键是：height-balanced BST，所以root必须要选取array中排在中间的值。而root的左右子树则可以通过recursion的方式取得。
 
@@ -442,7 +691,7 @@ public TreeNode helper(int left, int right) {
 
 ******
 
-[0110]：
+##### [0110]
 
 + Solution 1: Top-down
 
@@ -471,7 +720,9 @@ public TreeNode helper(int left, int right) {
 
 ******
 
-[0136]：Single Number：数组中除了一个数只出现1次，其他都出现2次。在==liner time==和==no extra space==的情况下，找出该数字。
+##### [0136] Single Number
+
+数组中除了一个数只出现1次，其他都出现2次。在==liner time==和==no extra space==的情况下，找出该数字。
 
 ```java
 public int singleNumber(int[] nums) {
@@ -483,7 +734,9 @@ public int singleNumber(int[] nums) {
 
 ******
 
-[0137]：Single Number II：数组中除了一个数只出现1次，其他都出现3次。在==liner time==和==no extra space==的情况下，找出该数字。
+##### [0137] Single Number II
+
+数组中除了一个数只出现1次，其他都出现3次。在==liner time==和==no extra space==的情况下，找出该数字。
 
 如果没有linear time和no extra space的限制：
 
@@ -546,7 +799,9 @@ public int singleNumber(int[] nums) {
 
 *****
 
-[0142]：典型的Floyd's Algorithm
+##### [0142]
+
+典型的Floyd's Algorithm
 
 + ==Floyd's Algorithm:== 
   + Phase 1: tortoise 一步一node；hare 一步二nodes    $\implies$    两者在intersection相遇
@@ -555,7 +810,7 @@ public int singleNumber(int[] nums) {
 
 *****
 
-[0173]：
+##### [0173]
 
 + Solution 1: next()参考了[0285] Solution 3: 每次执行next()，都需要$\mathcal{O}(n)$，不好
 + Solution 2: 先执行一遍Inorder Traversal，再对遍历结果编写Iterator，最容易理解
@@ -563,7 +818,7 @@ public int singleNumber(int[] nums) {
 
 ******
 
-[0217]：Contains Duplicate
+##### [0217] Contains Duplicate
 
 + Solution 1 & 2: 最intuitive的思路：用HashSet $\mathcal{O}(n)$，两种判断方法：
 
@@ -578,7 +833,9 @@ public int singleNumber(int[] nums) {
 
 *******
 
-[0219]：Contains Duplicate II：在索引值差k的范围内，有两数相同（`nums[i]==nums[j] && |i-j|≤k`）
+##### [0219] Contains Duplicate II
+
+在索引值差k的范围内，有两数相同（`nums[i]==nums[j] && |i-j|≤k`）
 
 + Solution 1: 将每个数依次与其后的k个数（注意别超限）比较（是否相同） $\implies$ $\mathcal{O}(n^2$)
 
@@ -602,7 +859,9 @@ public int singleNumber(int[] nums) {
 
 *****
 
-[0220]：Contains Duplicate III：在索引值差k的范围内，有两数相差t（`|nums[i]-nums[j]|≤t && |i-j|≤k`）
+##### [0220] Contains Duplicate III
+
+在索引值差k的范围内，有两数相差t（`|nums[i]-nums[j]|≤t && |i-j|≤k`）
 
 + Solution 1: 将每个数依次与其后的k个数（注意别超限）比较（是否相差t以内） $\implies$ $\mathcal{O}(n^2$)
 
@@ -644,7 +903,7 @@ public int singleNumber(int[] nums) {
 
 *****
 
-[0231] : Power of Two
+##### [0231] Power of Two
 
 + $\mathcal{O}(logn)$ : 不停对2整除，看最后的商是否为1
 
@@ -689,13 +948,17 @@ public int singleNumber(int[] nums) {
 
 *****
 
-[0235]：利用[0236] Solution 3的思路
+##### [0235]
 
-+ 区别：与[0236] Solution 3不同的是，在确定p和q是否位于当前node的子树中时，可以利用val的大小来判断
+利用[0236] Solution 3的思路
+
+*区别：*与[0236] Solution 3不同的是，在确定p和q是否位于当前node的子树中时，可以利用val的大小来判断
 
 *****
 
-[0236]：三种方法都算得上巧妙
+##### [0236]
+
+三种方法都算得上巧妙
 
 + Solution 1: 理论上复杂度应该较高 (> $\mathcal{O}(n)$)，但实际performance不错（?）
 
@@ -733,7 +996,9 @@ public int singleNumber(int[] nums) {
 
 *****
 
-[0260]：Single NUmber III：数组中除了两个数（$x$、$y$）只出现1次，其他都出现2次。在==liner time==和==no extra space==的情况下，找出这两个数字，顺序随意。
+##### [0260] Single Number III
+
+数组中除了两个数（$x$、$y$）只出现1次，其他都出现2次。在==liner time==和==no extra space==的情况下，找出这两个数字，顺序随意。
 
 + 区分出现奇数次和偶次数的数：XOR
 
@@ -788,7 +1053,7 @@ public int singleNumber(int[] nums) {
 
 ******
 
-[0285]：
+##### [0285]
 
 + Solution 1: 并没有利用BST inorder traversal得到的结果为升序的特性
   + successor的位置有两种情况：
@@ -808,7 +1073,9 @@ public int singleNumber(int[] nums) {
 
 *****
 
-[0287]：参考[0142]: Linked List Cycle II
+##### [0287]
+
+参考[0142]: Linked List Cycle II
 
 + 如何将array转化为linked list：f(x) = nums[x]
 + Floyd's Algorithm: 
@@ -817,7 +1084,7 @@ public int singleNumber(int[] nums) {
 
 ******
 
-[0369]：Plus One Linked List   [0066]    ==操作对象是Linked List==
+##### [0369] Plus One Linked List (==操作对象是Linked List==)
 
 + Solution 1: 因为所要操作的Linked List只给了作为head的ListNode，所以先将原Linked List reverse，再逐位+1，最后将结果reverse：      $\mathcal{O}(n)$
 
@@ -895,7 +1162,7 @@ public int singleNumber(int[] nums) {
 
 *****
 
-[0410]：
+##### [0410]
 
 + DP: 长度为n，subarray数为m，建立dp二维数组dp\[n+1][m+1]
 
@@ -922,11 +1189,11 @@ public int singleNumber(int[] nums) {
 
 ******
 
-[0421]：Maximum XOR of Two Numbers in an Array
+##### [0421] Maximum XOR of Two Numbers in an Array
 
 + 思路1：数组中两两相异或，保留最大值 $\implies$ $\mathcal{O}(n^2)$ for nested for loop.
 
-+ 思路2：对于异或结果的大小，越高位的权重越大。且已知数组中的元素对应的二进制最大位数为 $L$ 位，则异或的最大可能值为 $\begin{matrix} \underbrace{ 111\ldots111 } \\ L\end{matrix}$ 。故==确定异或结果最大的位数后，从最高位开始，依次向下判断XOR结果的各位是否能为1==。
++ 思路2：对于异或结果的大小，越高位的权重越大。且已知数组中的元素对应的二进制最大位数为 $L$ 位，则异或的最大可能值为 $\begin{matrix} \underbrace{ 111\ldots111 } \\ L\end{matrix}$ 。
 
   *e.g.*  nums = [3, 10, 5, 25, 2, 8]
 
@@ -936,15 +1203,60 @@ public int singleNumber(int[] nums) {
 
   ​	   $\implies$ the maximum XOR is no more than $11111$
 
-   
+   故，==确定异或结果最大的位数 $L$ 后，从最高位开始，依次向下判断XOR结果的各位是否能为1==。==**贪心算法**==
 
-  
+  *cont.* $3=(00011)_2 \quad 10=(01010)_2 \quad 5=(00101)_2 \quad 25=(11001)_2 \quad 2=(00010)_2 \quad 8=(01000)_2$
 
+  ​		$\implies$ 若要确定XOR能否为 $(1****)_2$，只需要 $\begin{aligned}3=(0****)_2 \quad 10=(0****)_2 \quad 5=(0****)_2 \\ 25=(1****)_2 \quad 2=(0****)_2 \quad 8=(0****)_2 \end{aligned}$
+
+  ​		$\implies$ 若要确定XOR能否为 $(11***)_2$，只需要 $\begin{aligned}3=(00***)_2 \quad 10=(01***)_2 \quad 5=(00***)_2 \\ 25=(11***)_2 \quad 2=(00***)_2 \quad 8=(01***)_2 \end{aligned}$
+
+  ​		$\implies \dots$
+
+  ```java
+  public int findMaximumXOR(int[] nums) {
+      // Step 1: 确定异或结果最大的位数L：数组中最大值所对应的二进制位数
+      // 根据题目的限制，L不会超过31，所以也可以直接取L = 31
+      int maxNum = nums[0];
+      for(int num : nums) maxNum = Math.max(maxNum, num);
+      int L = (Integer.toBinaryString(maxNum)).length();
   
+   		// Step 2: 从最高位开始，依次向下判断XOR的各位
+      int maxXor = 0, currXor;
+      Set<Integer> prefixes = new HashSet<>();
+      for(int i = L - 1; i > -1; --i) {  // 这里i从L-1开始是因为异或结果要从最高位开始依次向后确定
+          // 通过左移一位为当前的maxXor在最右侧增加一位，e.g. 0变为0，1变为10
+          maxXor <<= 1;
+          // 将最右侧新增的一位置1，接下来检验这一位到底能不能为1，e.g. 0变为1，10变为11
+          currXor = maxXor | 1;
+          prefixes.clear();
+          // 假如现在要判断XOR的前两位的值，则需要用到数组中元素的前两位的值
+        	// 通过下面右移i位的操作，取到数组中各元素相应的前几位
+        	// e.g. 现在currXor为11，那么就需要数组中所有元素的前两位。已知数组中元素对应二进制的最长位数为L，要取前两位，只需右移3位即可（01000变为00001，11001变为00011）==>> 这也是为什么最开始for循环i从L-1开始取
+          for(int num: nums) prefixes.add(num >> i);
+        	// 最右侧能否保留刚置的1，取决于数组中是否有两元素相对应位的异或结果==curXor
+          // 变换下思路：将确定 是否有p1^p2 == currXor 变为 是否有p1 == currXor^p2.
+          for(int p: prefixes) {
+              if (prefixes.contains(currXor^p)) {
+                // 新增的一位可以为1，更新maxXor
+                maxXor = currXor;
+                break;
+              }
+          }
+      }
+      return maxXor;
+  }
+  ```
+
+  *Time Complexity:* 外层for循环 $L (\le 31)$ 次，内层两个for循环分别循环 $n$ 和 $\le n$ 次 $\implies \mathcal{O}(2Ln)$  *i.e.* $\mathcal{O}(n)$    
+
+  *Space Complexity:* $\mathcal{O}(n)$ for HashSet
 
 *****
 
-[0572]：Recursion
+##### [0572]
+
+Recursion
 
 ```java
 if (s == null) return t== null;
@@ -968,20 +1280,22 @@ if (s != null) {
 
 *****
 
-[0682]：Reverse Polish Notation
+##### [0682]
+
+Reverse Polish Notation
 
 + String —> Integer: `Integer.valueOf(String) // new Integer(String): deprecated`
 
 *****
 
-[0709]：
+##### [0709]
 
 + Solution 1: PriorityQueue 构建min heap  ==最简单，也最容易想到==
 + Solution 2: [LeetCode Analysis](https://leetcode.com/explore/learn/card/introduction-to-data-structure-binary-search-tree/142/conclusion/1009/) 是个有趣的思路，但没必要且不好理解
 
 ******
 
-[0719]：
+##### [0719]
 
 + Naive method: 找到所有pair的difference $(\mathcal{O}(n^2))$ $\rightarrow$ sort the differences $(\mathcal{O}(n^2log(n^2)))$ $\rightarrow$ 找到第 $k^{th}$ 小的value.
 
@@ -1022,7 +1336,7 @@ if (s != null) {
 
 ******
 
-[0724]：Find Pivot Index
+##### [0724] Find Pivot Index
 
 惟一要注意的点是：pivot index可以为0或者nums.length-1，只要剩余部分之和为0即可。Two pointers一首一尾向中间逼近的做法并不能满足这个条件。
 
@@ -1038,7 +1352,7 @@ for (int i = 0; i < nums.length; i++) {     // O(n)
 
 *******
 
-[0747]：Largest Number At Least Twice of Others
+##### [0747] Largest Number At Least Twice of Others
 
 定义maxIdx和secondMaxIdx（==secondMaxIdx不能和maxIdx一样从0开始==，可初始化为除0以外的任意值），最终比较`nums[maxIdx] >= 2 * nums[secondMaxIdx]` 。
 
@@ -1049,7 +1363,7 @@ for (int i = 0; i < nums.length; i++) {     // O(n)
 
 *****
 
-[0819]：
+##### [0819]
 
 + Solution 1: word层面
 
