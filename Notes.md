@@ -130,13 +130,9 @@ The essential difference between the hash set and the tree set is that ==keys in
 
 ##### ***Rabin-Karp Algorithm***
 
-Rabin-Karp algorithm is used to perform a multiple pattern search. It's used for plagiarism detection and in bioinformatics to look for similarities in two or more proteins.
+[Rabin-Karp algorithm](https://en.wikipedia.org/wiki/Rabin%E2%80%93Karp_algorithm) is used to perform a multiple pattern search. It's used for plagiarism detection and in bioinformatics to look for similarities in two or more proteins.
 
 *实现：*将要查找的内容（字符串）通过散列函数转换为hash值。同样，将待查找的文本的内容也通过散列函数转换为hash值。通过hash值的对比，来确定待查找文本中是否含有目标字符串。
-
-*注意：*待查找文本中的内容在转换为hash值时，可以直接通过确定好的散列函数实现，也可以通过已有字符串的hash值推测出来。后者 (***Rolling Hash***) 在要查找的内容较长时，可以极大地节约时间。
-
-*e.g.* 文本串为“abracadabra”，则首个可能匹配的串为“abr”，此时通过散列函数得到“abr”对应的hash值。而第二个要匹配的串为“bra”，此时可以通过“abr”的hash值来计算：只需减去首字母“a”的hash值，将整个串偏移一位再加上新的末位字母对应的散列值即可。
 
 ```java
 function RabinKarp(string s[1..n], string pattern[1..m])
@@ -148,6 +144,29 @@ function RabinKarp(string s[1..n], string pattern[1..m])
                 return i
     return not found
 ```
+
+*注意：*待查找文本中的内容在转换为hash值时，可以直接通过确定好的散列函数实现，也可以通过已有字符串的hash值推测出来。后者 (***[Rolling Hash](https://en.wikipedia.org/wiki/Rolling_hash)***) 在要查找的内容较长时，可以极大地节约时间。
+
+假设计算the first sequence of Length $L$ 的hash值的公式为
+$$
+h_0=\sum_{i=0}^{L-1}c_ibase^{L-1-i}=c_0base^{L-1}+c_1base^{L-2}+ \dots + c_{L-2}base + c_{L-1}
+$$
+则*Rolling Hash*可以有多种方式:
+
++ $\begin{matrix} \underbrace{ 111\ldots111 } \\ L\end{matrix}$
+
+$$
+\begin{matrix} 
+h_i = \underbrace{ \underbrace {(h_{i-1}-c_{i-1}base^{L-1}})\times base  \\ removing\ first} \underbrace{+c_{L-1+i}} \ (i>1) \\  shifting\ second
+\end{matrix}
+$$
+
+
+
++ removing first, shift right and add last: `h = (h - nums[start - 1] * aL) * a + nums[start + L - 1];`
++ shifting right first and then removing and adding `h = h * a - nums[start - 1] * aL + nums[start + L - 1];`
+
+*e.g.* 文本串为“abracadabra”，则首个可能匹配的串为“abr”，此时通过散列函数得到“abr”对应的hash值。而第二个要匹配的串为“bra”，此时可以通过“abr”的hash值来计算：只需减去首字母“a”的hash值，将整个串偏移一位再加上新的末位字母对应的散列值即可。
 
 *LeetCode:* [[0187]](#[0187] Repeated DNA Sequences)
 
@@ -1431,15 +1450,15 @@ Solution 2：如何one pass同时完成对HashMap的insert和search
 
 + Solution 2: [Rabin-Karp](#Rabin-Karp Algorithm) : Constant-time Slice Using Rolling Hash
 
-  + Prerequisite: 将字母对应成数字：$'A' \rightarrow 0,\ 'C' \rightarrow 1,\ 'G' \rightarrow 2,\ 'T' \rightarrow 3$
+  + Prerequisite: 将字母对应成数字：$'A' \rightarrow 0,\ 'C' \rightarrow 1,\ 'G' \rightarrow 2,\ 'T' \rightarrow 3 \implies base =4$
 
     *e.g.* $AAAAACCCCCAAAAA \rightarrow 000001111100000$
 
-  + Step 1: 计算待查找字符串中首10位子字符串的hash值：$h_0=\sum_{i=0}^{L-1}c_i4^{L-1-i}\ (L=10)$ 
+  + Step 1: 计算待查找字符串中首10位子字符串的hash值：$h_0=\sum_{i=0}^{L-1}c_i4^{L-1-i}\ (L=10,\ base=4)$ 
 
     *e.g.* The first sequence of length 10 is $AAAAACCCCC$, so $c_{0,1,2,3,4}=0$ and $c_{5,6,7,8,9}=1$ are digits of $0000011111$.
 
-  + Step 2: 通过Rolling Hash的方式依次计算之后的子字符串：$h_1=(h_0 \times4-c_04^L)+c_{10} \implies h_i=(h_{i-1}\times4-c_{i-1}4^L)+c_{L-1+i}(L=10,\ i\ge1)$ 
+  + Step 2: 通过Rolling Hash的方式依次计算之后的子字符串：$h_1=(h_0 \times4-c_04^L)+c_{10} \implies h_i=(h_{i-1}\times4-c_{i-1}4^L)+c_{L-1+i}\ (L=10,\ base=4,\ i\ge1)$ 
 
     *e.g.* $AAAAACCCCC \rightarrow AAAACCCCCA$ means $0000011111 \rightarrow 0000111110$, to remove leading 0 and to add trailing 0. 
 
