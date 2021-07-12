@@ -115,6 +115,26 @@ The essential difference between the hash set and the tree set is that ==keys in
 
 ******
 
+##### HashMap定义时初始化
+
+```java
+Map<Character, Integer> toInt = new HashMap<>() {
+  {
+    put('A', 0); 
+    put('C', 1); 
+    put('G', 2); 
+    put('T', 3); 
+  }
+};
+// or
+Map<Character, Integer> toInt = new
+                HashMap<>() {{put('A', 0); put('C', 1); put('G', 2); put('T', 3); }};
+```
+
+*解释：*外层大括号为匿名内部类；内层大括号内还可以写for循环。
+
+******
+
 *****
 
 #### Algorithms
@@ -145,30 +165,50 @@ function RabinKarp(string s[1..n], string pattern[1..m])
     return not found
 ```
 
-*注意：*待查找文本中的内容在转换为hash值时，可以直接通过确定好的散列函数实现，也可以通过已有字符串的hash值推测出来。后者 (***[Rolling Hash](https://en.wikipedia.org/wiki/Rolling_hash)***) 在要查找的内容较长时，可以极大地节约时间。
-
-假设计算the first sequence of Length $L$ 的hash值的公式为
-$$
-h_0=\sum_{i=0}^{L-1}c_ibase^{L-1-i}=c_0base^{L-1}+c_1base^{L-2}+ \dots + c_{L-2}base + c_{L-1}
-$$
-则*Rolling Hash*可以有多种方式:
-
-+ $\begin{matrix} \underbrace{ 111\ldots111 } \\ L\end{matrix}$
-
-$$
-\begin{matrix} 
-h_i = \underbrace{ \underbrace {(h_{i-1}-c_{i-1}base^{L-1}})\times base  \\ removing\ first} \underbrace{+c_{L-1+i}} \ (i>1) \\  shifting\ second
-\end{matrix}
-$$
-
-
-
-+ removing first, shift right and add last: `h = (h - nums[start - 1] * aL) * a + nums[start + L - 1];`
-+ shifting right first and then removing and adding `h = h * a - nums[start - 1] * aL + nums[start + L - 1];`
+*注意：*待查找文本内容中的sequences在转换为hash值时，可以直接通过确定好的散列函数实现，也可以通过已有字符串的hash值推测出来。后者 (***[Rolling Hash](https://en.wikipedia.org/wiki/Rolling_hash)***) 在要查找的sequence较长时，可以极大地节约时间。
 
 *e.g.* 文本串为“abracadabra”，则首个可能匹配的串为“abr”，此时通过散列函数得到“abr”对应的hash值。而第二个要匹配的串为“bra”，此时可以通过“abr”的hash值来计算：只需减去首字母“a”的hash值，将整个串偏移一位再加上新的末位字母对应的散列值即可。
 
-*LeetCode:* [[0187]](#[0187] Repeated DNA Sequences)
+假设计算the first sequence of Length $L$ 的hash值的公式为
+$$
+\begin{split}
+h_0 &=\sum_{i=0}^{L-1}c_ibase^{L-1-i} \\
+&=c_0base^{L-1}+c_1base^{L-2}+ \dots + c_{L-2}base + c_{L-1}\\
+&=(\dots((((c_0base + c_1)\times base+c_2)\times base+\dots + c_{L-2})\times base + c_{L-1}
+\end{split} \tag{1.1}
+$$
+则通过*Rolling Hash*计算之后sequences的hash值可以有多种方式:
+
+​	 $h_i$ : 第 $i$ 个sequence的hash值 $h_i$    	$h_{i-1} $ : 第 $i-1$ 个sequence的hash值
+
+​	$c_{i-1}$ : 第 $i-1$ 个sequence的第一个字符       $c_{L-1+i}$ : 第 $i$ 个sequence的最后一个字符         
+
++ 第一种方式： $\begin{matrix} 
+  ①\ remove\ the\ first\ digit \ \ ③\ add\ the\ last\ digit \\
+  h_i = \underbrace{\overbrace{(h_{i-1}-c_{i-1}base^{L-1})} \times base} \overbrace{+c_{L-1+i}} \ (i\ge1)  \\
+  ②\ shift\ left\ one\ digit\quad\quad\quad\quad\quad\ \
+  \end{matrix}$
++ 第二种方式： $\begin{matrix} 
+  ①\ shift\ left\ one\ digit \ \ ③\ add\ the\ last\ digit \\
+  h_i = \overbrace{h_{i-1}\times base} \underbrace{-c_{i-1}base^L} \overbrace{+c_{L-1+i}} \ (i\ge1)  \\
+  ②\ remove\ the\ first\ digit
+  \end{matrix}$ （第一种方式内部项乘开）<a name="第二种方式"></a>
+
+*解释：*
+
++ *为什么在 remove the first digit 时，要减去 $c_{i-1}base^{L-1}$ ？*
+
+  对于第 $i-1$ 个sequence，其第一位字符为 $c_{i-1}$。根据公式 $(1.1)$ 可知，在计算任一sequence的hash值时，其第一个字符的权重为 $base^{L-1}$。故从 $h_{i-1}$ 中移除第一位字符时，要减去 $c_{i-1}base^{L-1}$ 。
+
++ *为什么在 shift left one digit 时，要乘以 $base$ ？*
+
+  类比Bitwise Operation中的移位，左移 $n$ 位相当于原值乘以 $base^n$。
+
++ *为什么在 add the last digit 时，可以直接加上 $c_{L-1+i}$ ？*
+
+  根据公式 $(1.1)$ 可知，在计算任一sequence的hash值时，其最后一位字符的权重为 $base^0=1$。
+
+*LeetCode:* [[0187]](#[0187] Repeated DNA Sequences)（采用的第二种方式的Rolling Hash）
 
 ******
 
@@ -1140,6 +1180,73 @@ Trie (can be pronounced "try" or "tree") or prefix tree is a tree data structure
 
 ******
 
+#### Rabin-Karp Algorithm
+
+##### [0187] Repeated DNA Sequences
+
++ Solution 1: 最intuitive的方法，肯定是两层for循环嵌套，两两子字符串进行匹配。利用[[0001]](#[0001] Two Sum)中的==***Trick:*** *当需要两层嵌套的 for 循环时，考虑引入 HashSet / HashMap 转变为 one pass*==改进为one pass。
+
+  $\implies \mathcal{O}((n-10)10)$
+
+==下面的两个做法，都只是为了省去Solution 1中`substring(i, i+10)`的操作，从而降低TC==
+
++ Solution 2: [Rabin-Karp](#Rabin-Karp Algorithm) : Constant-time Slice Using Rolling Hash
+
+  + Prerequisite: 将字母对应成数字：$'A' \rightarrow 0,\ 'C' \rightarrow 1,\ 'G' \rightarrow 2,\ 'T' \rightarrow 3 \implies base =4$
+
+    *e.g.* $AAAAACCCCCAAAAA \rightarrow 000001111100000$
+
+  + Step 1: 计算待查找字符串中首10位子字符串的hash值：==代码中的实现是依据公式的第三行==
+    $$
+    \begin{split}
+    h_0 &=\sum_{i=0}^{L-1}c_i4^{L-1-i}\ (L=10,\ base=4) \\
+    &=c_04^9+c_14^8+c_24^7+c_34^6+c_44^5+c_54^4+c_64^3 + c_74^2+c_84 + c_9\\
+    &=((((((((c_0\times4 + c_1)\times 4+c_2)\times 4+c_3)\times 4+c_4)\times 4+c_5)\times4+c_6)\times4+c_7)\times4+c_8)\times4 + c_9
+    \end{split}
+    $$
+    *e.g.* The first sequence of length 10 is $AAAAACCCCC$, so $c_{0,1,2,3,4}=0$ and $c_{5,6,7,8,9}=1$ are digits of $0000011111$.
+
+  + Step 2: 通过[Rolling Hash的第二种方式](#第二种方式)依次计算之后的子字符串：
+    $$
+    h_1=(h_0 \times4-c_04^L)+c_{10} \ (L=10,\ base=4,\ i\ge1)\\
+    \implies h_i=(h_{i-1}\times4-c_{i-1}4^L)+c_{L-1+i}
+    $$
+    *e.g.* $AAAAACCCCC \rightarrow AAAACCCCCA$ means $0000011111 \rightarrow 0000111110$, to remove leading 0 and to add trailing 0. 
+
+  + Step 3: 同Solution 1中利用`HashSet seen`和`HashSet res`进行两两子字符串匹配。
+
+  $\implies \mathcal{O}(n-10)$
+
++ Solution 3: Bit Manipulation : Constant-time Slice Using Bitmask
+
+  + Prerequisite: 将字母对应成二进制：$'A' \rightarrow 00,\ 'C' \rightarrow 01,\ 'G' \rightarrow 10,\ 'T' \rightarrow 11$
+
+    *e.g.* $AAAAACCCCCAAAAA \rightarrow 000000000011111111110000000000$
+
+  + Step 1: 计算the first sequence of Length L的对应的长度为 $2L$ 的二进制串 (bitmask)
+
+  + Step 2: 已知 $h_{i-1}$ 对应的长度为 $2L$ 的二进制串 (bitmask)，如何得出 $h_i$ 的二进制串 (bitmask)？
+
+    ==借用Rolling Hash的思路==
+
+    + Do left shift to free the last two bits: `bitmask <<= 2`
+    + Add the new last bits: `biitmask != nums[L-1+i]`
+    + Remove the original first two bits: `bitmask &= ~(3 << 2 * L)`
+
+  + Step 3: 同Solution 1中利用`HashSet seen`和`HashSet res`进行两两子字符串匹配。
+
+  *Analysis: Why `bitmask &= ~(3 << 2 * L)` can set the original first two bits to 0?*
+
+  已知与上 `1<<n` 可以 set n-th bit equal to 1，则与上 `~(1<<n)` 可以 set n-th bit equal to 0。
+
+  假如此时 $h_{i-1}$ 为 $\begin{matrix}\underbrace{110000\dots001001} \\ 20\end{matrix}$，左移两位且加上新的值 $'T'=11$ 后，变为 $\begin{matrix}\underbrace{110000\dots001001\underline{11}} \\ 22\end{matrix}$。现在要置最开始的两位 $11$ 为 $00$ ，则需要与上 $\begin{matrix} \underbrace{001111\dots\dots111111)} \\ 22\end{matrix}=$$\begin{matrix}\neg \underbrace{(110000\dots\dots000000)} \\ 22\end{matrix}$，而这个数即为 `~(3 << 2 * 10)`。
+
+  $\implies \mathcal{O}(n-10)$ ==Performance最佳，但Solution 3主要还是借用了Rabin-Karp Algorithm的思路和Rolling Hash的思路==
+
+******
+
+******
+
 #### Recursion
 
 ##### [0108] Convert (strictly increrasing) Sorted Array to (height-balanced) Binary Search Tree
@@ -1437,36 +1544,6 @@ Solution 2：如何one pass同时完成对HashMap的insert和search
    digits[0] = 1;
    return digits;
    ```
-
-******
-
-##### [0187] Repeated DNA Sequences
-
-+ Solution 1: 最intuitive的方法，肯定是两层for循环嵌套，两两子字符串进行匹配。利用[[0001]](#[0001] Two Sum)中的==***Trick:*** *当需要两层嵌套的 for 循环时，考虑引入 HashSet / HashMap 转变为 one pass*==改进为one pass。
-
-  $\implies \mathcal{O}((n-10)10)$
-
-==下面的两个做法，都只是为了省去Solution 1中`substring(i, i+10)`的操作，从而降低TC==
-
-+ Solution 2: [Rabin-Karp](#Rabin-Karp Algorithm) : Constant-time Slice Using Rolling Hash
-
-  + Prerequisite: 将字母对应成数字：$'A' \rightarrow 0,\ 'C' \rightarrow 1,\ 'G' \rightarrow 2,\ 'T' \rightarrow 3 \implies base =4$
-
-    *e.g.* $AAAAACCCCCAAAAA \rightarrow 000001111100000$
-
-  + Step 1: 计算待查找字符串中首10位子字符串的hash值：$h_0=\sum_{i=0}^{L-1}c_i4^{L-1-i}\ (L=10,\ base=4)$ 
-
-    *e.g.* The first sequence of length 10 is $AAAAACCCCC$, so $c_{0,1,2,3,4}=0$ and $c_{5,6,7,8,9}=1$ are digits of $0000011111$.
-
-  + Step 2: 通过Rolling Hash的方式依次计算之后的子字符串：$h_1=(h_0 \times4-c_04^L)+c_{10} \implies h_i=(h_{i-1}\times4-c_{i-1}4^L)+c_{L-1+i}\ (L=10,\ base=4,\ i\ge1)$ 
-
-    *e.g.* $AAAAACCCCC \rightarrow AAAACCCCCA$ means $0000011111 \rightarrow 0000111110$, to remove leading 0 and to add trailing 0. 
-
-  + Step 3: 同Solution 1中利用`HashSet seen`和`HashSet res`进行两两子字符串匹配。
-
-  $\implies \mathcal{O}(n-10)$
-
-+ Solution 3: Bit Manipulation : Constant-time Slice Using Bitmask
 
 ******
 
