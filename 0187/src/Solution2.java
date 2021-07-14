@@ -14,7 +14,8 @@ public class Solution2 {
         if (n <= L) return new ArrayList();
 
         // rolling hash parameters: 见Note -> Concept -> Rabin-Karp Algorithm
-        int base = 4, shiftLeft = (int)Math.pow(base, L);  // base^L
+        int base = 4;
+        int adjustedWeight = (int)Math.pow(base, L);  // 详见Notes：对于任一sequence，其首位字符的权重应为base^(L-1)，但因为本题中采用的是Rolling Hash的第二种方式，故首位字符的权重调整为base^L
 
         // convert string to array of integers
         Map<Character, Integer> toInt = new
@@ -29,7 +30,7 @@ public class Solution2 {
         for (int start = 0; start < n - L + 1; ++start) {
             // compute hash of the current sequence in O(1) time
             if (start != 0)  // 根据h_{i-1}的hash值，计算出h_i的hash值 （i≥1）
-                h = h * base - nums[start - 1] * shiftLeft + nums[start + L - 1];
+                h = h * base - nums[start - 1] * adjustedWeight + nums[start + L - 1];
                 // compute hash of the first sequence in O(L) time
             else // 根据hash function计算出h_0
                 for(int i = 0; i < L; ++i) h = h * base + nums[i]; // 这里参考Note中Step 1公式的第三行

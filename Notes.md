@@ -148,6 +148,20 @@ Map<Character, Integer> toInt = new
 
 ******
 
+#####  String-searching algorithms
+
+Best [String-searching algorithms](https://en.wikipedia.org/wiki/String-searching_algorithm#Single-pattern_algorithms) have a linear execution time in average. 
+
+The most popular ones are [Aho-Corasick](https://en.wikipedia.org/wiki/Aho–Corasick_algorithm), [KMP](https://en.wikipedia.org/wiki/Knuth–Morris–Pratt_algorithm) and [Rabin-Karp](https://en.wikipedia.org/wiki/Rabin–Karp_algorithm): 
+
++ Aho-Corasick is used by [fgrep](https://en.wikipedia.org/wiki/Grep#Variations)
++ KMP is used for [chinese string searching](https://www.aclweb.org/anthology/C96-2200)
++ Rabin-Karp is used for plagiarism detection and in bioinformatics to look for similarities in two or more proteins.
+
+The first two are optimised for a single pattern search, and Rabin-Karp for a multiple pattern search.
+
+******
+
 ##### ***Rabin-Karp Algorithm***
 
 [Rabin-Karp algorithm](https://en.wikipedia.org/wiki/Rabin%E2%80%93Karp_algorithm) is used to perform a multiple pattern search. It's used for plagiarism detection and in bioinformatics to look for similarities in two or more proteins.
@@ -159,8 +173,8 @@ function RabinKarp(string s[1..n], string pattern[1..m])
     hpattern := hash(pattern[1..m]);
     for i from 1 to n-m+1
         hs := hash(s[i..i+m-1])
-        if hs = hpattern
-            if s[i..i+m-1] = pattern[1..m]
+        if hs = hpattern // 仅仅是hash值相同，可能是因为hash collision导致的伪重复 
+            if s[i..i+m-1] = pattern[1..m] // 因此保险起见，还需要再检测子字符串是否真的相同
                 return i
     return not found
 ```
@@ -188,11 +202,14 @@ $$
   h_i = \underbrace{\overbrace{(h_{i-1}-c_{i-1}base^{L-1})} \times base} \overbrace{+c_{L-1+i}} \ (i\ge1)  \\
   ②\ shift\ left\ one\ digit\quad\quad\quad\quad\quad\ \
   \end{matrix}$
+
 + 第二种方式： $\begin{matrix} 
   ①\ shift\ left\ one\ digit \ \ ③\ add\ the\ last\ digit \\
   h_i = \overbrace{h_{i-1}\times base} \underbrace{-c_{i-1}base^L} \overbrace{+c_{L-1+i}} \ (i\ge1)  \\
   ②\ remove\ the\ first\ digit
-  \end{matrix}$ （第一种方式内部项乘开）<a name="第二种方式"></a>
+  \end{matrix}$ 
+
+  （第一种方式内部项乘开 / In a generalised way）<a name="第二种方式"></a>
 
 *解释：*
 
@@ -208,7 +225,7 @@ $$
 
   根据公式 $(1.1)$ 可知，在计算任一sequence的hash值时，其最后一位字符的权重为 $base^0=1$。
 
-*LeetCode:* [[0187]](#[0187] Repeated DNA Sequences)（采用的第二种方式的Rolling Hash）
+*LeetCode:* [[0187]](#[0187] Repeated DNA Sequences)（采用的第二种方式的Rolling Hash）  [[1044]](#[1044] Longest Duplicate Substring)       [1062]
 
 ******
 
@@ -1242,6 +1259,36 @@ Trie (can be pronounced "try" or "tree") or prefix tree is a tree data structure
   假如此时 $h_{i-1}$ 为 $\begin{matrix}\underbrace{110000\dots001001} \\ 20\end{matrix}$，左移两位且加上新的值 $'T'=11$ 后，变为 $\begin{matrix}\underbrace{110000\dots001001\underline{11}} \\ 22\end{matrix}$。现在要置最开始的两位 $11$ 为 $00$ ，则需要与上 $\begin{matrix} \underbrace{001111\dots\dots111111)} \\ 22\end{matrix}=$$\begin{matrix}\neg \underbrace{(110000\dots\dots000000)} \\ 22\end{matrix}$，而这个数即为 `~(3 << 2 * 10)`。
 
   $\implies \mathcal{O}(n-10)$ ==Performance最佳，但Solution 3主要还是借用了Rabin-Karp Algorithm的思路和Rolling Hash的思路==
+
+******
+
+##### [1044] Longest Duplicate Substring
+
+这道题和[[0187]](#[0187] Repeated DNA Sequences)相比，惟一的区别是并没有明确sequence的length ([0187]中明确了 $L=10$ )，而是需要我们自己找出length可能的最大值，故将问题分为两个子问题：
+
+1. Perform a search by a substring length in the interval from 1 to n-1;
+2. Check if there is a duplicate substring of a given length L $\implies \mathcal{O}(n-L)$.
+
+子问题2就是[0187] Rabin-Karp + Rolling Hash，不多考虑。子问题1第一反应是从n-1开始，依次循环递减至1。但假如length最大值为0 (无重复的substring)，则复杂度仍需 $\mathcal{O}(n)$。故借助Binary Search，可将复杂度降至 $\mathcal{O}(logn)$。因此该问题总的复杂度为 $\mathcal{O}((n-L)logn)=\mathcal{O}(nlogn)$。
+
+*具体实现：*
+
++ 子问题1: 
+
+  ```java
+  int left = 1, right = n;
+  while ()
+  ```
+
++ 子问题2:
+
+  因为本题中 $base=26$，且 $L_{max}=3 \times 10^4$，故在[0187]的代码上要注意以下几点：
+
+  +  
+
+
+
+
 
 ******
 
