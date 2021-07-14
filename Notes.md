@@ -225,7 +225,7 @@ $$
 
   根据公式 $(1.1)$ 可知，在计算任一sequence的hash值时，其最后一位字符的权重为 $base^0=1$。
 
-*LeetCode:* [[0187]](#[0187] Repeated DNA Sequences)（采用的第二种方式的Rolling Hash）  [[1044]](#[1044] Longest Duplicate Substring)       [1062]
+*LeetCode:* [[0187]](#[0187] Repeated DNA Sequences)（采用的第二种方式的Rolling Hash）  [[1044]](#[1044] Longest Duplicate Substring)（采用的第二种方式的Rolling Hash）   [1062]
 
 ******
 
@@ -337,11 +337,11 @@ $$
 
 ##### ***XOR (exclusive OR) 异或***
 
-+ 表示：$\bigoplus$（数学符号）、^（程序符号）
++ 表示：$\oplus$（数学符号）、^（程序符号）
 
 + 性质：
 
-  1. $p \bigoplus q = (p \and \neg q) \or (\neg p \and q)$
+  1. $p \oplus q = (p \and \neg q) \or (\neg p \and q)$
 
   2. 如果a、b两个值不相同，则异或结果为1。如果a、b两个值相同，异或结果为0。
 
@@ -1267,28 +1267,94 @@ Trie (can be pronounced "try" or "tree") or prefix tree is a tree data structure
 这道题和[[0187]](#[0187] Repeated DNA Sequences)相比，惟一的区别是并没有明确sequence的length ([0187]中明确了 $L=10$ )，而是需要我们自己找出length可能的最大值，故将问题分为两个子问题：
 
 1. Perform a search by a substring length in the interval from 1 to n-1;
-2. Check if there is a duplicate substring of a given length L $\implies \mathcal{O}(n-L)$.
+2. Check if there is a duplicate substring of a given length $L$ $\implies \mathcal{O}(n-L)$.
 
 子问题2就是[0187] Rabin-Karp + Rolling Hash，不多考虑。子问题1第一反应是从n-1开始，依次循环递减至1。但假如length最大值为0 (无重复的substring)，则复杂度仍需 $\mathcal{O}(n)$。故借助Binary Search，可将复杂度降至 $\mathcal{O}(logn)$。因此该问题总的复杂度为 $\mathcal{O}((n-L)logn)=\mathcal{O}(nlogn)$。
 
 *具体实现：*
 
-+ 子问题1: 
++ 子问题1：虽然在检查是否存在duplicate substring时，substring的长度 $L \in [0,n-1]$，但最终的结果却可为0，意味着该字符串中并没有重复的子字符串。以及，考虑到当长度为 $L$ 时，发现重复子串存在，则 `left` 要更新为 $L$ ，因为 $L$ 仍有可能为最终结果（即并不存在长度大于 $L$ 的重复子串）；而未发现重复子串存在时，则 `right` 要更新为 $L-1$ ，因为 $L$ 已经不可能为最终结果了。故选择Binary Search Template II，==但是要加一个改动，保证 $L$ 不会取到0==。
 
   ```java
-  int left = 1, right = n;
-  while ()
+  int left = 0, right = n-1; 
+  while (left < right) {
+      int L = left + (right - left) / 2;
+      if (L == left) L++; // 仅仅是为了防止当String S的长度为2，left=0，right=1，此时L取0而取不到1
+      if (searchDuplicate(S, L) != -1) left = L;
+      else right = L - 1;
+  }
   ```
 
-+ 子问题2:
++ 子问题2：因为本题中 $base=26$，且 $L_{max}=3 \times 10^4$，故在[0187]的代码基础上要注意以下几点：
 
-  因为本题中 $base=26$，且 $L_{max}=3 \times 10^4$，故在[0187]的代码上要注意以下几点：
+  +  任一sequence的首位字符的权重 $base^{L-1}$ 很大可能会overflow，需依据[线性同余方法](https://en.wikipedia.org/wiki/Linear_congruential_generator#Parameters_in_common_use)引入 $modulus=2^{32}$，故
 
-  +  
+    + the first sequence $h_0$ 的公式变为
+      $$
+      h_0 =\sum_{i=0}^{L-1}c_ibase^{L-1-i}\ \% \ modulus
+      $$
+      $\implies$ 任一sequence的首位字符的权重变为 $base^{L-1}\ \%\ modulus$
 
+      $\implies$ `long adjustedWeight = (long) (Math.pow(base, L) % modulus);`  *LeetCode是通过循环实现，没有这个直观*
 
+      对应的 Java 代码为
 
+      ```java
+      for(int i = 0; i < L; ++i) h = (h * base + nums[i]) % modulus;
+      ```
 
+      *解释：*假设 $L=3$，此时
+
+      按照公式：
+      $$
+      h_0=c_0\times base^2\ \%\ modulus+c_1\times base\ \%\ modulus+c_2\ \%\ modulus
+      $$
+      按照代码：
+      $$
+      \begin{aligned}
+      h_0&=((c_0\ \%\ modulus\times base+c_1)\ \%\ modulus \times base + c_2)\ \%\ modulus \\ 
+      &=(c_0\ \%\ modulus\ \%\ modulus\times base^2+c_1\ \%\ modulus\times base + c_2)\ \%\ modulus \\
+      &= c_0\ \%\ modulus\ \%\ modulus\ \%\ modulus\times base^2+c_1\ \%\ modulus\ \%\ modulus\times base + c_2\ \%\ modulus
+      \end{aligned} \\
+      \because \boldsymbol{\color{red}{(a\ \%\ n)\ \%\ n=a\ \%\ n}} \\
+      \therefore h_0=c_0\times base^2\ \%\ modulus+c_1\times base\ \%\ modulus+c_2\ \%\ modulus
+      $$
+      两者结果相同 $\implies$ $Q.E.T.$
+
+    + Rolling Hash的公式变为
+      $$
+      h_i = (h_{i-1}\times base -c_{i-1}base^L +c_{L-1+i})\  \% \ modulus \ (i\ge1)
+      $$
+      对应的 Java 代码为
+
+      ```java
+      h = (h * base - nums[start - 1] * adjustedWeight + nums[start + L - 1]) % modulus
+      ```
+
+  + 又因为一个[purely Java-related overflow issue](https://leetcode.com/problems/longest-duplicate-substring/discuss/292982/Java-version-with-comment)，上述Rolling Hash的计算代码要rewrite如下：
+
+    ```java
+    h = (h * base - nums[start - 1] * adjustedWeight % modulus + modulus) % modulus;
+    h = (h + nums[start + L - 1]) % modulus;
+    ```
+
+    但其实这么改写就是因为原代码写法可能会使 $h_i$ 为negative，所以下面写法==更好理解且速度更快==：
+
+    ```java
+    h = (h * base - nums[start - 1] * adjustedWeight + nums[start + L - 1]) % modulus;
+    if (h < 0) h += modulus;
+    ```
+
+  + LeetCode提供的答案（both [0187] & [1044]）并没有避免hash collision，导致有些sequences仅仅因为hash值相同（实际内容并不相同）而导致选择了错误的 $L$。故还需要==在hash值相同时，增加验证实际内容是否也相同==的方法：
+
+    ```java
+    private boolean verify(int x, int y, String s, int L) {
+        for (int i = 0; i < L; i++) {
+          	if (s.charAt(x++) != s.charAt(y++)) return false;
+        }
+        return true;
+    }
+    ```
 
 ******
 
