@@ -804,6 +804,155 @@ public int singleNumber(int[] nums) {
     return new int[]{x_bitmask, bitmask^x_bitmask};
     ```
 
+*******
+
+##### [0318] Maximum Product of Word Lengths
+
+Given a string array `words`, return *the maximum value of* `length(word[i]) * length(word[j])` *where the two words do not share common letters*. If no such two words exist, return `0`.
+
+*The naive straightforward solution:*
+
+```java
+class Solution {
+  public boolean noCommonLetters(String s1, String s2){
+    // TODO
+  }
+
+  public int maxProduct(String[] words) {
+    int n = words.length;
+
+    int maxProd = 0;
+    for (int i = 0; i < n; ++i)
+      for (int j = i + 1; j < n; ++j)
+        if (noCommonLetters(words[i], words[j]))
+          maxProd = Math.max(maxProd, words[i].length() * words[j].length());
+
+    return maxProd;
+  }
+}
+```
+
+*Two tasks:*
+
++ Optimize function `noCommonLetters`: implementation of `noCommonLetters` with minimum time complexity;
++ Optimize numbers of comparisons: minimize the number of word comparisons. There is no need to always perform $\mathcal{O}(N^2)$ comparisons. Among all the strings with the same set of letters ($ab,aaaaabaabaaabb,bbabbabba$) it's enough to keep the longest one ($aaaaabaabaaabb$).
+
+*具体实现：*
+
++ 对于the implementation of `noCommonLetters`有三种方法：
+
+  + Naive solution : Check the characters in the first word one by one. For each character ensure that this character is *not* in the second word. $\implies \mathcal{O}(L_1 \times L_2)$
+
+    ```java
+    public boolean noCommonLetters(String s1, String s2){
+      for (char c : s1.toCharAarray())
+        if (s2.indexOf(ch) != -1) return false;
+      return true;
+    }
+    ```
+
+  + 将两个word转换为其各自对应的bitmasks，通过两个bitmasks的与操作判断 : $\implies \mathcal{O}(L_1 + L_2)$
+
+    1. 利用 `(int)letter - (int)'a'` 计算word中每个字母对应的bit number，即字母a对应数字0，字母b对应数字1，依次类推：
+
+       *e.g.* word为 “leetcode” $\rightarrow$ bit number for each letter is $[11, 4,4,19,2,14,3,4]$  
+
+    2. 因为有26个字母，故bitmask有26 bits。依据Step 1中得到的bit number for each letter得到bitmask：
+
+       *e.g.* 由$[11, 4,4,19,2,14,3,4]$可得： 
+       $$
+       \begin{bmatrix}
+       z&y&x&w&v&u&\color{red}{t}&s&r&q&p&\color{red}{o}&n&m&\color{red}{l}&k&j&i&h&g&f&\color{red}{e}&\color{red}{d}&\color{red}{c}&b&a\\
+       25&24&23&22&21&20&\color{red}{19}&18&17&16&15&\color{red}{14}&13&12&\color{red}{11}&10&9&8&7&6&5&\color{red}{4}&\color{red}{3}&\color{red}{2}&1&0 \\
+       0&0&0&0&0&0&\color{red}{1}&0&0&0&0&\color{red}{1}&0&0&\color{red}{1}&0&0&0&0&0&0&\color{red}{1}&\color{red}{1}&\color{red}{1}&0&0
+       \end{bmatrix}
+       $$
+       ​		$\implies$ bitmask for word "leetcode" is $00000010000100100000011100$
+
+    ```java
+    public int bitNumber(char ch) {
+      return (int)ch - (int)'a';
+    }
+    
+    public boolean noCommonLetters(String s1, String s2) {
+      int bitmask1 = 0, bitmask2 = 0;
+      for (char ch : s1.toCharArray())
+        // add bit number bit_number in bitmask
+        bitmask1 |= 1 << bitNumber(ch);
+      for (char ch : s2.toCharArray())
+        bitmask2 |= 1 << bitNumber(ch);
+    
+      return (bitmask1 & bitmask2) == 0;
+    }
+    ```
+
+  + Bitmasks + Precomputation：In the previous approach one computes a bitmask of each word N times. In fact, each bitmask could be precomputed just once, memorised and then used for the runtime comparison in a constant time.
+
+    ```java
+    public int bitNumber(char ch) {
+      return (int)ch - (int)'a';
+    }
+    
+    public int maxProduct(String[] words) {
+      int n = words.length;
+      int[] masks = new int[n];
+    
+      int bitmask = 0;
+      for (int i = 0; i < n; ++i) {    // O(L), where L is a total length of all words together
+        bitmask = 0;
+        for (char ch : words[i].toCharArray()) {
+          bitmask |= 1 << bitNumber(ch);
+        }
+        masks[i] = bitmask;
+      }
+    
+      int maxVal = 0;
+      for (int i = 0; i < n; ++i)
+        for (int j = i + 1; j < n; ++j)    // O(n^2)
+          if ((masks[i] & masks[j]) == 0)   // O(1)
+            maxVal = Math.max(maxVal, words[i].length() * words[j].length());
+    
+      return maxVal;
+    }
+    ```
+
+    *Time Complexity:* $\mathcal{O}(n^2+L)$
+
+    *Space Complexity:* $\mathcal{O}(n)$ for array
+
++ 在上面代码的基础上，进行第二个优化：借助`hashmap(bitmask, maxLength)` (一个bitmask实际表示的是用到了哪些字母，而这些字母可以有很多的不同组合，但只记录最长组合的长度)
+
+  ```java
+  public int bitNumber(char ch) {
+    return (int)ch - (int)'a';
+  }
+  
+  public int maxProduct(String[] words) {
+    HashMap<Integer, Integer> hashmap = new HashMap<>();
+  
+    int bitmask = 0;
+    for (String word : words) {    // O(L), where L is a total length of all words together
+      bitmask = 0;
+      for (char ch : word.toCharArray()) {
+        bitmask |= 1 << bitNumber(ch);
+      }
+      hashmap.put(bitmask, Math.max(hashmap.getOrDefault(bitmask, 0), word.length()));
+    }
+  
+    int maxVal = 0;
+    for (int x : hashmap.keySet())
+      for (int y : hashmap.keySet())    // O(n^2)
+        if ((x & y) == 0)   // O(1)
+          maxVal = Math.max(maxVal, hashmap.get(x) * hashmap.get(y));
+  
+    return maxVal;
+  }
+  ```
+
+  *Time Complexity:* $\mathcal{O}(n^2+L)$      *因为Java HashMap的性能比起array差非常多，所以性能并没有很大提升。其他语言会好很多*
+
+  *Space Complexity:* $\mathcal{O}(n)$ for Hashmap
+
 ******
 
 ********
@@ -1201,7 +1350,7 @@ Trie (can be pronounced "try" or "tree") or prefix tree is a tree data structure
 
 ##### [0187] Repeated DNA Sequences
 
-+ Solution 1: 最intuitive的方法，肯定是两层for循环嵌套，两两子字符串进行匹配。利用[[0001]](#[0001] Two Sum)中的==***Trick:*** *当需要两层嵌套的 for 循环时，考虑引入 HashSet / HashMap 转变为 one pass*==改进为one pass。
++ Solution 1: 最intuitive的方法，肯定是两层for循环嵌套，两两子字符串进行匹配。利用***[Trick](#hashsetTrick)***改进为one pass。
 
   $\implies \mathcal{O}((n-10)10)$
 
@@ -1293,10 +1442,6 @@ Trie (can be pronounced "try" or "tree") or prefix tree is a tree data structure
       $$
       h_0 =\sum_{i=0}^{L-1}c_ibase^{L-1-i}\ \% \ modulus
       $$
-      $\implies$ 任一sequence的首位字符的权重变为 $base^{L-1}\ \%\ modulus$
-
-      $\implies$ `long adjustedWeight = (long) (Math.pow(base, L) % modulus);`  *LeetCode是通过循环实现，没有这个直观*
-
       对应的 Java 代码为
 
       ```java
@@ -1321,6 +1466,25 @@ Trie (can be pronounced "try" or "tree") or prefix tree is a tree data structure
       $$
       两者结果相同 $\implies$ $Q.E.T.$
 
+      *关于任一sequence的首位字符的权重：*
+
+      任一sequence的首位字符的权重变为 $base^{L-1}\ \%\ modulus$
+
+      对应的 Java 代码为
+
+      ```java
+      long adjustedWeight = 1;
+      for (int i = 1; i <= L; ++i) adjustedWeight = (adjustedWeight * base) % modulus;
+      ```
+
+      注意不要为了方便理解写成
+
+      ```java
+      long adjustedWeight = (long) (Math.pow(base, L) % modulus);  // L = 15时，计算错误
+      // or
+      long adjustedWeight = (long) (Math.pow(base, L)) % modulus;  // L = 14时，计算错误
+      ```
+
     + Rolling Hash的公式变为
       $$
       h_i = (h_{i-1}\times base -c_{i-1}base^L +c_{L-1+i})\  \% \ modulus \ (i\ge1)
@@ -1338,11 +1502,11 @@ Trie (can be pronounced "try" or "tree") or prefix tree is a tree data structure
     h = (h + nums[start + L - 1]) % modulus;
     ```
 
-    但其实这么改写就是因为原代码写法可能会使 $h_i$ 为negative，所以下面写法==更好理解且速度更快==：
+    但其实这么改写就是因为原代码写法可能会因为overflow $h_i$ 为negative，所以下面写法==更好理解且速度更快==：
 
     ```java
     h = (h * base - nums[start - 1] * adjustedWeight + nums[start + L - 1]) % modulus;
-    if (h < 0) h += modulus;
+    while (h < 0) h += modulus;
     ```
 
   + LeetCode提供的答案（both [0187] & [1044]）并没有避免hash collision，导致有些sequences仅仅因为hash值相同（实际内容并不相同）而导致选择了错误的 $L$。故还需要==在hash值相同时，增加验证实际内容是否也相同==的方法：
@@ -1355,6 +1519,26 @@ Trie (can be pronounced "try" or "tree") or prefix tree is a tree data structure
         return true;
     }
     ```
+
++ 子问题2如果通过[[1062]](#[1062] Longest Repeating Substring) Solution 2实现会Memory Limit Exceeded；Solution 3实现会hash collision。
+
+******
+
+##### [1062] Longest Repeating Substring
+
+同[[1044]](#[1044] Longest Duplicate Substring)，返回值不同而已
+
++ Solution 1：Binary Search + HashMap of <u>*Hashes*</u> of already seen strings （==by Rabin-Karp + Rolling Hash==，有检测Hash Collision）
++ Solution 2：Binary Search + Hashset of Already Seen Strings : 利用***[Trick](#hashsetTrick)***改进为one pass
++ Solution 3：Binary Search + Hashset of <u>*Hashes*</u> of Already Seen Strings: 利用***[Trick](#hashsetTrick)***改进为one pass （==by `substring.hashCode()`==，没有检测Hash Collision）
+
+Summary : 
+
+|                           Solution                           |                       Time Complexity                        |                       Space Complexity                       |
+| :----------------------------------------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: |
+| **Rabin-Karp : constant-time slice + hashset of <u>*hashes*</u> of already seen strings** |     $\mathcal{O}((N−L)logN) \implies \mathcal{O}(NlogN)$     | Moderate space consumption even in the case of large strings  $\implies \mathcal{O}(N)$ to keep the hashmap |
+|   **Linear-time slice + hashset of already seen strings**    | $\mathcal{O}(((N−L)L)logN) \implies \mathcal{O}(NlogN)$ in average case and $\mathcal{O}(N^2)$ in the worst case of $L$ close to $N/2$ | Huge space consumption in the case of large strings $\implies \mathcal{O}(N^2)$ to keep the hashset |
+| **Linear-time slice + hashset of <u>*hashes*</u> of already seen strings** | $\mathcal{O}(((N−L)L)logN) \implies \mathcal{O}(NlogN)$ in average case and $\mathcal{O}(N^2)$ in the worst case of $L$ close to $N/2$ | Moderate space consumption even in the case of large strings  $\implies \mathcal{O}(N)$ to keep the hashset |
 
 ******
 
@@ -1621,7 +1805,9 @@ if (s != null) {
 
 Solution 2：如何one pass同时完成对HashMap的insert和search 
 
-==***Trick:*** *当需要两层嵌套的 for 循环时，考虑引入 HashSet / HashMap 转变为 one pass*==  [[0187]](#[0187] Repeated DNA Sequences)
+==***Trick:*** *当需要两层嵌套的 for 循环时，考虑引入 HashSet / HashMap 转变为 one pass<a name="hashsetTrick"></a>  
+
+[[0187]](#[0187] Repeated DNA Sequences)
 
 *******
 
@@ -1764,6 +1950,26 @@ Solution 2：如何one pass同时完成对HashMap的insert和search
     + the maximum largest sum of each subarray doesn't exceed the mid. Once the sum exceeds the mid, split it and begin a new subarray  $\implies$ 定义变量sum记录当前元素之和
     + the number of subarrays doesn't exceed m $\implies$ 定义变量cnt记录subarray的数量
     + 同时满足上述两个条件，则F(mid) == true.
+
+*****
+
+##### [0498] Diagonal Traverse
+
+将一个二维数组按照如下方式遍历为一个一维数组：$[[1,2,3],[4,5,6],[7,8,9]] \rightarrow [1,2,4,7,5,3,6,8,9]$
+
+![](/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/[0498].jpg)
+
+由上图红色部分标注可知：
+
+Input : `int[m+1][n+1] mat`     Output : `int[(m+1)*(n+1)] res`
+
++ 同一条对角线上元素的index $(i,j)$ 之和sum ($=i+j$) 相同，范围为sum $\in [0, m+n]$；
+
++ 若sum为偶数，则对角线自左下向右上，故 $i$ 先大后小，$\implies i$ 从 $min(sum,m)$ 减至 $[max(sum-n,0)],\ j=sum-i$；
+
+  若sum为奇数，则对角线自右上向左下，故 $i$ 先小后大，$\implies i$从 $max(sum-n,0)$ 增至 $min(sum,m)],\ j=sum-i$。
+
+  ==$i$ 的范围取法是为了确保 $i$ 和 $j$ 都不越界==
 
 *****
 

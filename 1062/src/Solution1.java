@@ -3,14 +3,14 @@ import java.util.HashMap;
 
 /**
  * @author YonghShan
- * @date 7/13/21 - 16:33
+ * @date 7/14/21 - 15:11
  */
-class Solution1 {
+public class Solution1 {
     // Rabin-Karp Algorithm + Binary Search
-    /* Runtime: 329ms (faster than 41.98%)
-       Memory: 51.5MB (less than 25.43%)
+    /* Runtime: 6ms (faster than 69.42%)    O(nlogn)
+       Memory: 39.3MB (less than 60.04%)    O(n) for HashSet
      */
-    public int searchDuplicate(String S, int L) {
+    public int searchDuplicate(String S, int L) {     // O(n)
         int n = S.length();
 
         // convert string to array of integers
@@ -35,8 +35,8 @@ class Solution1 {
         // 详见Notes：a^L % modulus, which is the adjusted weight of the first digit in any sequence
         long adjustedWeight = 1;
         for (int i = 1; i <= L; ++i) adjustedWeight = (adjustedWeight * base) % modulus;
-        // 不要写成下面这种：验证下面这种会出错可以看[1062] - test.java
-        // long adjustedWeight = (long) (Math.pow(base, L) % modulus);
+        // 不要写成下面这种
+        // long adjustedWeight = (long) (Math.pow(base, L)) % modulus;
 
         for(int start = 1; start < n - L + 1; ++start) {
             // compute rolling hash in O(1) time：计算公式为啥变这样，详见Notes
@@ -66,41 +66,18 @@ class Solution1 {
         return true;
     }
 
-    public String longestDupSubstring(String S) {
-        int n = S.length();
+    public int longestRepeatingSubstring(String s) {    // O(nlogn)
+        int n = s.length();
 
         // binary search, L = repeating string length
         int left = 0, right = n-1;
         while (left < right) {
             int L = left + (right - left) / 2;
             if (L == left) L++; // 防止String S的长度为2，此时L取不到1
-            if (searchDuplicate(S, L) != -1) left = L;
+            if (searchDuplicate(s, L) != -1) left = L;    // O(n)
             else right = L - 1;
         }
 
-        if (left == 0) return "";
-        int start = searchDuplicate(S, left);
-        return S.substring(start, start + left);
-    }
-
-    public String longestDupSubstring2(String S) {  // 在最后return时，少进行一次searchDuplicate()的执行，实际runtime无区别
-        int n = S.length();
-
-        // binary search, L = repeating string length
-        int left = 0, right = n-1;
-        int idx = -1;
-        while (left < right) {
-            int L = left + (right - left) / 2;
-            if (L == left) L++; // 防止String S的长度为2，此时L取不到1
-            int foundIdx = searchDuplicate(S, L);
-            if (foundIdx != -1) {
-                idx = foundIdx;
-                left = L;
-            }
-            else right = L - 1;
-        }
-
-        if (left == 0) return "";
-        return S.substring(idx, idx + left);
+        return left;
     }
 }
