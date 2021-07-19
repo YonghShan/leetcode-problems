@@ -1487,6 +1487,28 @@ $\implies$ 总的次数为$1+2+3+\dots+numRows = \frac{numRows(numRows+1)}{2} = 
 
 #### Rabin-Karp Algorithm
 
+##### [0028] Implement strStr()
+
+C++: [`strStr()`](http://www.cplusplus.com/reference/cstring/strstr/) / Java: [`indexOf(String s)`](https://docs.oracle.com/javase/7/docs/api/java/lang/String.html#indexOf(java.lang.String))  返回字符串needle在字符串haystack中第一次出现的位置
+
++ Solution 1: 最intuitive的方法，`haystack` 中取substring，与 `needle` 进行匹配 
+
+  $\implies \mathcal{O}(haystack.length()*needle.length())$
+
++ Solution 2: Rabin-Karp Algorithm: 完全参考[[1044]](#[1044] Longest Duplicate Substring)
+
+  参数如下：
+
+  + base = 26
+  + $L$ = needle.length()
+  + modulus = $2^{32}$：因为 needle.length() 最大可为 $5*10^{4}$，hash可能会overflow
+
+  $\implies \mathcal{O}(max(haystack.length(),needle.length()))$
+
++ 好像KMP更快
+
+********
+
 ##### [0187] Repeated DNA Sequences
 
 + Solution 1: 最intuitive的方法，肯定是两层for循环嵌套，两两子字符串进行匹配。利用***[Trick](#hashsetTrick)***改进为one pass。
@@ -1947,6 +1969,108 @@ Solution 2：如何one pass同时完成对HashMap的insert和search
 ==***Trick:*** *当需要两层嵌套的 for 循环时，考虑引入 HashSet / HashMap 转变为 one pass<a name="hashsetTrick"></a>  
 
 [[0187]](#[0187] Repeated DNA Sequences)
+
+******
+
+##### [0014] Longest Common Prefix
+
++ Solution 1: 最先想到的就是利用Trie
+
+  将所有字符串插入Trie后，从root开始遍历，沿着只有一个childNode的TrieNode构建prefix。但有个特殊情况需要注意，假如strs = ["a", "ab"]，则按照上述思路得到的prefix为"ab"，但实际应为"a"。故还需==判断得到的prefix和strs中最短字符串的长度关系==：the length of the longest common prefix ≤ the length of the shortest string.
+
+  ```java
+  class TrieNode {
+    private TrieNode[] node;
+    private int childNodesNum;
+  
+    public TrieNode() {
+      node = new TrieNode[26];
+      childNodesNum = 0;
+    }
+  }
+  
+  class Trie {
+    private TrieNode root;
+  
+    public Trie() {
+      root = new TrieNode();
+    }
+  
+    public void insert(String s) {
+      TrieNode p = root;
+      for (int i = 0; i < s.length(); i++) {
+        int idx = s.charAt(i) - 'a';
+        if (p.node[idx] == null) {
+          p.node[idx] = new TrieNode();
+          p.childNodesNum++;
+        }
+        p = p.node[idx];
+      }
+    }
+  
+    public String findLongestPrefix() {
+      TrieNode p = root;
+      StringBuilder sb = new StringBuilder();
+  
+      while (p.childNodesNum == 1) {
+        int idx = 0;
+        for (int i = 0; i < 26; i++) {
+          if (p.node[i] != null) idx = i;
+        }
+        sb.append((char)(idx + 'a'));
+        p = p.node[idx];
+      }
+  
+      return sb.toString();
+    }
+  }
+  
+  public String longestCommonPrefix(String[] strs) {
+    Trie trie = new Trie();
+  
+    // 假设strs为["a", "ab"]，则调用findLongestPrefix()的结果为"ab"，但实际结果应为"a"
+    // 为防止这种情况，在遍历strs时，记录长度最小的str
+    int shortestLen = Integer.MAX_VALUE;
+    String shortestStr = "";
+    for (String str : strs) {  // O(S), where S is the total length of all str in strs together
+      if (str.length() == 0) return ""; // 只要strs中有str为""，则return "";
+      if (str.length() < shortestLen) {
+        shortestLen = str.length();
+        shortestStr = str;
+      }
+      trie.insert(str);
+    }
+  
+    // the longest prefix的长度不可能比shortestLen大
+    String res= trie.findLongestPrefix();  // O(P), where P is the length of the potential longest prefix
+    return res.length() > shortestLen ? shortestStr : res;
+  }
+  ```
+
+  *Time Complexity:* $\mathcal{O}(S+P)$
+
+  *Space Complexity:* $\mathcal{O}(S)$ for all the TrieNodes
+
++ Solution 2: Horizontal Scanning
+
+  strs中第一个String与第二个String比较得出common prefix后，再将common prefie与第三个String比较，更新common prefix后再与第四个...
+
+  关键是 `indexOf(Stirng s)` 的使用： ==`indexOf()` 的参数不仅可以是char，也可以是String==
+
+  ```java
+  public String longestCommonPrefix(String[] strs) {
+    String prefix = strs[0];
+    for (int i = 1; i < strs.length; i++) {
+      while (strs[i].indexOf(prefix) != 0) { // 如果strs[i]中并不包含prefix或者包含prefix但位置不是在最开头，则需要修剪prefix
+        prefix = prefix.substring(0, prefix.length()-1);
+        if (prefix.isEmpty()) return "";
+      }
+    }
+    return prefix;
+  }
+  ```
+
+  
 
 *******
 
