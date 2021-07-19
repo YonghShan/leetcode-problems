@@ -6,7 +6,7 @@ import java.util.List;
  * @date 3/10/21 - 23:26
  */
 public class Solution3 {
-    // DP: 有点傻，没有我的Solution1好
+    // DP: 和Solution1本质相同，但写法有点傻，没有我的Solution1好
     /* Runtime: O(numRows^2)
        Memory:  O(numRows^2)
      */

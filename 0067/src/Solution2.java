@@ -13,6 +13,8 @@ public class Solution2 {
     public String addBinary(String a, String b) {
         // 1. convert a and b into integers x and y
         //    x will be used to keep an answer, y for the carry
+        // 因为题目中说明了1 <= a.length, b.length <= 10^4，
+        // 所以a/b对应的十进制数可能超过long，但不超过BigInteger的范围
         BigInteger x = new BigInteger(a, 2);
         BigInteger y = new BigInteger(b, 2);
         BigInteger zero = new BigInteger("0", 2);

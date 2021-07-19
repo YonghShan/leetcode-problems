@@ -546,7 +546,7 @@ $$
 
   Drawbacks:
 
-  + a和b所表示的二进制数很长时，其对应的十进制数可能超过Integer / Long / BigInteger的范围；
+  + a和b所表示的二进制数很长（`1 <= a.length, b.length <= 10^4`）时，其对应的十进制数可能超过Integer / Long / BigInteger的范围；
 
     如果字符串超过 3333 位，不能转化为 Integer；
     如果字符串超过 6565 位，不能转化为 Long；
@@ -596,7 +596,7 @@ $$
 
   *Algorithm:*
 
-  - Convert a and b into integers x and y, x will be used to keep an answer, and y for the carry.
+  - Convert a and b into [BigInteger](https://docs.oracle.com/javase/7/docs/api/java/math/BigInteger.html)s x and y, x will be used to keep an answer, and y for the carry.
   - While carry is nonzero: `y != 0`:
     - Current answer without carry is XOR of x and y: `answer = x^y`.
     - Current carry is left-shifted AND of x and y: `carry = (x & y) << 1`.
@@ -607,7 +607,9 @@ $$
   public String addBinary(String a, String b) {
       // 1. convert a and b into integers x and y
       //    x will be used to keep an answer, y for the carry
-      BigInteger x = new BigInteger(a, 2);
+    	// 因为题目中说明了1 <= a.length, b.length <= 10^4，
+      // 所以a/b对应的十进制数可能超过long，但不超过BigInteger的范围
+      BigInteger x = new BigInteger(a, 2); 
       BigInteger y = new BigInteger(b, 2);
       BigInteger zero = new BigInteger("0", 2);
       BigInteger carry, answer;
@@ -622,6 +624,8 @@ $$
       return x.toString(2);
   }
   ```
+  
+  `and(BigInteger val)` , `compareTo(BingInteger val)` , `xor(BigInteger val)` , `shiftLeft(BigInteger val)` 均为 Java BigInteger 自带方法。
 
 ******
 
@@ -1145,6 +1149,141 @@ Trie (can be pronounced "try" or "tree") or prefix tree is a tree data structure
   另外，对于个别的超长字符 Trie 会进一步变深。这时候如果 Trie 是存储在硬盘中，Trie 结构过深带来的影响是多次随机 IO，随机 IO 是成本很高的操作。同时 Trie 的特殊结构，也会为分布式存储将会带来困难。
 
   因此在工程领域中 Trie 的应用面不广。至于一些诸如「联想输入」、「模糊匹配」、「全文检索」的典型场景在工程主要是通过 ES (ElasticSearch) 解决的。而 ES 的实现则主要是依靠「倒排索引」。
+
+******
+
+*******
+
+#### Dynamic Programming
+
+##### [0118] Pascal's Triangle
+
+给定行数 `numRows`，填帕斯卡三角：一开始就是按照Iteration做的，看了Solution发现其实可以理解为DP。
+
+![](/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/[0118]_3.jpeg)
+
+*性质：*
+
++ 每行第一个和最后一个元素一定为1；
++ $f(i,j) = f(i-1,j-1)+f(i-1,j)$, where $f(i,j)$ is the element in the $i^{th}$ row and $j^{th}$ column of Pascal's triangle.
+
+```java
+public List<List<Integer>> generate(int numRows) {
+  List<List<Integer>> res = new ArrayList<>();
+
+  for (int i = 0; i < numRows; i++) {
+    List<Integer> row = new ArrayList<>();
+    row.add(1);  // the first digit is always 1
+
+    for (int j = 1; j < i; j++) 
+      row.add(res.get(i-1).get(j-1) + res.get(i-1).get(j));
+
+    if (i > 0) row.add(1); // Once the length of this row is bigger than 1, then the last digit is always 1
+    res.add(row);
+  }
+}
+```
+
+*Time Complexity Analysis:*
+
+很明显outer loop runs numRows times；而每一次inner loop循环的次数等于rowIndex (因为帕斯卡三角第一行有一个元素，第二行有两个元素，...)
+$\implies$ 总的次数为$1+2+3+\dots+numRows = \frac{numRows(numRows+1)}{2} = \frac{numRows^2}{2} + \frac{numRows}{2} \implies \mathcal{O}(numRows^2)$
+
+******
+
+##### [0119] Pascal's Triangle II
+
+给定 `rowIndex`，返回帕斯卡三角（0-indexed）该行的内容。
+
++ Solution 1: Recursion
+
+  ```java
+  public List<Integer> getRow(int rowIndex) {
+    if (rowIndex > 1) prev = getRow(rowIndex-1);  // 提前取好getRow(rowIndex-1)，不然重复取getRow(rowIndex-1)会导致TLE
+  
+    List<Integer> res = new ArrayList<>();
+    res.add(1);
+    for (int i = 1; i < rowIndex; i++) {
+      res.add(prev.get(i-1) + prev.get(i));
+    }
+    if (rowIndex > 0) res.add(1);
+    return res;
+  }
+  ```
+
+  *Time Complexity:* $\mathcal{O}(rowIndex^2)$   ?
+
+  *Space Complexity:* $\mathcal{O}(rowIndex^2)$ for stack
+
++ Solution 2: DP with 2D array
+
+  ```java
+  public List<Integer> getRow(int rowIndex) {
+      // 这里dp并没有选择Integer[]，而为了保持初始值为0，选择int[]
+      int[][] dp = new int[rowIndex+1][rowIndex+1]; // 是从第0行开始的，所以宽度为rowIndex+1
+      // 将每行行首赋为1
+      for (int i = 0; i < rowIndex+1; i++) dp[i][0] = 1;
+      // 更新：
+      for (int i = 1; i < dp.length; i++) // 从第二行开始更新
+          for (int j = 1; j < rowIndex+1; j++)
+              dp[i][j] = dp[i-1][j-1] + dp[i-1][j];
+      // 将int[]转为List
+      List<Integer> res = Arrays.stream(dp[rowIndex]).boxed().collect(Collectors.toList()); // 也可以在上面更新时当j=rowIndex时，将dp[i][j]存入List
+      return res;
+  }
+  ```
+
+  *Time Complexity:* $\mathcal{O}(rowIndex^2)$  
+
+  *Space Complexity:* $\mathcal{O}(rowIndex^2)$ for 2D DP array
+
++ Solution 3: DP with 1D array （滚动数组）
+
+  ```java
+  public List<Integer> getRow(int rowIndex) {
+      Integer[] dp = new Integer[rowIndex + 1]; // 这里dp是Integer[]，方便之后转为list！
+    	// 但因为Integer[]的初始值为null，所以需要重新初始化
+      Arrays.fill(dp,1);
+      for(int i = 2;i < dp.length;i++) // 从第三行开始更新
+          for(int j = i - 1;j > 0;j--) // 需要依据前面的值来更新自己，所以要倒着更新
+              dp[j] = dp[j] + dp[j - 1];
+    	// 将Integer[]转为List
+      List<Integer> res = Arrays.asList(dp);
+      return res;
+  }
+  ```
+
+  *Time Complexity:* $\mathcal{O}(rowIndex^2)$  
+
+  *Space Complexity:* $\mathcal{O}(rowIndex)$ for 1D DP array
+
++ Solution 4: Maths
+
+  The entry in the $n^{th}$ row and $k^{th}$ column of Pascal's triangle is denoted $\dbinom{n}{r}$ and $\dbinom{n}{r}=\dbinom{n-1}{r-1}+\dbinom{n-1}{r}$.
+
+  已知 $\dbinom{n}{r}=\dfrac{n!}{r!(n-r)!}$ ，则
+  $$
+  \frac{\dbinom{n}{r}}{\dbinom{n}{r-1}} = \frac{\dfrac{n!}{r!(n-r)!}}{\dfrac{n!}{(r-1)!(n-r+1)!}} = \frac{n-r+1}{r} \\
+  \implies \dbinom{n}{r} = \frac{n-r+1}{r}\dbinom{n}{r-1}
+  $$
+  $\implies$ 并不一定需要上一行的元素才能计算出本行的元素，==同一行也可以根据前一个元素计算出后一位元素==。
+
+  ```java
+  public List<Integer> getRow(int rowIndex) {
+      int i = rowIndex;
+      List<Integer> res = new ArrayList<>();;
+      res.add(1);
+      for (int j = 0; j < rowIndex; j++) {
+          res.add((int) ((res.get(j) * (long) (rowIndex-(j+1)+1)) / (j+1)));
+      }
+  
+      return res;
+  }
+  ```
+
+  *Time Complexity:* $\mathcal{O}(rowIndex)$  
+
+  *Space Complexity:* $\mathcal{O}(rowIndex)$ 
 
 ******
 
@@ -1815,6 +1954,38 @@ Solution 2：如何one pass同时完成对HashMap的insert和search
 
 无论是Iteration还是Recursion，关键都是比较l1.val和l2.val
 
+*****
+
+##### [0054] Spiral Matrix
+
+将一个二维数组按照如下方式遍历为一个一维数组：$[[1,2,3,4],[5,6,7,8],[9,10,11,12]] \rightarrow [1,2,3,4,8,12,11,10,9,5,6,7]$
+
+![](/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/[0054].jpg)
+
+Solution: Layer-by-Layer
+
+![](/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/[0054]_1.png)
+
+```java
+int r1 = 0, r2 = matrix.length-1;
+int c1 = 0, c2 = matrix[0].length-1;
+
+while (r1 <= r2 && c1 <= c2) {
+    for (int c = c1; c <= c2; c++) res.add(matrix[r1][c]);
+    for (int r = r1+1; r <= r2; r++) res.add(matrix[r][c2]);
+    // 如果r1 == r2，则说明此次进while循环时，只剩一行元素，已经由第一个for循环结束，无需在进行下面的循环
+    // 如果c1 == c2，则说明此次进while循环时，只剩一列元素，已经由第二个for循环结束，无需在进行下面的循环
+    if (r1 < r2 && c1 < c2) {
+        for (int c = c2-1; c > c1; c--) res.add(matrix[r2][c]);
+        for (int r = r2; r > r1; r--) res.add(matrix[r][c1]);
+    }
+    r1++;
+    r2--;
+    c1++;
+    c2--;
+}
+```
+
 *******
 
 ##### [0066] Plus One
@@ -1969,7 +2140,7 @@ Input : `int[m+1][n+1] mat`     Output : `int[(m+1)*(n+1)] res`
 
   若sum为奇数，则对角线自右上向左下，故 $i$ 先小后大，$\implies i$从 $max(sum-n,0)$ 增至 $min(sum,m)],\ j=sum-i$。
 
-  ==$i$ 的范围取法是为了确保 $i$ 和 $j$ 都不越界==
+  ==$i$ 的范围取法是为了确保 $i$ 和 $j$ 都不越界==     [自己写的题解](https://leetcode.com/problems/diagonal-traverse/discuss/1342850/Java-20-line-code-Only-using-array-100-faster)
 
 *****
 
