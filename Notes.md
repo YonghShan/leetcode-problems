@@ -1589,7 +1589,7 @@ C++: [`strStr()`](http://www.cplusplus.com/reference/cstring/strstr/) / Java: [`
   int left = 0, right = n-1; 
   while (left < right) {
       int L = left + (right - left) / 2;
-      if (L == left) L++; // 仅仅是为了防止当String S的长度为2，left=0，right=1，此时L取0而取不到1
+      if (L == left) L++; // 1.为了防止当String S的长度为2，left=0，right=1，此时L取0而取不到1 2. 防止String S的长度为3，此时left=0，right=2，L=1；如果满足条件，则left=L=1，right=2，陷入循环
       if (searchDuplicate(S, L) != -1) left = L;
       else right = L - 1;
   }
@@ -1976,7 +1976,7 @@ Solution 2：如何one pass同时完成对HashMap的insert和search
 
 + Solution 1: 最先想到的就是利用Trie
 
-  将所有字符串插入Trie后，从root开始遍历，沿着只有一个childNode的TrieNode构建prefix。但有个特殊情况需要注意，假如strs = ["a", "ab"]，则按照上述思路得到的prefix为"ab"，但实际应为"a"。故还需==判断得到的prefix和strs中最短字符串的长度关系==：the length of the longest common prefix ≤ the length of the shortest string.
+  *思路：*将所有字符串插入Trie后，从root开始遍历，沿着只有一个childNode的TrieNode构建prefix。但有个特殊情况需要注意，假如strs = ["a", "ab"]，则按照上述思路得到的prefix为"ab"，但实际应为"a"。故还需==判断得到的prefix和strs中最短字符串的长度关系==：the length of the longest common prefix ≤ the length of the shortest string.
 
   ```java
   class TrieNode {
@@ -2053,9 +2053,9 @@ Solution 2：如何one pass同时完成对HashMap的insert和search
 
 + Solution 2: Horizontal Scanning
 
-  strs中第一个String与第二个String比较得出common prefix后，再将common prefie与第三个String比较，更新common prefix后再与第四个...
+  *思路：*strs中第一个String与第二个String比较得出common prefix后，再将common prefie与第三个String比较，更新common prefix后再与第四个...
 
-  关键是 `indexOf(Stirng s)` 的使用： ==`indexOf()` 的参数不仅可以是char，也可以是String==
+  *关键：* `indexOf(Stirng s)` 的使用： ==`indexOf()` 的参数不仅可以是char，也可以是String==
 
   ```java
   public String longestCommonPrefix(String[] strs) {
@@ -2070,7 +2070,111 @@ Solution 2：如何one pass同时完成对HashMap的insert和search
   }
   ```
 
+  *Time Complexity:* $\mathcal{O}(S=m·n)$. In the worst case there will be $n$ equal strings with length $m$ and the algorithm performs $S=m·n$ comparisons. 第一个String要和之后的所有的Strings全部比一遍。
+
+  *Space Complexity:* $\mathcal{O}(1)$
+
++ Solution 3: Vertical Scanning  ==**最佳**==
+
+  *思路：*Compare characters from top to bottom on the same column before moving on to the next column.
+
+  ```java
+  public String longestCommonPrefix(String[] strs) {
+    for (int i = 0; i < strs[0].length(); i++) {
+      char c = strs[0].charAt(i);
+      for (int j = 1; j < strs.length; j++) {
+        if (i == strs[j].length() || c != strs[j].charAt(i)) // strs[j]可能短于strs[0]
+          return strs[0].substring(0, i);
+      }
+    }
+    return strs[0];
+  }
+  ```
+
+  *Time Complexity:* $\mathcal{O}(S=m·n)$. 同样in the worst case all $n$ strings are the same. 此时还是需要完成 $S$ comparisons. 而in the best case there are at most $n·minLen$ comparisons. 因此，与Solution 2相比，对于a very short string is the common prefix at the end of the array这一情况，Solution 3可以提前结束，不必完成 $S$ comparisons.
+
+  *Space Complexity:* $\mathcal{O}(1)$
+
++ Solution 4: Divide and Conquer
+
+  *思路：*对strs[]分组后分别找寻longest common prefix.
+
+  ```java
+  public String longestCommonPrefix(String[] strs) {
+    return divideAndConquer(strs, 0, strs.length-1);
+  }
   
+  public String divideAndConquer(String[] strs, int left, int right) {
+    if (left == right) { // 不停分割，直到不能再分割
+      return strs[left];
+    } else {
+      int mid = left + (right - left) / 2;
+      String lcpLeft = divideAndConquer(strs, left, mid);
+      String lcpRight = divideAndConquer(strs, mid+1, right);
+      return commonPrefix(lcpLeft, lcpRight); // Conquer
+    }
+  }
+  
+  public String commonPrefix(String left, String right) { 
+    int minLen = Math.min(left.length(), right.length());
+    for (int i = 0; i < minLen; i++) {
+      if (left.charAt(i) != right.charAt(i))
+        return left.substring(0, i);
+    }
+    return left.substring(0, minLen);
+  }
+  ```
+
+  *Time Complexity:* $T(n)=2·T(\frac{n}{2})+\mathcal{O}(m) \implies \mathcal{O}(S=m·n)$. In the best case this algorithm performs $\mathcal{O}(n·minLen)$.
+
+  *Space Complexity:* $\mathcal{O}(m·logn)$. There are $logn$ recursive calls, each call needs $m$ space to store the result.
+
++ Solution 5: Binary Search
+
+  *思路：*已知the length of the longest common prefix ≤ the length of the shortest string，所以可以对the length of the longest common prefix进行binary search，上限为 $minLen$ 。
+
+  ```java
+  public String longestCommonPrefix(String[] strs) {
+    // Step 1: find the minLen
+    int minLen = Integer.MAX_VALUE;
+    for (String str : strs) 
+      minLen = Math.min(minLen, str.length());
+  
+    // Step 2: Binary Search
+    int left = 0;
+    int right = minLen;
+    while (left < right) {
+      int mid = left + (right - left) / 2;
+      if (mid == left) mid++; // 防止String S的长度为3，此时left=0，right=2，mid=1；如果满足条件，则left=mid=1，right=2，陷入循环
+      if (isCommonPrefix(strs, mid)) left = mid;
+      else right = mid-1;
+    }
+    
+    return strs[0].substring(0, left);
+  }
+  
+  public boolean isCommonPrefix(String[] strs, int len) {
+    String prefix = strs[0].substring(0, len);
+    for (int i = 1; i < strs.length; i++) 
+      if (!strs[i].startsWith(prefix))
+        return false;
+    return true;
+  }
+  ```
+
+  *Time Complexity:* $\mathcal{O}(S·logm)$. The algorithm makes $logm$ iterations, for each of them there are $S=m·n$ comparisons.
+
+  *Space Complexity:* $\mathcal{O}(1)$
+
+*Summary:* In the worst case there will be $n$ equal strings with length $m$.
+
+|         Solution          |                       Time Complexity                        |             Space Complexity              |
+| :-----------------------: | :----------------------------------------------------------: | :---------------------------------------: |
+|           Trie            |                      $\mathcal{O}(S+P)$                      |      $\mathcal{O}(S)$ for TrieNodes       |
+|    Horizontal Scanning    |                     $\mathcal{O}(S=m·n)$                     |             $\mathcal{O}(1)$              |
+| ==**Vertical Scanning**== | $\mathcal{O}(S=m·n)$ in worst case; $\mathcal{O}(n·minLen)$ in best case |             $\mathcal{O}(1)$              |
+|     Divide & Conqure      | $\mathcal{O}(S=m·n)$ in worst case; $\mathcal{O}(n·minLen)$ in best case | $\mathcal{O}(m·logn)$ for recursive calls |
+|       Binary Search       |                    $\mathcal{O}(S·logm)$                     |             $\mathcal{O}(1)$              |
 
 *******
 

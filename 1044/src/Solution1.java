@@ -73,7 +73,7 @@ class Solution1 {
         int left = 0, right = n-1;
         while (left < right) {
             int L = left + (right - left) / 2;
-            if (L == left) L++; // 防止String S的长度为2，此时L取不到1
+            if (L == left) L++; // 1.防止String S的长度为2，此时L取不到1; 2. 防止String S的长度为3，此时left=0，right=2，L=1；如果满足条件，则left=L=1，right=2，陷入循环
             if (searchDuplicate(S, L) != -1) left = L;
             else right = L - 1;
         }
