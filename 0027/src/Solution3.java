@@ -6,6 +6,7 @@
 class Solution3 {
     // Two pointers when the elements to remove are rare
     // To avoid unnecessary copy/move operations required in Solution 2
+    // The relative order of the elements may be changed.
     /* Runtime: 0ms
        Memory: 37M (for loop) / 39M (while loop)
      */
@@ -16,8 +17,8 @@ class Solution3 {
 //        for (i = 0; i < len; i++) {
 //            if (nums[i] == val) {
 //                nums[i] = nums[len-1];
-//                i--;
-//                len--; // Only need this operation when chose for loop
+//                i--;  // Only need this operation when chose for loop
+//                len--;
 //            }
 //        }
 

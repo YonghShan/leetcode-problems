@@ -4,9 +4,10 @@
  */
 
 class Solution3 {
+    // 和two-pointer一样，只是阐述方式不同
     // 将0作为隔板，利用0的index计算。需要注意的是要在数组首尾各加一个0
-    /* Runtime: 3ms
-       Memory: 53M
+    /* Runtime: 3ms   O(n)
+       Memory: 53M    O(1)
      */
     public int findMaxConsecutiveOnes(int[] nums) {
         int prev = -1; // prev是数组首加的0

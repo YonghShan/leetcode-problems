@@ -4,7 +4,7 @@
  */
 
 class Solution3 {
-    // Two Pointers but fancier
+    // Two Pointers but fancier：引入lastZeroIindex=-1，巧妙
     /* Runtime: 2ms O(N)
        Memory: 40M  O(1)
      */
@@ -22,7 +22,7 @@ class Solution3 {
                 count++;
             }
 
-            max1s = count > max1s ? count : max1s;
+            max1s = Math.max(count, max1s);
         }
 
         return max1s;

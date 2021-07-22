@@ -5,8 +5,8 @@
 
 class Solution2 {
     // One Pass
-    /* Runtime: 2ms
-       Memory: 53M
+    /* Runtime: 2ms  O(n)
+       Memory: 53M   O(1)
      */
     public int findMaxConsecutiveOnes(int[] nums) {
         int count = 0;

@@ -6,7 +6,7 @@
 class Solution1 {
     // Compare the elements of array with the reference value from the end of array
     // If equal, all the elements behind this elements left shift by one
-    // 采取"若想等，则其后元素依次左移"的处理方式，只能选择从后往前遍历
+    // 采取"若相等，则其后元素依次左移"的处理方式，只能选择从后往前遍历
     /* Runtime: 0ms
        Memory: 38M
      */

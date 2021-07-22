@@ -12,6 +12,7 @@ public class Solution3 {
         int right = numbers.length-1;
         while (left < right) {
             int mid = left + (right - left) / 2;
+            // 这个分析得不好，具体看Notes
             // tmp取numbers[left] + numbers[right]的原因:
             //    因为numbers是sorted，则numbers[left] < numbers[mid] < numbers[right]
             //    所以，numbers[left] + numbers[mid] < numbers[left] + numbers[right] < numbers[mid] + numbers[right]

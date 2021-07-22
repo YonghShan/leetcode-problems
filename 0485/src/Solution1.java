@@ -5,8 +5,8 @@
 
 class Solution1 {
     // 双指针-滑动窗口
-    /* Runtime: 2ms （合并后的while循环只用1ms)
-       Memory: 40M
+    /* Runtime: 1ms (faster than 100%)    O(n)
+       Memory: 40M                        O(1)
      */
     public int findMaxConsecutiveOnes(int[] nums) {
         int start = 0;

@@ -14,15 +14,14 @@ class Solution1 {
         int start = 0;
         int end = 0;
         int i = 0;
-        int[] lens = new int[nums.length+1]; // 因为下面第一个for循环本是为了记录全为1的子串的长度，但是写的却是每当值为0时也会记下长度（=1），导致所需要的lens数组长度过长
+        int[] lens = new int[nums.length+1]; // 因为下面第一个for循环本是为了记录全为1的子串的长度，但是写的却是每当值为0时也会记下长度（=0），导致所需要的lens数组长度过长
         int maxLen = 1;
 
         if (nums.length == 1) return 1;
 
-        for (end = 0; end < nums.length; end++) {
+        for (; end < nums.length; end++) {
             if (nums[end] == 0) {
-                lens[i] = end - start;
-                i++;
+                lens[i++] = end - start;
                 start = end + 1;
             }
         }
