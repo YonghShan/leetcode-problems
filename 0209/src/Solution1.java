@@ -3,7 +3,7 @@
  * @date 7/22/21 - 01:11
  */
 public class Solution1 {
-    // Two-Pointer
+    // Two-Pointer: Sliding Window
     /* Runtime: 1ms (faster than 100%)    O(n)
        Memory: 39MB (less than 48.44%)    O(1)
      */

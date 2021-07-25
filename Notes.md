@@ -38,9 +38,14 @@ The key to solving this kind of problems is to
 
 > Determine the movement strategy for both pointers.
 
-Similar to the previous scenario, you might sometimes need to `sort` the array before using the two-pointer technique. And you might need a `greedy` thought to determine your movement strategy.
+Similar to the previous scenario, you might sometimes need to **sort** the array before using the two-pointer technique. And you might need a **greedy** thought to determine your movement strategy.
 
 *LeetCode:* [[0027]](#[0027] Remove Element)
+
+==补充：== Two-Pointer Technique Scenario II 还可以应用于以下问题：
+
++ Slow-pointer and fast-pointer problem in Linked List: [0141]     [0142]     [0160]     [0019]
++ Sliding Window Problem: [[0209]](#[0209] Minimum Size Subarray Sum) 
 
 ******
 
@@ -1301,11 +1306,13 @@ $\implies$ 总的次数为$1+2+3+\dots+numRows = \frac{numRows(numRows+1)}{2} = 
 
   已知 $\dbinom{n}{r}=\dfrac{n!}{r!(n-r)!}$ ，则
   $$
+  \begin{gathered}
   \frac{\dbinom{n}{r}}{\dbinom{n}{r-1}} = \frac{\dfrac{n!}{r!(n-r)!}}{\dfrac{n!}{(r-1)!(n-r+1)!}} = \frac{n-r+1}{r} \\
   \implies \dbinom{n}{r} = \frac{n-r+1}{r}\dbinom{n}{r-1}
+  \end{gathered}
   $$
   $\implies$ 并不一定需要上一行的元素才能计算出本行的元素，==同一行也可以根据前一个元素计算出后一位元素==。
-
+  
   ```java
   public List<Integer> getRow(int rowIndex) {
       int i = rowIndex;
@@ -1320,7 +1327,7 @@ $\implies$ 总的次数为$1+2+3+\dots+numRows = \frac{numRows(numRows+1)}{2} = 
   ```
 
   *Time Complexity:* $\mathcal{O}(rowIndex)$  
-
+  
   *Space Complexity:* $\mathcal{O}(rowIndex)$ 
 
 ******
@@ -1365,7 +1372,7 @@ $\implies$ 总的次数为$1+2+3+\dots+numRows = \frac{numRows(numRows+1)}{2} = 
 
   ​		In binary form: $3=(11)_2 \quad 10=(1010)_2 \quad 5=(101)_2 \quad 25=(11001)_2 \quad 2=(10)_2 \quad 8=(1000)_2$
 
-   	  $\implies$ the length of the max number in the binary representation is $5$ 
+  ​	   $\implies$ the length of the max number in the binary representation is $5$ 
 
   ​	   $\implies$ the maximum XOR is no more than $11111$
 
@@ -1527,7 +1534,7 @@ $\implies$ 总的次数为$1+2+3+\dots+numRows = \frac{numRows(numRows+1)}{2} = 
 
 ##### [0028] Implement strStr()
 
-C++: [`strStr()`](http://www.cplusplus.com/reference/cstring/strstr/) / Java: [`indexOf(String s)`](https://docs.oracle.com/javase/7/docs/api/java/lang/String.html#indexOf(java.lang.String))  返回字符串needle在字符串haystack中第一次出现的位置
+C++: [strStr()](http://www.cplusplus.com/reference/cstring/strstr/) / Java: [indexOf(String s)](https://docs.oracle.com/javase/7/docs/api/java/lang/String.html#indexOf(java.lang.String))  返回字符串needle在字符串haystack中第一次出现的位置
 
 + Solution 1: 最intuitive的方法，`haystack` 中取substring，与 `needle` 进行匹配 
 
@@ -1635,7 +1642,7 @@ C++: [`strStr()`](http://www.cplusplus.com/reference/cstring/strstr/) / Java: [`
 
 + 子问题2：因为本题中 $base=26$，且 $L_{max}=3 \times 10^4$，故在[0187]的代码基础上要注意以下几点：
 
-  +  任一sequence的首位字符的权重 $base^{L-1}$ 很大可能会overflow，需依据[线性同余方法](https://en.wikipedia.org/wiki/Linear_congruential_generator#Parameters_in_common_use)引入 $modulus=2^{32}$，故
+  + 任一sequence的首位字符的权重 $base^{L-1}$ 很大可能会overflow，需依据[线性同余方法](https://en.wikipedia.org/wiki/Linear_congruential_generator#Parameters_in_common_use)引入 $modulus=2^{32}$，故
 
     + the first sequence $h_0$ 的公式变为
       $$
@@ -1655,6 +1662,7 @@ C++: [`strStr()`](http://www.cplusplus.com/reference/cstring/strstr/) / Java: [`
       $$
       按照代码：
       $$
+      \begin{gathered}
       \begin{aligned}
       h_0&=((c_0\ \%\ modulus\times base+c_1)\ \%\ modulus \times base + c_2)\ \%\ modulus \\ 
       &=(c_0\ \%\ modulus\ \%\ modulus\times base^2+c_1\ \%\ modulus\times base + c_2)\ \%\ modulus \\
@@ -1662,6 +1670,7 @@ C++: [`strStr()`](http://www.cplusplus.com/reference/cstring/strstr/) / Java: [`
       \end{aligned} \\
       \because \boldsymbol{\color{red}{(a\ \%\ n)\ \%\ n=a\ \%\ n}} \\
       \therefore h_0=c_0\times base^2\ \%\ modulus+c_1\times base\ \%\ modulus+c_2\ \%\ modulus
+      \end{gathered}
       $$
       两者结果相同 $\implies$ $Q.E.T.$
 
@@ -1670,20 +1679,20 @@ C++: [`strStr()`](http://www.cplusplus.com/reference/cstring/strstr/) / Java: [`
       任一sequence的首位字符的权重变为 $base^{L-1}\ \%\ modulus$
 
       对应的 Java 代码为
-
+      
       ```java
       long adjustedWeight = 1;
       for (int i = 1; i <= L; ++i) adjustedWeight = (adjustedWeight * base) % modulus;
       ```
 
       注意不要为了方便理解写成
-
+      
       ```java
       long adjustedWeight = (long) (Math.pow(base, L) % modulus);  // L = 15时，计算错误
       // or
       long adjustedWeight = (long) (Math.pow(base, L)) % modulus;  // L = 14时，计算错误
       ```
-
+      
     + Rolling Hash的公式变为
       $$
       h_i = (h_{i-1}\times base -c_{i-1}base^L +c_{L-1+i})\  \% \ modulus \ (i\ge1)
@@ -2153,7 +2162,7 @@ if (s != null) {
   }
   ```
 
-  
++ Solution 2: [Binary Search](https://leetcode.com/problems/minimum-size-subarray-sum/solution/): C++写的，不想看。。。
 
 ******
 
@@ -2376,9 +2385,108 @@ Given a binary array `nums`, return *the maximum number of consecutive* `1`*'s i
 
 ******
 
+#### Tricks
 
+##### [0189] Rotate Array
 
+Given an array, rotate the array to the right by `k` steps, where `k` is non-negative.
 
++ Solution 1: Brute Force $\implies \mathcal{O}(n ·k)$
+
+  ```java
+  public void rotate(int[] nums, int k) {
+      if (k == 0) return;
+      k %= nums.length;  // in case that k > nums.length
+  
+      int len = nums.length;
+      int temp;
+      for (int i = 0; i < k; i++) {  // O(nk)
+          temp = nums[len-1];
+          for (int j = len-1; j > 0; j--) nums[j] = nums[j-1];
+          nums[0] = temp;
+      }
+  }
+  ```
+
++ Solution 2: Using Extra Space $\implies \mathcal{O}(n)$
+
+  ```java
+  public void rotate(int[] nums, int k) {
+      int[] a = new int[nums.length];
+      for (int i = 0; i < nums.length; i++) {
+          a[(i + k) % nums.length] = nums[i];  // 这么写是因为无论是(i+k)还是(i+k%nums.length)都有可能越界
+      }
+      for (int i = 0; i < nums.length; i++) {
+          nums[i] = a[i];
+      }
+  }
+  ```
+
++ Solution 3: Using Cyclic Replacements $\implies \mathcal{O}(n)$
+
+  我们从位置 $0$​​ 开始，最初令 $\textit{temp}=\textit{nums}[0]$​​。根据规则，位置 $0$​​ 的元素会放至 $(0+k)\bmod n$​​ 的位置，令 $x=(0+k)\bmod n$​​，此时交换 $\textit{temp}$​​ 和 $\textit{nums}[x]$​​，完成位置 $x$​​ 的更新。然后，我们考察位置 $x$​​ (即，原本放在 $x$​ 的值的新位置在 $(x+k) \bmod n$​ )，并交换 $\textit{temp}$​ 和 $\textit{nums}[(x+k)\bmod n]$​，从而完成下一个位置的更新。不断进行上述过程，直至回到初始位置 $0$​​​。如果还有元素未被移动（$nums.length$ 为偶数），则移至下一个未移动的元素，重复上述过程。
+
+  这里回到初始位置有两种可能：
+
+  + $nums.length$ 为奇数（无论 $k$​ 为奇还是偶数）：当回到初始位置时，数组中所有的元素都已重构完毕。
+
+    <img src="/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/[0189]_1.png" style="zoom:50%;" />
+
+  + $nums.length$ 为偶数（无论 $k$ 为奇还是偶数）：当回到初始位置时，数组中的元素并没有全部重构完毕。
+
+    <img src="/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/[0189]_2.png" style="zoom:50%;" />
+
+  因此，还需要在更新时，记录已经被移动过的元素的个数 `count` ，当 `count==nums.length` 时，重构结束。
+
+  ```java
+  public void rotate(int[] nums, int k) {
+      k = k % nums.length;
+      int count = 0;
+    	// nums.length为奇数：for循环1次，do-while循环nums.length次；
+    	// nums.length为偶数：for循环a次，do-while循环b次 ==>> ab = nums.length
+      for (int start = 0; count < nums.length; start++) { 
+        	int current = start; // 即上述文字表述中的x
+        	int prev = nums[start]; 
+        	do {
+          		int next = (current + k) % nums.length;
+          		int temp = nums[next];
+          		nums[next] = prev;
+          		prev = temp;
+          		current = next;
+          		count++;
+        	} while (start != current); // 终止条件：回到初始位置
+      }
+  }
+  ```
+
++ Solution 4: Using Reverse $\implies \mathcal{O}(n)$​    ==实际运行速度最快==
+
+  For example: Let $n=7$ and $k=3$​.
+
+  |             Original List              | $[1,2,3,4,5,6,7]$ |
+  | :------------------------------------: | :---------------: |
+  |    **After reversing all numbers**     | $[7,6,5,4,3,2,1]$ |
+  | **After reversing first $k$ numbers**  | $[5,6,7,4,3,2,1]$ |
+  | **After reversing last $n-k$ numbers** | $[5,6,7,1,2,3,4]$ |
+
+  ```java
+  public void rotate(int[] nums, int k) {
+      k %= nums.length;
+      reverse(nums, 0, nums.length - 1);
+      reverse(nums, 0, k - 1);
+      reverse(nums, k, nums.length - 1);
+  }
+    
+  public void reverse(int[] nums, int start, int end) {
+      while (start < end) {
+        	int temp = nums[start];
+        	nums[start] = nums[end];
+        	nums[end] = temp;
+        	start++;
+        	end--;
+      }
+  }
+  ```
 
 ********
 
