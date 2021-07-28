@@ -9,7 +9,7 @@ public class Solution4 {
     //      Step 2: determine the start position of both pointers
     //      Step 3: one step per iteration both pointers
     // 如果p1和p2到达的tail不一样，则没有intersection
-    /* Runtime: 1ms     <=O(min(n,m)) 当intersection为tail时，取等号
+    /* Runtime: 1ms     <=O(n+m) 当intersection为tail时，取等号
        Memory: 52MB        O(1)
      */
     public ListNode getIntersectionNode(ListNode headA, ListNode headB) {

@@ -14,7 +14,7 @@ public class Solution2Abbr {
             slow = slow.next;
             fast = fast.next.next;
             if (slow == fast) {  // Phase 2
-                while (fast != head) {   // 与其让tortoise（slow）回到起点，不如直接用起点（head）
+                while (fast != head) {   // 与其让tortoise（slow）回到起点，不如直接用起点（head），但是这样会改变原list
                     fast = fast.next;
                     head = head.next;
                 }

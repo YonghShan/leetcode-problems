@@ -44,7 +44,8 @@ Similar to the previous scenario, you might sometimes need to **sort** the array
 
 ==补充：== Two-Pointer Technique Scenario II 还可以应用于以下问题：
 
-+ Slow-pointer and fast-pointer problem in Linked List: [0141]     [0142]     [0160]     [0019]
++ Slow-pointer and fast-pointer problem in Linked List: [[0141]](#[0141] Linked List Cycle)     [[0160]](#[0160] Intersection of Two Linked Lists)     [[0019]](#[0019] Remove Nth Node From End of List)
+  + Floyd's Algorithm: [[0142]](#[0142] Linked List Cycle II) 
 + Sliding Window Problem: [[0209]](#[0209] Minimum Size Subarray Sum) 
 
 ******
@@ -472,55 +473,56 @@ $$
 
 + 常用：
 
-  元字符是一个预定义的字符。
+    元字符是一个预定义的字符。
 
-  | 正则表达式 |                             描述                             |
-  | :--------: | :----------------------------------------------------------: |
-  |    `\d`    |               匹配一个数字，是 `[0-9]` 的简写                |
-  |   `\d+`    |                         匹配多个数字                         |
-  |    `\D`    |              匹配一个非数字，是 `[^0-9]` 的简写              |
-  |    `\s`    |          匹配一个空格，是 `[ \t\n\x0b\r\f]` 的简写           |
-  |   `\s+`    |                         匹配多个空格                         |
-  |    `\S`    |                        匹配一个非空格                        |
-  |    `\w`    | 匹配一个单词字符（大小写字母、数字、下划线），是 `[a-zA-Z_0-9]` 的简写 |
-  |    `\W`    | 匹配一个非单词字符（除了大小写字母、数字、下划线之外的字符），等同于 `[^\w]` |
+    | 正则表达式 |                             描述                             |
+    | :--------: | :----------------------------------------------------------: |
+    |    `\d`    |               匹配一个数字，是 `[0-9]` 的简写                |
+    |   `\d+`    |                         匹配多个数字                         |
+    |    `\D`    |              匹配一个非数字，是 `[^0-9]` 的简写              |
+    |    `\s`    |          匹配一个空格，是 `[ \t\n\x0b\r\f]` 的简写           |
+    |   `\s+`    |                         匹配多个空格                         |
+    |    `\S`    |                        匹配一个非空格                        |
+    |    `\w`    | 匹配一个单词字符（大小写字母、数字、下划线），是 `[a-zA-Z_0-9]` 的简写 |
+    |    `\W`    | 匹配一个非单词字符（除了大小写字母、数字、下划线之外的字符），等同于 `[^\w]` |
 
 + Java中正则表达式字符串：
 
-  Java 中的正则表达式字符串有两层含义，首先 Java 字符串转义出符合正则表达式语法的字符串，然后再由转义后的正则表达式进行模式匹配。
+    Java 中的正则表达式字符串有两层含义，首先 Java 字符串转义出符合正则表达式语法的字符串，然后再由转义后的正则表达式进行模式匹配。
 
-  因为反斜杠本就在Java中表示转义字符，所以==上述过程中尤其需要注意反斜杠==：
+    因为反斜杠本就在Java中表示转义字符，所以==上述过程中尤其需要注意反斜杠==：
 
-  + 对于匹配 `.` / `{` / `[` / `(` / `?` / `$` / `^` / `*` 这些特殊字符时，正则表达式即为 `\.`。但这与Java中转义 `.` 的写法重合，因此在Java中匹配 `.` 的正则表达式字符串要写为 `\\.`，第一步转义为正则表达式 `\.`，第二步在匹配。
-  + 在匹配 `\` 时，对于正则表达式即为 \\\，但Java中要写为 `\\\\`。
-  + 匹配多个空格的正则表达式为 `\s+`，但在Java中写为字符串则需写为 `\\s+`。
+    + 对于匹配 `.` / `{` / `[` / `(` / `?` / `$` / `^` / `*` 这些特殊字符时，正则表达式即为 `\.`。但这与Java中转义 `.` 的写法重合，因此在Java中匹配 `.` 的正则表达式字符串要写为 `\\.`，第一步转义为正则表达式 `\.`，第二步在匹配。
+    + 在匹配 `\` 时，对于正则表达式即为 \\\，但Java中要写为 `\\\\`。
+    + 匹配多个空格的正则表达式为 `\s+`，但在Java中写为字符串则需写为 `\\s+`。
 
 + Java中内置的字符串正则处理方法：
 
-  在 Java 中有四个内置的运行正则表达式的方法，分别是 `matches()`、`split())`、`replaceFirst()`、`replaceAll()`。注意 `replace()` 方法不支持正则表达式。
+    在 Java 中有四个内置的运行正则表达式的方法，分别是 `matches()`、`split())`、`replaceFirst()`、`replaceAll()`。注意 `replace()` 方法不支持正则表达式。
 
-  |                   方法                   |                  描述                   |
-  | :--------------------------------------: | :-------------------------------------: |
-  |           `s.matches("regex")`           | 当仅且当正则匹配整个字符串时返回 `true` |
-  |            `s.split("regex")`            |      按匹配的正则表达式切片字符串       |
-  | `s.replaceFirst("regex", "replacement")` |        替换首次匹配的字符串片段         |
-  |  `s.replaceAll("regex", "replacement")`  |           替换所有匹配的字符            |
+    |                   方法                   |                  描述                   |
+    | :--------------------------------------: | :-------------------------------------: |
+    |           `s.matches("regex")`           | 当仅且当正则匹配整个字符串时返回 `true` |
+    |            `s.split("regex")`            |      按匹配的正则表达式切片字符串       |
+    | `s.replaceFirst("regex", "replacement")` |        替换首次匹配的字符串片段         |
+    |  `s.replaceAll("regex", "replacement")`  |           替换所有匹配的字符            |
 
 + 参考：
 
-  + [Java 正则表达式详解](https://segmentfault.com/a/1190000009162306)
-  + [Java Doc](https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html#sum)
+    + [Java 正则表达式详解](https://segmentfault.com/a/1190000009162306)
+    + [Java Doc](https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html#sum)
 
 *****
 
 ##### StringBuilder
 
 + StringBuilder的三种清空方式：==方法一最慢，方法二和三差不多==
-  + 重新 `new StringBuilder()`；
-  + 使用 `stringBuilder.delete(0, stringBuilder.length())`；
-  + 使用 `setLength(0)`
+    + 重新 `new StringBuilder()`；
+    + 使用 `stringBuilder.delete(0, stringBuilder.length())`；
+    + 使用 `setLength(0)`
 + Built-in Method:
-  + 不仅同样有 `charAt(int index)` 还有 `setCharAt(int index, char c)`
+    + 不仅同样有 `charAt(int index)` 还有 `setCharAt(int index, char c)`
+    + `insert(int index, content)` : 在指定位置处插入内容，内容可为任一基本类型或者对象，原本的内容向后移动  ==可以用来reverse== [[0557]](#[0557] Reverse Words in a String III) Solution 4
 
 ******
 
@@ -1415,12 +1417,52 @@ $\implies$ 总的次数为$1+2+3+\dots+numRows = \frac{numRows(numRows+1)}{2} = 
 
 ##### [0142] Linked List Cycle II
 
-典型的Floyd's Algorithm
+Given a linked list, return the node where the cycle begins. If there is no cycle, return `null`. **Notice** that you **should not modify** the linked list.    分别引自[[0141]](#[0141] Linked List Cycle)的两个方法
 
-+ ==Floyd's Algorithm:== 
-  + Phase 1: tortoise 一步一node；hare 一步二nodes    $\implies$    两者在intersection相遇
-  + Phase 2: 因为intersection并不一定是the entrance of the cycle，所以还需要Phase 2: tortoise 回到起点一步一node；hare 待在intersection一步一node    $\implies$    两者在entrance相遇                
-+ Solution2Abbr: ==写得好==
++ Solution 1: Use HashSet $\implies \mathcal{O}(n)\ \&\ \mathcal{O}(n)$​
+
+  ```java
+  public boolean hasCycle(ListNode head) {
+    Set<ListNode> set = new HashSet<ListNode>();
+  
+    if (head == null) return false;
+  
+    while (head.next != null) {
+      if (!set.contains(head)) {
+        set.add(head);
+        head = head.next;
+      } else {
+        return head;
+      }
+    }
+  
+    return false;
+  }
+  ```
+
++ Solution 2: Two-Pointer Scenario II / Floyd's Algorithm  $\implies \mathcal{O}(n)\ \&\ \mathcal{O}(1)$    ==**写得好**==
+
+  ```java
+  public boolean hasCycle(ListNode head) {
+    ListNode slow = head;
+    ListNode fast = head;
+    
+    while (fast != null && fast.next != null) { // Phase I: Find the intersection
+      slow = slow.next;
+      fast = fast.next.next;
+      if (slow == fast) { // Phase II: Find the entrance
+        slow = head; // 题目要求不能修改原list，不然这里可以直接让fast和head比即可
+        while (fast != slow) {
+          slow = slow.next;
+          fast = fast.next;
+        }
+        return slow;
+      }
+    }
+    
+    return false;
+  }
+  ```
 
 *****
 
@@ -2055,115 +2097,115 @@ Given an input string `s`, reverse the order of the **words**. A **word** is def
 
 + Solution 1: Use ==**built-in method**==: `trim()` , `split()` , `reverse()` and `join()` . $\implies \mathcal{O}(n)\ \&\ \mathcal{O}(n)$
 
-  <img src="/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/[0151]_1.png" style="zoom:50%;" />
+    <img src="/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/[0151]_1.png" style="zoom:50%;" />
 
-  ```java
-  public String reverseWords(String s) {
-    s = s.trim();
-    List<String> wordList = Arrays.asList(s.split("\\s+"));
-    Collections.reverse(wordList);
-    return String.join(" ", wordList);
-  }
-  ```
+    ```java
+    public String reverseWords(String s) {
+      s = s.trim();
+      List<String> wordList = Arrays.asList(s.split("\\s+"));
+      Collections.reverse(wordList);
+      return String.join(" ", wordList);
+    }
+    ```
 
-  *解释：*
+    *解释：*
 
-  + `trim()` : 将原字符串中首尾的空格删去，*TC和SC均为 $\mathcal{O}(n)$​*
-  + `split("\\s+")` : 将原字符串按照其内一个或多个空格为界，分割为String[]   正则表达式见[Regular Expression](#Regular Expression)
-  + `String.join(" ", wordList)` : 以空格作为delimiter（定界符），将 `wordList` 中的内容合并起来。
+    + `trim()` : 将原字符串中首尾的空格删去，*TC和SC均为 $\mathcal{O}(n)$​*
+    + `split("\\s+")` : 将原字符串按照其内一个或多个空格为界，分割为String[]   正则表达式见[Regular Expression](#Regular Expression)
+    + `String.join(" ", wordList)` : 以空格作为delimiter（定界符），将 `wordList` 中的内容合并起来。
 
 + Solution 2: Reverse the Whole String and Then Reverse Each Word $\implies \mathcal{O}(n)\ \&\ \mathcal{O}(n)$​  ==**表现最好**==
 
-  <img src="/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/[0151]_2.png" style="zoom:50%;" />
+    <img src="/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/[0151]_2.png" style="zoom:50%;" />
 
-  ==下面的代码全程借用StringBuilder是因为Java中的String是immutable==
+    ==下面的代码全程借用StringBuilder是因为Java中的String是immutable==
 
-  ```java
-  public StringBuilder trimSpaces(String s) {
-    int left = 0, right = s.length() - 1;
-    // remove leading spaces
-    while (left <= right && s.charAt(left) == ' ') ++left;
-    // remove trailing spaces
-    while (left <= right && s.charAt(right) == ' ') --right;
-  
-    // reduce multiple spaces to single one
-    StringBuilder sb = new StringBuilder();
-    while (left <= right) {
-      char c = s.charAt(left);
-      if (c != ' ' || sb.charAt(sb.length()-1) != ' ') sb.append(c); // word后紧跟的第一个空格也保留
-      ++left;
+    ```java
+    public StringBuilder trimSpaces(String s) {
+      int left = 0, right = s.length() - 1;
+      // remove leading spaces
+      while (left <= right && s.charAt(left) == ' ') ++left;
+      // remove trailing spaces
+      while (left <= right && s.charAt(right) == ' ') --right;
+    
+      // reduce multiple spaces to single one
+      StringBuilder sb = new StringBuilder();
+      while (left <= right) {
+        char c = s.charAt(left);
+        if (c != ' ' || sb.charAt(sb.length()-1) != ' ') sb.append(c); // word后紧跟的第一个空格也保留
+        ++left;
+      }
+      return sb;
     }
-    return sb;
-  }
-  
-  public void reverse(StringBuilder sb, int left, int right) {
-    while (left < right) {
-      char tmp = sb.charAt(left);
-      sb.setCharAt(left++, sb.charAt(right));
-      sb.setCharAt(right--, tmp);
+    
+    public void reverse(StringBuilder sb, int left, int right) {
+      while (left < right) {
+        char tmp = sb.charAt(left);
+        sb.setCharAt(left++, sb.charAt(right));
+        sb.setCharAt(right--, tmp);
+      }
     }
-  }
-  
-  public void reverseEachWord(StringBuilder sb) {
-    int n = sb.length();
-    int start = 0, end = 0;
-  
-    while (start < n) {
-      // go to the end of the word
-      while (end < n && sb.charAt(end) != ' ') ++end;
-      // reverse the word
-      reverse(sb, start, end - 1);
-      // move to the next word
-      start = ++end;
+    
+    public void reverseEachWord(StringBuilder sb) {
+      int n = sb.length();
+      int start = 0, end = 0;
+    
+      while (start < n) {
+        // go to the end of the word
+        while (end < n && sb.charAt(end) != ' ') ++end;
+        // reverse the word
+        reverse(sb, start, end - 1);
+        // move to the next word
+        start = ++end;
+      }
     }
-  }
-  
-  public String reverseWords(String s) {
-    // converst string to string builder 
-    // and trim spaces at the same time
-    StringBuilder sb = trimSpaces(s);
-  
-    // reverse the whole string
-    reverse(sb, 0, sb.length() - 1);
-  
-    // reverse each word
-    reverseEachWord(sb);
-  
-    return sb.toString();
-  }
-  ```
+    
+    public String reverseWords(String s) {
+      // converst string to string builder 
+      // and trim spaces at the same time
+      StringBuilder sb = trimSpaces(s);
+    
+      // reverse the whole string
+      reverse(sb, 0, sb.length() - 1);
+    
+      // reverse each word
+      reverseEachWord(sb);
+    
+      return sb.toString();
+    }
+    ```
 
 + Solution 3: Stack of Words $\implies \mathcal{O}(n)\ \& \ \mathcal{O}(n)$
 
-  <img src="/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/[0151]_3.png" style="zoom:50%;" />
+    <img src="/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/[0151]_3.png" style="zoom:50%;" />
 
-  ```java
-  public String reverseWords(String s) {
-    int left = 0, right = s.length()-1;
-  
-    // remove leading and trailing spaces
-    while (left <= right && s.charAt(left) == ' ') left++;
-    while (left <= right && s.charAt(right) == ' ') right--;
-  
-    Deque<String> stack = new ArrayDeque<>();
-    StringBuilder sb = new StringBuilder();
-    // push word by word in front of stack
-    while (left <= right) {
-      char c = s.charAt(left);
-  
-      if (c == ' ' && sb.length() != 0) { // 说明找到了一个word
-        stack.addFirst(sb.toString());
-        sb.setLength(0);
-      } else if (c != ' ') {
-        sb.append(c);
+    ```java
+    public String reverseWords(String s) {
+      int left = 0, right = s.length()-1;
+    
+      // remove leading and trailing spaces
+      while (left <= right && s.charAt(left) == ' ') left++;
+      while (left <= right && s.charAt(right) == ' ') right--;
+    
+      Deque<String> stack = new ArrayDeque<>();
+      StringBuilder sb = new StringBuilder();
+      // push word by word in front of stack
+      while (left <= right) {
+        char c = s.charAt(left);
+    
+        if (c == ' ' && sb.length() != 0) { // 说明找到了一个word
+          stack.addFirst(sb.toString());
+          sb.setLength(0);
+        } else if (c != ' ') {
+          sb.append(c);
+        }
+        left++;
       }
-      left++;
+      stack.addFirst(sb.toString());
+    
+      return String.join(" ", stack);
     }
-    stack.addFirst(sb.toString());
-  
-    return String.join(" ", stack);
-  }
-  ```
+    ```
 
 ****
 
@@ -2171,73 +2213,104 @@ Given an input string `s`, reverse the order of the **words**. A **word** is def
 
 Given a string `s`, reverse the order of characters in each word within a sentence while still preserving whitespace and initial word order.      [[0151]](#[0151] Reverse Words in a String)的简化版
 
-+ Solution 1: [0151] Solution 2 $\implies \mathcal{O}(n)\ \&\ \mathcal{O}(n)$
++ Solution 1: [0151] Solution 2 ==完全没用Built-in Method== $\implies \mathcal{O}(n)\ \&\ \mathcal{O}(n)$​​    ==**要求不用Built-in Method选这个**==
 
-  ```java
-  public String reverseWords(String s) {
-    StringBuilder sb = new StringBuilder(s);
-    reverseEachWord(sb);
-    return sb.toString();
-  }
-  
-  public void reverseEachWord(StringBuilder sb) {
-    int n = sb.length();
-    int start = 0, end = 0;
-  
-    while (start < n) {
-      while (end < n && sb.charAt(end) != ' ') end++;
-      reverse(sb, start, end-1);
-      start = ++ end;
+    ```java
+    public String reverseWords(String s) {
+      StringBuilder sb = new StringBuilder(s);
+      reverseEachWord(sb);
+      return sb.toString();
     }
-  }
-  
-  public void reverse(StringBuilder sb, int left, int right) {
-    while (left < right) {
-      char tmp = sb.charAt(left);
-      sb.setCharAt(left, sb.charAt(right));
-      sb.setCharAt(right, tmp);
-      left++;
-      right--;
-    }
-  }
-  ```
-
-+ Solution 2: [0151] Solution 3 有改动：将Stack换为StringBuilder，且不用考虑words之间有多于1个的空格，对应LeetCode Approach #3 $\implies \mathcal{O}(n)\ \&\ \mathcal{O}(n)$
-
-  ```java
-  public String reverseWords(String s) {
-    StringBuilder res = new StringBuilder();
-    StringBuilder word = new StringBuilder();
-  
-    for (int i = 0; i < s.length(); i++) {
-      char c = s.charAt(i);
-      if (c != ' ') {
-        word.append(c);
-      } else {
-        res.append(word.reverse());
-        res.append(" "); // 应该是比res.append(word.reverse() + " ");要快些
-        word.setLength(0);
+    
+    public void reverseEachWord(StringBuilder sb) {
+      int n = sb.length();
+      int start = 0, end = 0;
+    
+      while (start < n) {
+        while (end < n && sb.charAt(end) != ' ') end++;
+        reverse(sb, start, end-1);
+        start = ++ end;
       }
     }
-    res.append(word.reverse());
-  
-    return res.toString();
-  }
-  ```
+    
+    public void reverse(StringBuilder sb, int left, int right) {
+      while (left < right) {
+        char tmp = sb.charAt(left);
+        sb.setCharAt(left, sb.charAt(right));
+        sb.setCharAt(right, tmp);
+        left++;
+        right--;
+      }
+    }
+    ```
 
-+ Solution 3: Use Built-in Method $\implies \mathcal{O}(n)\ \&\ \mathcal{O}(n)$
++ Solution 2: [0151] Solution 3 有改动：将Stack换为StringBuilder，且不用考虑words之间有多于1个的空格，对应LeetCode Approach #3 ==思路和下面Solution 3几乎一致，既没有做到完全不用Built-in Method `reverse()`，表现也没有Solution 3好== $\implies \mathcal{O}(n)\ \&\ \mathcal{O}(n)$​​
 
-  ```java
-  public String reverseWords(String s) {
-    String words[] = s.split(" ");
-    StringBuilder res = new StringBuilder();
-    for (String word: words)
-      res.append(new StringBuilder(word).reverse().toString() + " ");
-    return res.toString().trim();
-  }
-  ```
+    ```java
+    public String reverseWords(String s) {
+      StringBuilder res = new StringBuilder();
+      StringBuilder word = new StringBuilder();
+    
+      for (int i = 0; i < s.length(); i++) {
+        char c = s.charAt(i);
+        if (c != ' ') {
+          word.append(c);
+        } else {
+          res.append(word.reverse());
+          res.append(" "); // 应该是比res.append(word.reverse() + " ");要快些
+          word.setLength(0);
+        }
+      }
+      res.append(word.reverse());
+    
+      return res.toString();
+    }
+    ```
 
-  
++ Solution 3: Use Built-in Method $\implies \mathcal{O}(n)\ \&\ \mathcal{O}(n)$​   ==**表现最好**==
+
+    ```java
+    public String reverseWords(String s) {
+      String words[] = s.split(" ");
+      StringBuilder res = new StringBuilder();
+      for (String word: words)
+        res.append(new StringBuilder(word).reverse().toString() + " ");
+      return res.toString().trim();
+    }
+    ```
+
++ Solution 4: 在Solution 3的基础上，全部自己实现用到的Built-in Method（除了 `trim()` ），对应LeetCode Approach #3 $\implies \mathcal{O}(n)\ \&\ \mathcal{O}(n)$​​  ==**表现最差**==
+
+    ```java
+    public String reverseWords(String s) {
+      String words[] = split(s);
+      StringBuilder res = new StringBuilder();
+      for (String word: words)
+        res.append(reverse(word) + " ");
+      return res.toString().trim();
+    }
+    
+    public String[] split(String s) { // 和Solution 2相似
+      ArrayList<String> words = new ArrayList<>(); // 无法直接用String[]，因为不知道长度
+      StringBuilder word = new StringBuilder();
+      for (int i = 0; i < s.length(); i++) {
+        if (s.charAt(i) == ' ') {
+          words.add(word.toString());
+          word.setLength(0);
+        } else
+          word.append(s.charAt(i));
+      }
+      words.add(word.toString());
+      return words.toArray(new String[words.size()]);
+    }
+    
+    public String reverse(String s) { // 利用insert()实现reverse！！
+      StringBuilder res = new StringBuilder();
+      for (int i = 0; i < s.length(); i++)
+        res.insert(0,s.charAt(i));
+      return res.toString();
+    }
+    ```
 
 ********
 
@@ -2266,6 +2339,52 @@ Given a string `s`, reverse the order of characters in each word within a senten
 ******
 
 #### Two-Pointer Technique
+
+##### [0019] Remove Nth Node From End of List
+
+
+
+********
+
+##### [0026] Remove Duplicates from Sorted Array
+
+Given an integer array `nums` sorted in **non-decreasing order**, remove the duplicates [**in-place**](https://en.wikipedia.org/wiki/In-place_algorithm) such that each unique element appears only **once**. The **relative order** of the elements should be kept the **same**. Return `k` *after placing the final result in the first* `k` *slots of* `nums`.
+
++ Solution 1: Brute Force $\implies \mathcal{O}(n^2)$
+
+    ```java
+    public int removeDuplicates(int[] nums) {
+      int len = nums.length;
+    
+      for (int i = 1; i < len; i++) {
+        if (nums[i] == nums[i-1]) {
+          for (int j = i; j<len-1; j++) nums[j] = nums[j+1];
+          len--;
+          i--;
+        }
+      }
+      return len;
+    }
+    ```
+
++ Solution 2: Two-Pointer $\implies \mathcal{O}(n)$​    ==**写得好**==
+
+    ```java
+    public int removeDuplicates(int[] nums) {
+      int len = nums.length;
+      int i = 0;
+      
+      for (int j = 1; j < len; j++) {
+        if (nums[j] != nums[i]) nums[++i] = nums[j];
+      }
+      
+      // 当上面的循环结束时，此时的第i+1位元素是一串重复字符nums[i+1...len-1]的首位，所以第i+1位元素也要算在内
+      return i+1;
+    }
+    ```
+    
+
+******
 
 ##### [0027] Remove Element
 
@@ -2325,6 +2444,50 @@ Given a string `s`, reverse the order of characters in each word within a senten
   ```
 
 **********
+
+##### [0141] Linked List Cycle
+
+Given `head`, the head of a linked list, determine if the linked list has a cycle in it. Return `true` *if there is a cycle in the linked list*. Otherwise, return `false`.
+
++ Solution 1: Use HashSet $\implies \mathcal{O}(n)\ \&\ \mathcal{O}(n)$​
+
+  ```java
+  public boolean hasCycle(ListNode head) {
+    Set<ListNode> set = new HashSet<ListNode>();
+  
+    if (head == null) return false;
+  
+    while (head.next != null) {
+      if (!set.contains(head)) {
+        set.add(head);
+        head = head.next;
+      } else {
+        return true;
+      }
+    }
+  
+    return false;
+  }
+  ```
+
++ Solution 2: Two-Pointer Scenario II  $\implies \mathcal{O}(n)\ \&\ \mathcal{O}(1)$
+
+  ```java
+  public boolean hasCycle(ListNode head) {
+    ListNode slow = head;
+    ListNode fast = head;
+    
+    while (fast != null && fast.next != null) { 
+      slow = slow.next;
+      fast = fast.next.next;
+      if (slow == fast) return true;
+    }
+    
+    return false;
+  }
+  ```
+
+**************
 
 ##### [0167] Two Sum II - Input array is sorted
 
@@ -2434,6 +2597,34 @@ Given a string `s`, reverse the order of characters in each word within a senten
   ```
 
 + Solution 2: [Binary Search](https://leetcode.com/problems/minimum-size-subarray-sum/solution/): C++写的，不想看。。。
+
+******
+
+##### [0283] Move Zeroes
+
+Given an integer array `nums`, move all `0`'s to the end of it while maintaining the relative order of the non-zero elements. **In-place**
+
++ Solution 1: Brute Force 没写
+
++ Solution 2: Two-Pointer  $\implies \mathcal{O}(n)$    ==**写得好**==
+
+  ```java
+  public void moveZeroes(int[] nums) {
+    int i =0;
+    for (int j = 0; j < nums.length; j++) {
+      if (nums[j] != 0) {
+        nums[i] = nums[j];
+        // Without this, we just simply move all the non-zero elements to left.
+        // We should also set the last few elements to 0.
+        // Attention! We cannot just simply set nums[j] to 0 because we might cover the new nums[i] when i==j.
+        if (i != j) nums[j] = 0;
+        i++;
+      }
+    }
+  }
+  ```
+
+  `if (i != j) nums[j] = 0` 这个判断很重要，它实现了将最后几位置为0。在LeetCode Approach #2中，这一过程是通过另一for循环实现的, which is dumb.
 
 ******
 
@@ -2657,6 +2848,132 @@ Given a binary array `nums`, return *the maximum number of consecutive* `1`*'s i
 ******
 
 #### Tricks
+
+##### [0160] Intersection of Two Linked Lists
+
+Given the heads of two singly linked-lists `headA` and `headB`, return *the node at which the two lists intersect*. If the two linked lists have no intersection at all, return `null`.
+
++ Solution 1: Nested Loop: 将List A中的Node逐个和List B中的Node比较 $\implies \mathcal{O}(n·m)\ \&\ \mathcal{O}(1)$​​​​
+
+  ```java
+  public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+    if (headA == null || headB == null) return null;
+    
+    while (headB != null) {
+      ListNode p = headA;
+      while (p != null) {
+        if (p == headB) return p;
+        p = p.next;
+      }
+      headB = headB.next;
+    }
+    
+    return null;
+  }
+  ```
+
++ Solution 2: Use HashSet存储List A中的Node，再与List B中的Node比较 $\implies \mathcal{O}(n+m)\ \&\ \mathcal{O}(n)$​
+
+  ```java
+  public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+    if (headA == null || headB == null) return null;
+    
+    Set<ListNode> set = new HashSet<>();
+    while (headA != null) {
+      set.add(headA);
+      headA = headA.null;
+    }
+    
+    while (headB != null) {
+      if (set.contains(headB)) return headB;
+      headB = headB.next;
+    }
+    
+    return null;
+  }
+  ```
+
++ Solution 3: 同时遍历两条Lists，当本List遍历结束时，将pointer置为另一条List的head $\implies \mathcal{O}(\le(n+m))\ \&\ \mathcal{O}(1)$​​​​​   ==**巧妙**==
+
+  ```java
+  public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+  	ListNode p1 = headA;
+    ListNdoe p2 = headB;
+    
+    while (p1 != p2) {
+      p1 = (p1 != null) ? p1.next : headB;
+      p2 = (p2 != null) ? p2.next : headA;
+    }
+    
+    return p1;
+  }
+  ```
+
++ Solution 4: Pointer 1从List A第0个Node开始，Pointer 2从List B第m-n个Node开始，在经过n个iterations后两者在intersection相遇 $\implies \mathcal{O}(\le min(n,m))\ \&\ \mathcal{O}(1)$​​​   ==**更巧妙**==
+
+  <img src="/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/[0160].png" style="zoom:50%;" />
+
+  ```java
+  public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+    ListNode p1 = headA;
+    ListNdoe p2 = headB;
+    
+    // To reset the beginning of headA or headB
+    // Really Clever Trick!!!
+    while (p1 != null || p2 != null) {
+      if (p1 != null) 
+        p1 = p1.next;
+      else 
+        headB = headB.next;
+      if (p2 != null)
+        p2 = p2.next;
+      else 
+        headA = headA.next;
+    }
+    
+    while (headA != headB) {
+      headA = headA.next;
+      headB = headB.next;
+    }
+    
+    return headA;
+  }
+  ```
+
+  ==注意：== 这个方法，除了思路巧妙以外，如何找到两条Lists遍历的起点也非常巧妙。如果只是简单地利用while循环分别遍历两条Lists记录各种的长度，最终的TC仍为 $\mathcal{O}(n+m)$:
+
+  ```java
+  public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+    int lenA = getLength(headA);
+    int lenB = getLength(headB);
+    int diff = lenA > lenB ? lenA - lenB : lenB - lenA;
+  
+    // To reset the beginning of headA or headB
+    for (int i = 0; i < diff; i++) {
+      if (lenA > lenB)
+        headA = headA.next;
+      else
+        headB = headB.next;
+    }
+  
+    ...
+  }
+  ```
+
+  ```java
+  public int getLength(ListNode head) {
+    int len = 0;
+  
+    while (head != null) {
+      len++;
+      head = head.next;
+    }
+  
+    return len;
+  }
+  ```
+
+********
 
 ##### [0189] Rotate Array
 

@@ -13,6 +13,7 @@ public class Solution4Advanced {
         ListNode p2 = headB;
         
         // To reset the beginning of headA or headB
+        // Really Clever Trick!!!
         while (p1 != null || p2 != null) {
             if (p1 != null) {
                 p1 = p1.next;

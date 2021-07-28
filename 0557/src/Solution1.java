@@ -3,7 +3,7 @@
  * @date 7/26/21 - 15:14
  */
 public class Solution1 {
-    // [0151] Solution 2
+    // [0151] Solution 2     要求不用Built-in Method选这个
     /* Runtime: 7ms (faster than 48.61%)   O(n)
        Memory: 40MB (less than 31.98%)     O(n)
      */
