@@ -8,6 +8,439 @@ $1 < klogn < log^kn < n< nlogn = log(n!) < n^k < k^n < n! < n^n$
 
 *****
 
+#### Algorithms
+
+##### ***Floyd's Algorithm***
+
++ Phase 1: tortoise 一步一node；hare 一步二nodes    $\implies$    两者在intersection相遇
++ Phase 2: ==因为intersection并不一定是the entrance of the cycle，所以还需要Phase 2== tortoise 回到起点一步一node；hare 待在intersection一步一node    $\implies$    两者在entrance相遇
+
+*LeetCode:* [[0142]](#[0142] Linked List Cycle II)     [[0287]](#[0287] Find the Duplicate Number)
+
+******
+
+#####  String-searching algorithms
+
+Best [String-searching algorithms](https://en.wikipedia.org/wiki/String-searching_algorithm#Single-pattern_algorithms) have a linear execution time in average. 
+
+The most popular ones are [Aho-Corasick](https://en.wikipedia.org/wiki/Aho–Corasick_algorithm), [KMP](https://en.wikipedia.org/wiki/Knuth–Morris–Pratt_algorithm) and [Rabin-Karp](https://en.wikipedia.org/wiki/Rabin–Karp_algorithm): 
+
++ Aho-Corasick is used by [fgrep](https://en.wikipedia.org/wiki/Grep#Variations)
++ KMP is used for [chinese string searching](https://www.aclweb.org/anthology/C96-2200)
++ Rabin-Karp is used for plagiarism detection and in bioinformatics to look for similarities in two or more proteins.
+
+The first two are optimised for a single pattern search, and Rabin-Karp for a multiple pattern search.
+
+******
+
+##### ***Rabin-Karp Algorithm***
+
+[Rabin-Karp algorithm](https://en.wikipedia.org/wiki/Rabin%E2%80%93Karp_algorithm) is used to perform a multiple pattern search. It's used for plagiarism detection and in bioinformatics to look for similarities in two or more proteins.
+
+*实现：*将要查找的内容（字符串）通过散列函数转换为hash值。同样，将待查找的文本的内容也通过散列函数转换为hash值。通过hash值的对比，来确定待查找文本中是否含有目标字符串。
+
+```java
+function RabinKarp(string s[1..n], string pattern[1..m])
+    hpattern := hash(pattern[1..m]);
+    for i from 1 to n-m+1
+        hs := hash(s[i..i+m-1])
+        if hs = hpattern // 仅仅是hash值相同，可能是因为hash collision导致的伪重复 
+            if s[i..i+m-1] = pattern[1..m] // 因此保险起见，还需要再检测子字符串是否真的相同
+                return i
+    return not found
+```
+
+*注意：*待查找文本内容中的sequences在转换为hash值时，可以直接通过确定好的散列函数实现，也可以通过已有字符串的hash值推测出来。后者 (***[Rolling Hash](https://en.wikipedia.org/wiki/Rolling_hash)***) 在要查找的sequence较长时，可以极大地节约时间。
+
+*e.g.* 文本串为“abracadabra”，则首个可能匹配的串为“abr”，此时通过散列函数得到“abr”对应的hash值。而第二个要匹配的串为“bra”，此时可以通过“abr”的hash值来计算：只需减去首字母“a”的hash值，将整个串偏移一位再加上新的末位字母对应的散列值即可。
+
+假设计算the first sequence of Length $L$ 的hash值的公式为
+$$
+\begin{split}
+h_0 &=\sum_{i=0}^{L-1}c_ibase^{L-1-i} \\
+&=c_0base^{L-1}+c_1base^{L-2}+ \dots + c_{L-2}base + c_{L-1}\\
+&=(\dots((((c_0base + c_1)\times base+c_2)\times base+\dots + c_{L-2})\times base + c_{L-1}
+\end{split} \tag{1.1}
+$$
+则通过*Rolling Hash*计算之后sequences的hash值可以有多种方式:
+
+|   $h_i$   |    第 $i$ 个sequence的hash值    |  $h_{i-1}$  |   第 $i-1$ 个sequence的hash值   |
+| :-------: | :-----------------------------: | :---------: | :-----------------------------: |
+| $c_{i-1}$ | 第 $i-1$ 个sequence的第一个字符 | $c_{L-1+i}$ | 第 $i$ 个sequence的最后一个字符 |
+
++ 第一种方式： $\begin{matrix} 
+  ①\ remove\ the\ first\ digit \ \ ③\ add\ the\ last\ digit \\
+  h_i = \underbrace{\overbrace{(h_{i-1}-c_{i-1}base^{L-1})} \times base} \overbrace{+c_{L-1+i}} \ (i\ge1)  \\
+  ②\ shift\ left\ one\ digit\quad\quad\quad\quad\quad\ \
+  \end{matrix}$
+
++ 第二种方式： $\begin{matrix} 
+  ①\ shift\ left\ one\ digit \ \ ③\ add\ the\ last\ digit \\
+  h_i = \overbrace{h_{i-1}\times base} \underbrace{-c_{i-1}base^L} \overbrace{+c_{L-1+i}} \ (i\ge1)  \\
+  ②\ remove\ the\ first\ digit
+  \end{matrix}$ 
+
+  （第一种方式内部项乘开 / In a generalised way）<a name="第二种方式"></a>
+
+*解释：*
+
++ *为什么在 remove the first digit 时，要减去 $c_{i-1}base^{L-1}$ ？*
+
+  对于第 $i-1$ 个sequence，其第一位字符为 $c_{i-1}$。根据公式 $(1.1)$ 可知，在计算任一sequence的hash值时，其第一个字符的权重为 $base^{L-1}$。故从 $h_{i-1}$ 中移除第一位字符时，要减去 $c_{i-1}base^{L-1}$ 。
+
++ *为什么在 shift left one digit 时，要乘以 $base$ ？*
+
+  类比Bitwise Operation中的移位，左移 $n$ 位相当于原值乘以 $base^n$。
+
++ *为什么在 add the last digit 时，可以直接加上 $c_{L-1+i}$ ？*
+
+  根据公式 $(1.1)$ 可知，在计算任一sequence的hash值时，其最后一位字符的权重为 $base^0=1$。
+
+*LeetCode:* [[0187]](#[0187] Repeated DNA Sequences)（采用的第二种方式的Rolling Hash）  [[1044]](#[1044] Longest Duplicate Substring)（采用的第二种方式的Rolling Hash）   [1062]
+
+******
+
+******
+
+#### Bitwise Operation 位操作
+
+##### ***Two's complement 补码***
+
++ 表示：$-x=\neg x+1$ 
+
+  ![](/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/bitwiseOperators_1.png)
+
++ 负数的补码：两种理解方式
+
+  + 将==其对应正数==按位取反加1（此时的取反加一是<u>所有位</u>都取反且接受进位，包括符号位由 $0$ 变为 $1$）
+
+    *e.g.* $-128$ 对应的正数为 $128$ : $128=(10000000)_2 \rightarrow 01111111 \rightarrow 10000000$
+
+  + $2^{n-1}$ ($n$ 为位数) 与该负数绝对值的差值。
+
+    *e.g.* $-128 = 2^{8-1}-|-128|=256-128=128$，所以它的补码为10000000。
+
++ 与有符号数 (signed binary number) 的区别: ==因为正数和 $0$ 的补码和其原码相同，只考虑负数==
+
+  + Signed binary number的读法：
+
+    第一位为符号位，其余位正常读：
+
+    ![](/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/SignedBinaryNum.gif)
+
+  + 补码的读法：依据==补码的补码为原码==
+
+    已知是某负数的补码，直接取反加一（此时的取反加一同样是<u>所有位</u>都取反且接受进位，包括符号位由 $1$ 变为 $0$）即得原码。但要注意，*就像依据负数写出其补码时，是根据其对应的正数取反加一*，这里<u>得到的原码所表示的数同样是指原负数所对应的正数</u>，即还需再加上负号。
+    $$
+    \begin{gathered}
+    10110101 \rightarrow 01001010 \rightarrow 01001011 = (75)_{10} \implies 原负数为-75 \\
+    100 \rightarrow 011 \rightarrow 100 = (4)_{10} \implies 原负数为-4
+    \end{gathered}
+    $$
+
+******
+
+##### ***Bit Shifts 移位***
+
++ [Arithmetic shift](https://en.wikipedia.org/wiki/Arithmetic_shift)
+
+  + arithmetic left shift: ==整体左移，左侧原数字不会移走，最右边补 $0$== 
+
+    *e.g.* $0 <<1 \rightarrow 0$    ( $0$ 乘以或除以 $2^n$ 仍为0  $\implies$ 对 $0$ 左移右移 $n$ 位仍为 $0$ )
+
+    ​	   $10111 << 1 \rightarrow 10111\underline{0}$
+
+    Shifting left by $n$ bits on a <u>signed or unsigned</u> binary number has the effect of multiplying it by $2^n$.
+
+  + arithmetic right shift: ==整体右移，但右侧原数字会移走，最左边空出来的位数由原符号位补齐==
+
+    *e.g.* $0 >> 1 \rightarrow 0$
+
+    ​       $10010111 >> 2 \rightarrow \underline{11}100101{1\mkern-9mu/}{1\mkern-9mu/}$
+
+    Shifting right by $n$ bits on a <u>two's complement signed</u> binary number (我的理解是，计算机中无论正数还是负数都用其补码表示) has the effect of dividing it by $2^n$, but it always rounds down (towards negative infinity). 
+
++ Logical shift
+
+  In a logical shift, zeros are shifted in to replace the discarded bits. Therefore, the logical and arithmetic left-shifts are exactly the same.
+
++ 对应Java中的运算符：
+
+  + `<<` : arithmetic / logical left shift
+  + `>>` : arithmetic right shift
+  + `>>>` : logical right shift
+
+*****
+
+##### ***XOR (exclusive OR) 异或***
+
++ 表示：$\oplus$（数学符号）、^（程序符号）
+
++ 性质：
+
+  1. $p \oplus q = (p \and \neg q) \or (\neg p \and q)$
+
+  2. 如果a、b两个值不相同，则异或结果为1。如果a、b两个值相同，异或结果为0。
+
+     $0$ ^ $0=0$          $0$ ^ $1=1$          $1$ ^ $1=0$           助记: ==不带进位的加法==
+
+  3. 交换律：$a$ ^ $b=b$ ^ $a$
+
+  4. 结合律：$a$ ^ $b$ ^ $c=a$ ^ $(b$ ^ $c)=(a$ ^ $b)$ ^ $c$
+
+  5. ==归零律：$x$ ^ $x=0$==
+
+  6. ==恒等律：$x$ ^ $0=x$==
+
+  7. ==自反性：$a$ ^ $b$ ^ $a=b$==
+
+  8. ==If $a$ ^ $b=c$ , then $a$ ^ $c=b$  and  $b$ ^ $c=a$ .==  (Prove: 两边同时异或 $a/b/c$ 中任一即可)    [0421]
+
++ 应用：
+
+  1. 在不引入中间变量的情况下，交换两个变量的值：
+
+     ```java
+     int a = 5, b = 10;
+     a = a ^ b;   
+     b = a ^ b;   // b = a ^ b ^ b = a
+     a = a ^ b;   // a = a ^ b ^ a = b
+     ```
+
+  2. 一个数组中包含从1~1000共1001个元素，只有一个元素值重复，其他均只出现一次。每个数组元素只能访问一次，且不用辅助存储空间，找出该元素？
+
+     *Algorithm:* 将所有数异或后，得到的结果与$1$ ^ $2$ ^ $...$ ^ $999$ ^ $1000$ 的结果 $T$ 进行异或，得到的结果即为重复元素。
+
+     *Analysis:* 假设第$n$个数重复，则数组中所有数的异或结果为$1$ ^ $2$ ^ $...$ ^ $n$ ^ $n$ ^ $...$ ^ $999$ ^ $1000$ $=$ $T$ ^ $n$。再与 $T$ 进行异或：$T$ ^ $n$ ^ $T$ $=n$。
+
+  3. Google面试题的变形：一个数组存放若干整数，一个数出现奇数次，其余数均出现偶数次，找出这个出现奇数次的数？
+
+     ```java
+     public void fun() {
+         int a[] = { 22, 38,38, 22,22, 4, 4, 11, 11 };
+         int temp = 0;
+         for (int i = 0; i < a.length; i++) {
+             temp ^= a[i];
+         }
+         System.out.println(temp);
+     }
+     ```
+
+  4. Facebook面试题：不使用加法运算的情况下，两数相加   [[0067]](#[0067] Add Binary)
+
++ LeetCode中的相关题目：
+
+  [[0067]](#[0067] Add Binary)      [[0136]](#[0136] Single Number)     [[0137]](#[0137] Single Number II)     [[0187]](#[0187] Repeated DNA Sequences)     [[0260]](#[0260] Single Number III)     [0318]      [[0421]](#[0421] Maximum XOR of Two Numbers in an Array)     
+
+******
+
+##### ***Useful operations***
+
++ $x \& (-x)$ : Get / isolate the rightmost 1-bit
+
+![](/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/bitwiseOperators_2.png)
+
++ $x \& (x-1)$ : Turn off (= set to 0) the rightmost 1-bit
+
+![](/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/bitwiseOperators_3.png)
+
++ LeetCode中的相关题目：
+
+  [[0231]](#[0231] Power of Two)      [[0260]](#[0260] Single Number III)
+
+******
+
+******
+
+#### 基本数据类型 / 数据结构 / 数据对象 之间的相互转换 (Conversion)
+
+##### ***Integer 与 Binary String 相互转换***
+
++ `Integer.parseInt(String s, int radix)` - 输出一个十进制数，其中`int radix `表示`String s`的进制
+
+  *e.g.* `Integer.parseInt("1011", 2)` - 输出二进制字符串"1011"在十进制下的数，即11
+
++ `Integer.toBinaryString(int i)` - 输出一个二进制字符串（即字符串的内容是二进制数，如"1011"）
+
+  *e.g.* `Integer.toBinaryString(11)` - 输出十进制数11在二进制下的字符串，即"1011"
+
+  ==注意：输出的二进制字符串的位数不定，原则是除十进制数0外，二进制首位都为1==
+
+  | 十进制数 | 二进制字符串 |
+  | :------: | :----------: |
+  |    0     |      0       |
+  |    3     |      11      |
+  |    10    |     1010     |
+
+******
+
+********
+
+#### Data Structure
+
+##### ***TreeSet 和 HashSet的区别***
+
++ 对于HashSet，Search / Insert / Delete all takes $\mathcal{O}(1)$；
+
+  When there are ==too many elements with the same hash key==, it will cost $\mathcal{O}N)$ time complexity to look up for a specific element, where $N$ is the number of elements with the same hash key. ==此时，可以采用TreeSet，to improve the performance from $\mathcal{O}(N)$ to $\mathcal{O}(logN)$.==
+
++ 对于TreeSet，Search / Insert / Delete all takes $\mathcal{O}(logk$).
+
+The essential difference between the hash set and the tree set is that ==keys in the tree set are ordered==.
+
+*****
+
+##### ***关于ArrayList和LinkedList的选用***
+
++ Search by value - `indexOf()`: Time complexity都为$\mathcal{O}(n)$，但是ArrayList将元素连续地存放在一起，而LinkedList则是在内存中随机存放，所以ArrayList实际运行会更快；
++ Get element by index - `get()`: ArrayList只需$\mathcal{O}(1)$ as the array has random access property, 可以直接访问任意index而不需要从头遍历（也是因为ArrayList在内存中是连续存储），但是LinkedList需要$\mathcal{O}(n)$，it needs to iterate through each element to reach a given index。
+
+*****
+
+##### ***PriorityQueue & Min/Max Heap***
+
++ PriorityQueue: 从队首获取元素时，总是获取优先级最高的元素
+
+  + 创建：`PriorityQueue<> pq = new PriorityQueue<>();`
+
+  + Common Method Summary:
+
+    + `add()` / `offer()`
+    + `clear()`
+    + `contains()`
+    + `remove()` / `poll()`：==返回的总是优先级最高的元素== 对于min heap，最返回最小的元素，反之亦然
+    + `toArray()`
+    + `peek()`
+    + `size()`
+
+  + `Comparator`自定义排序算法：==默认升序排列，即维护了一个min heap==
+
+    ```java
+    Queue<Object> priorityQueue = new PriorityQueue<>((optional)size, new Comparator<Object>(){
+      @Override
+      public int compare(Object o1, Object o2) {
+        return o2.val-o1.val; // 当o2.val > o1.val时，return一个正数，即交换o1和o2的顺序，故实现max heap
+      }
+    });
+    ```
+
++ Min/Max Heap:
+
+  + Min Heap: a complete binary tree in which the value in each internal node is smaller than or equal to the values in the children of that node. （即：越小，优先级越高）
+  + Max Heap: a complete binary tree in which the value in each internal node is bigger than or equal to the values in the children of that node. （即：越大，优先级越高）
+
+******
+
+##### HashMap定义时初始化
+
+```java
+Map<Character, Integer> toInt = new HashMap<>() {
+  {
+    put('A', 0); 
+    put('C', 1); 
+    put('G', 2); 
+    put('T', 3); 
+  }
+};
+// or
+Map<Character, Integer> toInt = new
+                HashMap<>() {{put('A', 0); put('C', 1); put('G', 2); put('T', 3); }};
+```
+
+*解释：*外层大括号为匿名内部类；内层大括号内还可以写for循环。
+
+******
+
+*****
+
+#### Dynamic Programming
+
+
+
+******
+
+******
+
+#### Iteration & Recursion
+
+##### ***关于Recursion的Top-down和Bottom-up***
+
++ If recursive calls before conditional check, then it's bottom up. 
++ If recursive calls after conditional check, then it's top down.
+
+******
+
+******
+
+#### String
+
+##### Built-in Method
+
++ `trim()` : Returns a string whose value is this string, with any leading and trailing whitespace removed.
++ `split(String reg)` : Splits this string around matches of the given [regular expression](https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html#sum).
++ `String.join(CharSequence delimiter, CharSequence... elements)` : Returns a new String composed of copies of the `CharSequence elements` joined together with a copy of the specified `delimiter`.
+
+*****
+
+##### Regular Expression
+
++ 常用：
+
+    元字符是一个预定义的字符。
+
+    | 正则表达式 |                             描述                             |
+    | :--------: | :----------------------------------------------------------: |
+    |    `\d`    |               匹配一个数字，是 `[0-9]` 的简写                |
+    |   `\d+`    |                         匹配多个数字                         |
+    |    `\D`    |              匹配一个非数字，是 `[^0-9]` 的简写              |
+    |    `\s`    |          匹配一个空格，是 `[ \t\n\x0b\r\f]` 的简写           |
+    |   `\s+`    |                         匹配多个空格                         |
+    |    `\S`    |                        匹配一个非空格                        |
+    |    `\w`    | 匹配一个单词字符（大小写字母、数字、下划线），是 `[a-zA-Z_0-9]` 的简写 |
+    |    `\W`    | 匹配一个非单词字符（除了大小写字母、数字、下划线之外的字符），等同于 `[^\w]` |
+
++ Java中正则表达式字符串：
+
+    Java 中的正则表达式字符串有两层含义，首先 Java 字符串转义出符合正则表达式语法的字符串，然后再由转义后的正则表达式进行模式匹配。
+
+    因为反斜杠本就在Java中表示转义字符，所以==上述过程中尤其需要注意反斜杠==：
+
+    + 对于匹配 `.` / `{` / `[` / `(` / `?` / `$` / `^` / `*` 这些特殊字符时，正则表达式即为 `\.`。但这与Java中转义 `.` 的写法重合，因此在Java中匹配 `.` 的正则表达式字符串要写为 `\\.`，第一步转义为正则表达式 `\.`，第二步在匹配。
+    + 在匹配 `\` 时，对于正则表达式即为 \\\，但Java中要写为 `\\\\`。
+    + 匹配多个空格的正则表达式为 `\s+`，但在Java中写为字符串则需写为 `\\s+`。
+
++ Java中内置的字符串正则处理方法：
+
+    在 Java 中有四个内置的运行正则表达式的方法，分别是 `matches()`、`split())`、`replaceFirst()`、`replaceAll()`。注意 `replace()` 方法不支持正则表达式。
+
+    |                   方法                   |                  描述                   |
+    | :--------------------------------------: | :-------------------------------------: |
+    |           `s.matches("regex")`           | 当仅且当正则匹配整个字符串时返回 `true` |
+    |            `s.split("regex")`            |      按匹配的正则表达式切片字符串       |
+    | `s.replaceFirst("regex", "replacement")` |        替换首次匹配的字符串片段         |
+    |  `s.replaceAll("regex", "replacement")`  |           替换所有匹配的字符            |
+
++ 参考：
+
+    + [Java 正则表达式详解](https://segmentfault.com/a/1190000009162306)
+    + [Java Doc](https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html#sum)
+
+*****
+
+##### StringBuilder
+
++ StringBuilder的三种清空方式：==方法一最慢，方法二和三差不多==
+    + 重新 `new StringBuilder()`；
+    + 使用 `stringBuilder.delete(0, stringBuilder.length())`；
+    + 使用 `setLength(0)`
++ Built-in Method:
+    + 不仅同样有 `charAt(int index)` 还有 `setCharAt(int index, char c)`
+    + `insert(int index, content)` : 在指定位置处插入内容，内容可为任一基本类型或者对象，原本的内容向后移动  ==可以用来reverse== [[0557]](#[0557] Reverse Words in a String III) Solution 4
+
+******
+
+****
+
 #### Two-Pointer Technique
 
 ##### ***Scenario I***
@@ -103,430 +536,6 @@ In Java, you may use a ==TreeSet== or a ==TreeMap== as a self-balancing BST.
 ******
 
 *****
-
-#### Data Structure
-
-##### ***TreeSet 和 HashSet的区别***
-
-+ 对于HashSet，Search / Insert / Delete all takes $\mathcal{O}(1)$；
-
-  When there are ==too many elements with the same hash key==, it will cost $\mathcal{O}N)$ time complexity to look up for a specific element, where $N$ is the number of elements with the same hash key. ==此时，可以采用TreeSet，to improve the performance from $\mathcal{O}(N)$ to $\mathcal{O}(logN)$.==
-
-+ 对于TreeSet，Search / Insert / Delete all takes $\mathcal{O}(logk$).
-
-The essential difference between the hash set and the tree set is that ==keys in the tree set are ordered==.
-
-*****
-
-##### ***关于ArrayList和LinkedList的选用***
-
-+ Search by value - `indexOf()`: Time complexity都为$\mathcal{O}(n)$，但是ArrayList将元素连续地存放在一起，而LinkedList则是在内存中随机存放，所以ArrayList实际运行会更快；
-+ Get element by index - `get()`: ArrayList只需$\mathcal{O}(1)$ as the array has random access property, 可以直接访问任意index而不需要从头遍历（也是因为ArrayList在内存中是连续存储），但是LinkedList需要$\mathcal{O}(n)$，it needs to iterate through each element to reach a given index。
-
-*****
-
-##### ***PriorityQueue & Min/Max Heap***
-
-+ PriorityQueue: 从队首获取元素时，总是获取优先级最高的元素
-
-  + 创建：`PriorityQueue<> pq = new PriorityQueue<>();`
-
-  + Common Method Summary:
-
-    + `add()` / `offer()`
-    + `clear()`
-    + `contains()`
-    + `remove()` / `poll()`：==返回的总是优先级最高的元素== 对于min heap，最返回最小的元素，反之亦然
-    + `toArray()`
-    + `peek()`
-    + `size()`
-
-  + `Comparator`自定义排序算法：==默认升序排列，即维护了一个min heap==
-
-    ```java
-    Queue<Object> priorityQueue = new PriorityQueue<>((optional)size, new Comparator<Object>(){
-      @Override
-      public int compare(Object o1, Object o2) {
-        return o2.val-o1.val; // 当o2.val > o1.val时，return一个正数，即交换o1和o2的顺序，故实现max heap
-      }
-    });
-    ```
-
-+ Min/Max Heap:
-
-  + Min Heap: a complete binary tree in which the value in each internal node is smaller than or equal to the values in the children of that node. （即：越小，优先级越高）
-  + Max Heap: a complete binary tree in which the value in each internal node is bigger than or equal to the values in the children of that node. （即：越大，优先级越高）
-
-******
-
-##### HashMap定义时初始化
-
-```java
-Map<Character, Integer> toInt = new HashMap<>() {
-  {
-    put('A', 0); 
-    put('C', 1); 
-    put('G', 2); 
-    put('T', 3); 
-  }
-};
-// or
-Map<Character, Integer> toInt = new
-                HashMap<>() {{put('A', 0); put('C', 1); put('G', 2); put('T', 3); }};
-```
-
-*解释：*外层大括号为匿名内部类；内层大括号内还可以写for循环。
-
-******
-
-*****
-
-#### Algorithms
-
-##### ***Floyd's Algorithm***
-
-+ Phase 1: tortoise 一步一node；hare 一步二nodes    $\implies$    两者在intersection相遇
-+ Phase 2: ==因为intersection并不一定是the entrance of the cycle，所以还需要Phase 2== tortoise 回到起点一步一node；hare 待在intersection一步一node    $\implies$    两者在entrance相遇
-
-*LeetCode:* [[0142]](#[0142] Linked List Cycle II)     [[0287]](#[0287] Find the Duplicate Number)
-
-******
-
-#####  String-searching algorithms
-
-Best [String-searching algorithms](https://en.wikipedia.org/wiki/String-searching_algorithm#Single-pattern_algorithms) have a linear execution time in average. 
-
-The most popular ones are [Aho-Corasick](https://en.wikipedia.org/wiki/Aho–Corasick_algorithm), [KMP](https://en.wikipedia.org/wiki/Knuth–Morris–Pratt_algorithm) and [Rabin-Karp](https://en.wikipedia.org/wiki/Rabin–Karp_algorithm): 
-
-+ Aho-Corasick is used by [fgrep](https://en.wikipedia.org/wiki/Grep#Variations)
-+ KMP is used for [chinese string searching](https://www.aclweb.org/anthology/C96-2200)
-+ Rabin-Karp is used for plagiarism detection and in bioinformatics to look for similarities in two or more proteins.
-
-The first two are optimised for a single pattern search, and Rabin-Karp for a multiple pattern search.
-
-******
-
-##### ***Rabin-Karp Algorithm***
-
-[Rabin-Karp algorithm](https://en.wikipedia.org/wiki/Rabin%E2%80%93Karp_algorithm) is used to perform a multiple pattern search. It's used for plagiarism detection and in bioinformatics to look for similarities in two or more proteins.
-
-*实现：*将要查找的内容（字符串）通过散列函数转换为hash值。同样，将待查找的文本的内容也通过散列函数转换为hash值。通过hash值的对比，来确定待查找文本中是否含有目标字符串。
-
-```java
-function RabinKarp(string s[1..n], string pattern[1..m])
-    hpattern := hash(pattern[1..m]);
-    for i from 1 to n-m+1
-        hs := hash(s[i..i+m-1])
-        if hs = hpattern // 仅仅是hash值相同，可能是因为hash collision导致的伪重复 
-            if s[i..i+m-1] = pattern[1..m] // 因此保险起见，还需要再检测子字符串是否真的相同
-                return i
-    return not found
-```
-
-*注意：*待查找文本内容中的sequences在转换为hash值时，可以直接通过确定好的散列函数实现，也可以通过已有字符串的hash值推测出来。后者 (***[Rolling Hash](https://en.wikipedia.org/wiki/Rolling_hash)***) 在要查找的sequence较长时，可以极大地节约时间。
-
-*e.g.* 文本串为“abracadabra”，则首个可能匹配的串为“abr”，此时通过散列函数得到“abr”对应的hash值。而第二个要匹配的串为“bra”，此时可以通过“abr”的hash值来计算：只需减去首字母“a”的hash值，将整个串偏移一位再加上新的末位字母对应的散列值即可。
-
-假设计算the first sequence of Length $L$ 的hash值的公式为
-$$
-\begin{split}
-h_0 &=\sum_{i=0}^{L-1}c_ibase^{L-1-i} \\
-&=c_0base^{L-1}+c_1base^{L-2}+ \dots + c_{L-2}base + c_{L-1}\\
-&=(\dots((((c_0base + c_1)\times base+c_2)\times base+\dots + c_{L-2})\times base + c_{L-1}
-\end{split} \tag{1.1}
-$$
-则通过*Rolling Hash*计算之后sequences的hash值可以有多种方式:
-
-​	 $h_i$ : 第 $i$ 个sequence的hash值 $h_i$    	$h_{i-1} $ : 第 $i-1$ 个sequence的hash值
-
-​	$c_{i-1}$ : 第 $i-1$ 个sequence的第一个字符       $c_{L-1+i}$ : 第 $i$ 个sequence的最后一个字符         
-
-+ 第一种方式： $\begin{matrix} 
-  ①\ remove\ the\ first\ digit \ \ ③\ add\ the\ last\ digit \\
-  h_i = \underbrace{\overbrace{(h_{i-1}-c_{i-1}base^{L-1})} \times base} \overbrace{+c_{L-1+i}} \ (i\ge1)  \\
-  ②\ shift\ left\ one\ digit\quad\quad\quad\quad\quad\ \
-  \end{matrix}$
-
-+ 第二种方式： $\begin{matrix} 
-  ①\ shift\ left\ one\ digit \ \ ③\ add\ the\ last\ digit \\
-  h_i = \overbrace{h_{i-1}\times base} \underbrace{-c_{i-1}base^L} \overbrace{+c_{L-1+i}} \ (i\ge1)  \\
-  ②\ remove\ the\ first\ digit
-  \end{matrix}$ 
-
-  （第一种方式内部项乘开 / In a generalised way）<a name="第二种方式"></a>
-
-*解释：*
-
-+ *为什么在 remove the first digit 时，要减去 $c_{i-1}base^{L-1}$ ？*
-
-  对于第 $i-1$ 个sequence，其第一位字符为 $c_{i-1}$。根据公式 $(1.1)$ 可知，在计算任一sequence的hash值时，其第一个字符的权重为 $base^{L-1}$。故从 $h_{i-1}$ 中移除第一位字符时，要减去 $c_{i-1}base^{L-1}$ 。
-
-+ *为什么在 shift left one digit 时，要乘以 $base$ ？*
-
-  类比Bitwise Operation中的移位，左移 $n$ 位相当于原值乘以 $base^n$。
-
-+ *为什么在 add the last digit 时，可以直接加上 $c_{L-1+i}$ ？*
-
-  根据公式 $(1.1)$ 可知，在计算任一sequence的hash值时，其最后一位字符的权重为 $base^0=1$。
-
-*LeetCode:* [[0187]](#[0187] Repeated DNA Sequences)（采用的第二种方式的Rolling Hash）  [[1044]](#[1044] Longest Duplicate Substring)（采用的第二种方式的Rolling Hash）   [1062]
-
-******
-
-******
-
-#### Iteration & Recursion
-
-##### ***关于Recursion的Top-down和Bottom-up***
-
-+ If recursive calls before conditional check, then it's bottom up. 
-+ If recursive calls after conditional check, then it's top down.
-
-******
-
-******
-
-#### 基本数据类型 / 数据结构 / 数据对象 之间的相互转换 (Conversion)
-
-##### ***Integer 与 Binary String 相互转换***
-
-+ `Integer.parseInt(String s, int radix)` - 输出一个十进制数，其中`int radix `表示`String s`的进制
-
-  *e.g.* `Integer.parseInt("1011", 2)` - 输出二进制字符串"1011"在十进制下的数，即11
-
-+ `Integer.toBinaryString(int i)` - 输出一个二进制字符串（即字符串的内容是二进制数，如"1011"）
-
-  *e.g.* `Integer.toBinaryString(11)` - 输出十进制数11在二进制下的字符串，即"1011"
-
-  ==注意：输出的二进制字符串的位数不定，原则是除十进制数0外，二进制首位都为1==
-
-  | 十进制数 | 二进制字符串 |
-  | :------: | :----------: |
-  |    0     |      0       |
-  |    3     |      11      |
-  |    10    |     1010     |
-
-******
-
-********
-
-#### Bitwise Operation 位操作
-
-##### ***Two's complement 补码***
-
-+ 表示：$-x=\neg x+1$ 
-
-  ![](/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/bitwiseOperators_1.png)
-
-+ 负数的补码：两种理解方式
-
-  + 将==其对应正数==按位取反加1（此时的取反加一是<u>所有位</u>都取反且接受进位，包括符号位由 $0$ 变为 $1$）
-
-    *e.g.* $-128$ 对应的正数为 $128$ : $128=(10000000)_2 \rightarrow 01111111 \rightarrow 10000000$
-
-  + $2^{n-1}$ ($n$ 为位数) 与该负数绝对值的差值。
-
-    *e.g.* $-128 = 2^{8-1}-|-128|=256-128=128$，所以它的补码为10000000。
-
-+ 与有符号数 (signed binary number) 的区别: ==因为正数和 $0$ 的补码和其原码相同，只考虑负数==
-
-  + Signed binary number的读法：
-
-    第一位为符号位，其余位正常读：
-
-    ![](/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/SignedBinaryNum.gif)
-
-  + 补码的读法：依据==补码的补码为原码==
-
-    已知是某负数的补码，直接取反加一（此时的取反加一同样是<u>所有位</u>都取反且接受进位，包括符号位由 $1$ 变为 $0$）即得原码。但要注意，*就像依据负数写出其补码时，是根据其对应的正数取反加一*，这里<u>得到的原码所表示的数同样是指原负数所对应的正数</u>，即还需再加上负号。
-    $$
-    \begin{gathered}
-    10110101 \rightarrow 01001010 \rightarrow 01001011 = (75)_{10} \implies 原负数为-75 \\
-    100 \rightarrow 011 \rightarrow 100 = (4)_{10} \implies 原负数为-4
-    \end{gathered}
-    $$
-
-******
-
-##### ***Bit Shifts 移位***
-
-+ [Arithmetic shift](https://en.wikipedia.org/wiki/Arithmetic_shift)
-
-  + arithmetic left shift: ==整体左移，左侧原数字不会移走，最右边补 $0$== 
-
-    *e.g.* $0 <<1 \rightarrow 0$    ( $0$ 乘以或除以 $2^n$ 仍为0  $\implies$ 对 $0$ 左移右移 $n$ 位仍为 $0$ )
-
-    ​	   $10111 << 1 \rightarrow 10111\underline{0}$
-
-    Shifting left by $n$ bits on a <u>signed or unsigned</u> binary number has the effect of multiplying it by $2^n$.
-
-  + arithmetic right shift: ==整体右移，但右侧原数字会移走，最左边空出来的位数由原符号位补齐==
-
-    *e.g.* $0 >> 1 \rightarrow 0$
-
-    ​       $10010111 >> 2 \rightarrow \underline{11}100101{1\mkern-9mu/}{1\mkern-9mu/}$
-
-    Shifting right by $n$ bits on a <u>two's complement signed</u> binary number (我的理解是，计算机中无论正数还是负数都用其补码表示) has the effect of dividing it by $2^n$, but it always rounds down (towards negative infinity). 
-
-+ Logical shift
-
-  In a logical shift, zeros are shifted in to replace the discarded bits. Therefore, the logical and arithmetic left-shifts are exactly the same.
-
-+ 对应Java中的运算符：
-  + `<<` : arithmetic / logical left shift
-  + `>>` : arithmetic right shift
-  + `>>>` : logical right shift
-
-*****
-
-##### ***XOR (exclusive OR) 异或***
-
-+ 表示：$\oplus$（数学符号）、^（程序符号）
-
-+ 性质：
-
-  1. $p \oplus q = (p \and \neg q) \or (\neg p \and q)$
-
-  2. 如果a、b两个值不相同，则异或结果为1。如果a、b两个值相同，异或结果为0。
-
-     $0$ ^ $0=0$          $0$ ^ $1=1$          $1$ ^ $1=0$           助记: ==不带进位的加法==
-
-  3. 交换律：$a$ ^ $b=b$ ^ $a$
-
-  4. 结合律：$a$ ^ $b$ ^ $c=a$ ^ $(b$ ^ $c)=(a$ ^ $b)$ ^ $c$
-
-  5. ==归零律：$x$ ^ $x=0$==
-
-  6. ==恒等律：$x$ ^ $0=x$==
-
-  7. ==自反性：$a$ ^ $b$ ^ $a=b$==
-
-  8. ==If $a$ ^ $b=c$ , then $a$ ^ $c=b$  and  $b$ ^ $c=a$ .==  (Prove: 两边同时异或 $a/b/c$ 中任一即可)    [0421]
-
-+ 应用：
-
-  1. 在不引入中间变量的情况下，交换两个变量的值：
-
-     ```java
-     int a = 5, b = 10;
-     a = a ^ b;   
-     b = a ^ b;   // b = a ^ b ^ b = a
-     a = a ^ b;   // a = a ^ b ^ a = b
-     ```
-
-  2. 一个数组中包含从1~1000共1001个元素，只有一个元素值重复，其他均只出现一次。每个数组元素只能访问一次，且不用辅助存储空间，找出该元素？
-
-     *Algorithm:* 将所有数异或后，得到的结果与$1$ ^ $2$ ^ $...$ ^ $999$ ^ $1000$ 的结果 $T$ 进行异或，得到的结果即为重复元素。
-
-     *Analysis:* 假设第$n$个数重复，则数组中所有数的异或结果为$1$ ^ $2$ ^ $...$ ^ $n$ ^ $n$ ^ $...$ ^ $999$ ^ $1000$ $=$ $T$ ^ $n$。再与 $T$ 进行异或：$T$ ^ $n$ ^ $T$ $=n$。
-
-  3. Google面试题的变形：一个数组存放若干整数，一个数出现奇数次，其余数均出现偶数次，找出这个出现奇数次的数？
-
-     ```java
-     public void fun() {
-         int a[] = { 22, 38,38, 22,22, 4, 4, 11, 11 };
-         int temp = 0;
-         for (int i = 0; i < a.length; i++) {
-             temp ^= a[i];
-         }
-         System.out.println(temp);
-     }
-     ```
-
-  4. Facebook面试题：不使用加法运算的情况下，两数相加   [[0067]](#[0067] Add Binary)
-
-+ LeetCode中的相关题目：
-
-  [[0067]](#[0067] Add Binary)      [[0136]](#[0136] Single Number)     [[0137]](#[0137] Single Number II)     [[0187]](#[0187] Repeated DNA Sequences)     [[0260]](#[0260] Single Number III)     [0318]      [[0421]](#[0421] Maximum XOR of Two Numbers in an Array)     
-
-******
-
-##### ***Useful operations***
-
-+ $x \& (-x)$ : Get / isolate the rightmost 1-bit
-
-![](/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/bitwiseOperators_2.png)
-
-+ $x \& (x-1)$ : Turn off (= set to 0) the rightmost 1-bit
-
-![](/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/bitwiseOperators_3.png)
-
-+ LeetCode中的相关题目：
-
-  [[0231]](#[0231] Power of Two)      [[0260]](#[0260] Single Number III)
-
-******
-
-******
-
-#### String
-
-##### Built-in Method
-
-+ `trim()` : Returns a string whose value is this string, with any leading and trailing whitespace removed.
-+ `split(String reg)` : Splits this string around matches of the given [regular expression](https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html#sum).
-+ `String.join(CharSequence delimiter, CharSequence... elements)` : Returns a new String composed of copies of the `CharSequence elements` joined together with a copy of the specified `delimiter`.
-
-*****
-
-##### Regular Expression
-
-+ 常用：
-
-    元字符是一个预定义的字符。
-
-    | 正则表达式 |                             描述                             |
-    | :--------: | :----------------------------------------------------------: |
-    |    `\d`    |               匹配一个数字，是 `[0-9]` 的简写                |
-    |   `\d+`    |                         匹配多个数字                         |
-    |    `\D`    |              匹配一个非数字，是 `[^0-9]` 的简写              |
-    |    `\s`    |          匹配一个空格，是 `[ \t\n\x0b\r\f]` 的简写           |
-    |   `\s+`    |                         匹配多个空格                         |
-    |    `\S`    |                        匹配一个非空格                        |
-    |    `\w`    | 匹配一个单词字符（大小写字母、数字、下划线），是 `[a-zA-Z_0-9]` 的简写 |
-    |    `\W`    | 匹配一个非单词字符（除了大小写字母、数字、下划线之外的字符），等同于 `[^\w]` |
-
-+ Java中正则表达式字符串：
-
-    Java 中的正则表达式字符串有两层含义，首先 Java 字符串转义出符合正则表达式语法的字符串，然后再由转义后的正则表达式进行模式匹配。
-
-    因为反斜杠本就在Java中表示转义字符，所以==上述过程中尤其需要注意反斜杠==：
-
-    + 对于匹配 `.` / `{` / `[` / `(` / `?` / `$` / `^` / `*` 这些特殊字符时，正则表达式即为 `\.`。但这与Java中转义 `.` 的写法重合，因此在Java中匹配 `.` 的正则表达式字符串要写为 `\\.`，第一步转义为正则表达式 `\.`，第二步在匹配。
-    + 在匹配 `\` 时，对于正则表达式即为 \\\，但Java中要写为 `\\\\`。
-    + 匹配多个空格的正则表达式为 `\s+`，但在Java中写为字符串则需写为 `\\s+`。
-
-+ Java中内置的字符串正则处理方法：
-
-    在 Java 中有四个内置的运行正则表达式的方法，分别是 `matches()`、`split())`、`replaceFirst()`、`replaceAll()`。注意 `replace()` 方法不支持正则表达式。
-
-    |                   方法                   |                  描述                   |
-    | :--------------------------------------: | :-------------------------------------: |
-    |           `s.matches("regex")`           | 当仅且当正则匹配整个字符串时返回 `true` |
-    |            `s.split("regex")`            |      按匹配的正则表达式切片字符串       |
-    | `s.replaceFirst("regex", "replacement")` |        替换首次匹配的字符串片段         |
-    |  `s.replaceAll("regex", "replacement")`  |           替换所有匹配的字符            |
-
-+ 参考：
-
-    + [Java 正则表达式详解](https://segmentfault.com/a/1190000009162306)
-    + [Java Doc](https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html#sum)
-
-*****
-
-##### StringBuilder
-
-+ StringBuilder的三种清空方式：==方法一最慢，方法二和三差不多==
-    + 重新 `new StringBuilder()`；
-    + 使用 `stringBuilder.delete(0, stringBuilder.length())`；
-    + 使用 `setLength(0)`
-+ Built-in Method:
-    + 不仅同样有 `charAt(int index)` 还有 `setCharAt(int index, char c)`
-    + `insert(int index, content)` : 在指定位置处插入内容，内容可为任一基本类型或者对象，原本的内容向后移动  ==可以用来reverse== [[0557]](#[0557] Reverse Words in a String III) Solution 4
-
-******
-
-****
 
 #### Misc.
 

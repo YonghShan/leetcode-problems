@@ -9,6 +9,7 @@ import java.util.Set;
  */
 
 public class Solution3 {
+    // But extra space
     // One Pass & One Pointer: First, use a HashMap to store the nodes in the list; Second, do the operation to the target node in the HashSet
     /* Runtime: 1ms     O(L), where L is the length of the list
        Memory:  38MB    O(L)

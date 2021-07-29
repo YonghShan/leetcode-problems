@@ -4,7 +4,9 @@
  */
 
 public class Solution2 {
-    // Two Pass & Two Pointers: First, find the location for both pointers; Second, one step per iteration for both pointers
+    // 对应LeetCode Approach #2
+    // 虽然写成了两个循环，但实际上p2这个指针只完整地遍历了一边List
+    // One Pass & Two Pointers: First, find the location for both pointers; Second, one step per iteration for both pointers
     /* Runtime: 0ms     O(L-n+n) = O(L), where L is the length of the list
        Memory:  37MB    O(1)
      */
