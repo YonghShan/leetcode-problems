@@ -355,7 +355,58 @@ Map<Character, Integer> toInt = new
 
 #### Dynamic Programming
 
+##### Techniques
 
++ **如何确定可以使用动态规划来解决的？**
+
+  通常我们要从**「有无后效性」**进行入手分析。
+
+  如果对于某个状态，我们可以只关注状态的值，而不需要关注状态是如何转移过来的话，那么这就是一个无后效性的问题，可以考虑使用 DP 解决。==后续变化只取决于当前状态 而与当前状态是如何来的无关。==
+
+  另外一个更加实在的技巧，我们还可以通过 **数据范围** 来猜测是不是可以用 DP 来做。
+
+  ==因为 DP 是一个递推的过程，因此如果数据范围是 $10^5～10^6$ 的话，可以考虑是不是可以使用一维 DP 来解决；如果数据范围是 $10^2～10^3$​​ 的话，可以考虑是不是可以使用二维 DP 来做；如果不考虑加入记忆化的DFS，数据范围在 $30$​​​​ 以内。==
+
+  如果题目是需要求得方案数（[[0062]](#[0062] Unique Paths)），可以用DP。==但是如果题目要求枚举具体方案（的细节）则一般不使用DP，因为不满足无后效性（即需要关注状态是如何转移过来的）。要求求得所有的方案，采用回溯算法。但是如果求最佳方案的话，还是能用 DP，只不过在 DP 过程中还需要额外的数据结构（例如数组）来记录路径。== [[0064]](#[0064] Minimum Path Sum)
+
++ **如何确定本题的状态定义的？**
+
+  说实话，DP 的状态定义很大程度是靠经验去猜的。
+
+  虽然大多数情况都是猜的，但也不是毫无规律，相当一部分题目的状态定义是与**「结尾」**和**「答案」**有所关联的。
+
++ **如何确定状态转移方程的？**
+
+  通常来说，如果我们的状态定义猜对了，**「状态转移方程」**就是对**「最后一步的分情况讨论」**。
+
+  如果我们有一个对的**「状态定义」**的话，基本上**「状态转移方程」**就是呼之欲出。
+
+  因此一定程度上，**状态转移方程可以反过来验证我们状态定义猜得是否正确**：
+
+  如果猜了一个状态定义，然后发现无法列出涵盖所有情况（不漏）的状态转移方程，多半就是**状态定义猜错了，赶紧换个思路，而不是去死磕状态转移方程**。
+
++ **对状态转移的要求是什么？**
+
+  状态转移是要做到**「不漏」**还是**「不重不漏」**取决于问题本身：
+
+  + 如果是求最值的话，只需要确保**「不漏」**即可，因为重复不影响结果。
+
+  + 如果是求方案数的话，需要确保**「不重不漏」**。
+
++ **如何分析动态规划的时间复杂度的？**
+
+  对于动态规划的复杂度/计算量分析，有多少个状态，复杂度/计算量就是多少。
+
+  因此一维 DP 的复杂度通常是线性的，而二维 DP 的复杂度通常是平方的。
+
+********
+
+##### Application
+
++ Pascal's Triangle：[[0118]](#[0118] Pascal's Triangle)     [[0119]](#[0119] Pascal's Triangle II)     [[0120]](#[0120] Triangle)
+
++ 路径问题：[[0062]](#[0062] Unique Paths)     [[0063]](#[0063] Unique Paths II)     [[0064]](#[0064] Minimum Path Sum)     [[0120]](#[0120] Triangle)     [[0931]]()     [[1289]]()     [[1575]]()     [[0576]]()     [[1301]]()
++ 回文串
 
 ******
 
@@ -1287,6 +1338,277 @@ Trie (can be pronounced "try" or "tree") or prefix tree is a tree data structure
 
 #### Dynamic Programming
 
+##### [0062] Unique Paths
+
+A robot is located at the top-left corner of a $m\times n$ ==$(1\le m,n\le 100)$== grid (marked 'Start' in the diagram below). The robot can only move either down or right at any point in time. The robot is trying to reach the bottom-right corner of the grid (marked 'Finish' in the diagram below). How many possible unique paths are there?
+
+![](/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/[0062].png)
+
+*思路：* ==数据范围为 $10^2～10^3$，二维数组DP肯定可以==
+
+定义 `f[i][j]` 为到达位置 `(i,j)` 的不同路径数量。
+
+那么 `f[n-1][m-1]` 就是我们最终的答案，而 `f[0][0] = 1` 是一个显而易见的起始条件。
+
+由于题目限定了我们只能 **往下** 或者 **往右** 移动，因此我们按照**「当前可选方向」**进行分析：
+
+1. 当前位置只能由上一位置 **「往下」** 移动到达，即有 `f[i][j] = f[i-1][j] `  *i.e. 第一纵列 (j=0)*
+2. 当前位置只能由上一位置 **「往右」** 移动到达，即有 `f[i][j] = f[i][j-1]`  *i.e. 第一横行 (i=0)*
+3. 当前位置既能由上一位置 **「往下」** 也能 **「往右」** 移动到达，即有 `f[i][j] = f[i][j-1] + f[i-1][j]`
+
+```java
+public int uniquePaths(int m, int n) {
+  int[][] f = new int[m][n];
+  f[0][0] = 1;
+  for (int i = 0; i < m; i++) {
+    for (int j = 0; j < n; j++) {
+      if (i > 0 && j > 0) {
+        f[i][j] = f[i][j-1] + f[i-1][j];
+      } else if (j > 0) {
+        f[i][j] = f[i][j-1];
+      } else if (i > 0) {
+        f[i][j] = f[i-1][j];
+      }
+    }
+  }
+  return f[m-1][n-1];
+}
+```
+
+也可以首先把第一横行和第一纵列先置为1，循环从 `i=1, j=1` 开始：
+
+```java
+public int uniquePaths(int m, int n) {
+  int[][] f = new int[m][n];
+  for(int[] arr : f) Arrays.fill(arr, 1);
+  for (int i = 1; i < m; i++) {
+    for (int j = 1; j < n; j++) {
+      f[i][j] = f[i][j-1] + f[i-1][j];
+    }
+  }
+  return f[m-1][n-1];
+}
+```
+
+采用滚动数组的技巧只使用一维数组：
+
+```java
+public int uniquePaths(int m, int n) {
+  int[] f = new int[n];
+  Arrays.fill(f, 1);
+  for (int i = 1; i < m; i++) {
+    for (int j = 1; j < n; j++) {
+      f[j] = f[j-1] + f[j];
+    }
+  }
+  return f[n-1];
+}
+```
+
+*Time Complexity:* $\mathcal{O}(m \times n)$
+
+*Space Complexity:* $\mathcal{O}(m \times n)$​ or $\mathcal{O}(n)$​
+
+*补充：* 如果题目==不限制移动方向==，就不可以用DP了，而是变成了图论问题。同时问题也要作修改，如果不限制每个格子的访问次数，路径必然为无数条。
+
+******
+
+##### [0063] Unique Paths II
+
+和[0062]相比，区别在于机器人行进的格子中可能有障碍物。An obstacle and space is marked as `1` and `0` respectively in the grid.
+
+*思路：* 和上一题一模一样的思路，只需要：==由于某些格子上有障碍物，对于 `obstacleGrid[i][j]==1` 的格子，则有 `f[i][j] = 0`。==
+
+```java
+public int uniquePathsWithObstacles(int[][] obstacleGrid) {
+  int m = obstacleGrid.length, n = obstacleGrid[0].length;
+  int[][] f = new int[m][n];
+  f[0][0] = obstacleGrid[0][0] == 1 ? 0 : 1; // 题目说了机器人初始位于top-left conner，test case还把obstacleGrid[0][0]有可能是障碍物，无语。。。
+  for (int i = 0; i < m; i++) {
+    for (int j = 0; j < n; j++) {
+      // 对于obstacleGrid[i][j]为1的f[i][j]，不需要更新，初始即为1
+      if (obstacleGrid[i][j] != 1) { 
+        if (i > 0 && j > 0) {
+          f[i][j] = f[i][j-1] + f[i-1][j];
+        } else if (j > 0) {
+          f[i][j] = f[i][j-1];
+        } else if (i > 0) {
+          f[i][j] = f[i-1][j];
+        }
+      }
+    }
+  }
+  return f[m-1][n-1];
+}
+```
+
+*Time Complexity:* $\mathcal{O}(m \times n)$
+
+*Space Complexity:* $\mathcal{O}(m \times n)$​​ or ==$\mathcal{O}(1)$​​ when using `obstacleGrid` as DP array​==
+
+************
+
+##### [0064] Minimum Path Sum
+
+Given a `m x n` `grid` filled with non-negative numbers, find a path from top left to bottom right, which minimizes the sum of all numbers along its path. Note: You can only move either down or right at any point in time.
+
+在 [[0062]](#[0062] Unique Paths) 的基础上，增加了路径成本概念。
+
+*思路：*根据问题来调整「状态定义」：定义 `f[i][j]` 为从 `(0,0)` 开始到达位置 `(i,j)` 的最小总和。
+
+那么 `f[m-1][n-1]` 就是我们最终的答案，`f[0][0] = grid[0][0]` 是一个显而易见的起始状态。
+
+由于题目限定了只能 **往下** 或者 **往右** 移动，因此按照**「当前位置可由哪些位置转移过来」**进行分析：
+
+1. 当前位置只能通过 **「往下」** 移动而来，即有 `f[i][j] = f[i-1][j] + grid[i][j]`  *i.e. 第一纵列 (j=0)*
+2. 当前位置只能通过 **「往右」** 移动而来，即有 `f[i][j] = f[i][j-1] + grid[i][j]`  *i.e. 第一横行 (i=0)*
+3. 当前位置既能通过 **「往下」** 也能 **「往右」** 移动而来，即有 `f[i][j] = min(f[i][j-1],f[i-1][j]) + grid[i][j]`
+
+```java
+public int minPathSum(int[][] grid) {        
+  int m = grid.length, n = grid[0].length;
+  int[][] f = new int[m][n];
+  for (int i = 0; i < m; i++) {
+    for (int j = 0; j < n; j++) {
+      if (i == 0 && j == 0) {
+        f[i][j] = grid[i][j];
+      } else {
+        int top  = i - 1 >= 0 ? f[i - 1][j] + grid[i][j] : Integer.MAX_VALUE;
+        int left = j - 1 >= 0 ? f[i][j - 1] + grid[i][j] : Integer.MAX_VALUE;
+        f[i][j] = Math.min(top, left);
+      }
+    }
+  }
+  return f[m - 1][n - 1];
+}
+```
+
+*Time Complexity:* $\mathcal{O}(m \times n)$
+
+*Space Complexity:* $\mathcal{O}(m \times n)$​​ or ==$\mathcal{O}(1)$​​​ when using `grid` as DP array​==
+
+==*进阶 I：*== **如果要输出总和最低的路径呢？**
+
+从原问题我们知道，需要从 (0,0) 一步步转移到 (m-1,n-1)，也就是需要扫描完整个方块（转移完所有的状态），才能得到答案。那么显然，可以使用额外的数据结构来记录，是如何一步步转移到 `f[m-1][n-1]` 的。
+
+当整个 dp 过程结束后，再用辅助记录的数据结构来回推我们的路径。
+
+同时，由于原有的 dp 部分已经创建了一个二维数组来存储状态值，这次用于记录「上一步」的 g 数组我们改用一维数组来记录。==**Trick I**==
+
+```java
+int m, n;
+public int minPathSum(int[][] grid) {        
+  m = grid.length;
+  n = grid[0].length;
+  int[][] f = new int[m][n];
+  int[] g = new int[m * n];
+  for (int i = 0; i < m; i++) {
+    for (int j = 0; j < n; j++) {
+      if (i == 0 && j == 0) {
+        f[i][j] = grid[i][j];
+      } else {
+        int top  = i - 1 >= 0 ? f[i - 1][j] + grid[i][j] : Integer.MAX_VALUE;
+        int left = j - 1 >= 0 ? f[i][j - 1] + grid[i][j] : Integer.MAX_VALUE;
+        f[i][j] = Math.min(top, left);
+        g[getIdx(i, j)] = top < left ? getIdx(i - 1, j) : getIdx(i, j - 1);
+      }
+    }
+  }
+
+  // 从「结尾」开始，在 g[] 数组中找「上一步」
+  int idx = getIdx(m - 1, n - 1);
+  // 逆序将路径点添加到 path 数组中
+  int[][] path = new int[m + n][2];
+  path[m + n - 1] = new int[]{m - 1, n - 1};
+  for (int i = 1; i < m + n; i++) {
+    path[m + n - 1 - i] = parseIdx(g[idx]);
+    idx = g[idx];
+  }
+  // 顺序输出位置
+  for (int i = 1; i < m + n; i++) {
+    int x = path[i][0], y = path[i][1];
+    System.out.print("(" + x + "," + y + ") ");
+  }
+  System.out.println(" ");
+
+  return f[m - 1][n - 1];
+}
+
+int[] parseIdx(int idx) {
+  return new int[]{idx / n, idx % n};
+}
+
+int getIdx(int x, int y) {
+  return x * n + y;
+}
+```
+
+上述「输出」方案的代码麻烦的原因是因为找路径的过程是「倒着」找，而输出方案的时候则是「顺着」输出。
+
+==**Trick II**==  如果希望简化找路径的过程，需要对原问题进行 **等价转换**：
+
+**将 「(0,0) 到 (m-1,n-1) 的最短路径」转换为「从 (m-1,n-1) 到 (0,0) 的最短路径」，同时移动方向从「向下 & 向右」转换为「向上 & 向左」。**
+
+这样我们就能实现「找路径」的顺序和「输出」顺序同向。
+
+调整「状态定义」 `f[i][j]` 为从 `(m-1,n-1)` 开始到达位置 `(i,j)` 的最小总和。
+
+```java
+int m, n;
+public int minPathSum(int[][] grid) {        
+  m = grid.length;
+  n = grid[0].length;
+  int[][] f = new int[m][n];
+  int[] g = new int[m * n];
+  for (int i = m - 1; i >= 0; i--) {
+    for (int j = n - 1; j >= 0; j--) {
+      if (i == m - 1 && j == n - 1) {
+        f[i][j] = grid[i][j];
+      } else {
+        int bottom = i + 1 < m ? f[i + 1][j] + grid[i][j] : Integer.MAX_VALUE;
+        int right  = j + 1 < n ? f[i][j + 1] + grid[i][j] : Integer.MAX_VALUE; 
+        f[i][j] = Math.min(bottom, right);
+        g[getIdx(i, j)] = bottom < right ? getIdx(i + 1, j) : getIdx(i, j + 1);
+      }
+    }
+  }
+
+  int idx = getIdx(0,0);
+  for (int i = 1; i <= m + n; i++) {
+    if (i == m + n) continue;
+    int x = parseIdx(idx)[0], y = parseIdx(idx)[1];
+    System.out.print("(" + x + "," + y + ") ");
+    idx = g[idx];
+  }
+  System.out.println(" ");
+
+  return f[0][0];
+}
+
+int[] parseIdx(int idx) {
+  return new int[]{idx / n, idx % n};
+}
+
+int getIdx(int x, int y) {
+  return x * n + y;
+}
+```
+
+*==进阶 II：==* **如果方块中存在负权值，如何求解？**
+
+如果只是增加负权值的条件，走动规则不变（只能往下或往右），那么 DP 仍然有效。仍然能够得到「总成本最小」的路径，但不确保成本必然为负权，也不确保必然会经过负权位置。
+
+==*进阶 III：*== **如果走动规则调整为「可以往任意方向」且「每个位置最多只能访问一次」？**
+
+这时候问题就转换为「图论最短路」问题，而且是从「特定源点」到「特定汇点」的「单源最短路」问题。 
+
+需要根据是否存在「负权边」来分情况讨论：
+
+1. 不存在负权边：使用 Dijkstra 算法求解 
+2. 存在负权边：使用 Bellman Ford 或 SPFA 求解
+
+******
+
 ##### [0118] Pascal's Triangle
 
 给定行数 `numRows`，填帕斯卡三角：一开始就是按照Iteration做的，看了Solution发现其实可以理解为DP。
@@ -1416,7 +1738,125 @@ $\implies$ 总的次数为$1+2+3+\dots+numRows = \frac{numRows(numRows+1)}{2} = 
 
   *Time Complexity:* $\mathcal{O}(rowIndex)$  
   
-  *Space Complexity:* $\mathcal{O}(rowIndex)$ 
+  *Space Complexity:* $\mathcal{O}(rowIndex)$​ 
+
+*******
+
+##### [0120] Triangle
+
+Given a `triangle` array, return *the minimum path sum from top to bottom*.
+
+For each step, you may move to an adjacent number of the row below. More formally, if you are on index `i` on the current row, you may move to either index `i` or index `i + 1` on the next row.
+
+==还是DP在Pascal's Triangle的应用==
+$$
+\begin{gathered}
+\underline{2} \\
+\underline{3}\ \ 4\\
+6\ \ \underline{5}\ \ 7\\
+4\ \ \underline{1}\ \ 8\ \ 3\\
+\end{gathered}
+\rightarrow\ 
+\begin{matrix}
+\underline{2} &   &   & \\
+\underline{3} & 4 &   & \\
+6 & \underline{5} & 7 & \\
+4 & \underline{1} & 8 & 3 
+\end{matrix}
+$$
+令 $i$ 为行坐标，$j$ 为列坐标，有以下性质：
+
++ 第 $i$ 行有 $i+1$ 个元素；
++ 第一列 *(i.e. $j=0$)* 的元素都只能通过其「上方」转移过来 $\implies$​ 只要不是第一列的元素，都可通过「左上方」转移过来；
++ 最后一列 *(i.e. $j=i$)* 的元素都只能通过其「左上方」转移过来 $\implies$ 只要不是最后一列的元素，都可通过「上方」转移过来；
+
+对于本题，「状态定义」：`f[i][j]` 代表到达点 $(i,j)$ 的最小路径和。
+
+那么 $min(f[n-1][i]),i\in [0,n]$​（最后一行的每列的路径和的最小值）就是答案。
+
+```java
+public int minimumTotal(List<List<Integer>> tri) {
+  int n = tri.size();
+  int ans = Integer.MAX_VALUE;
+  int[][] f = new int[n][n];
+  f[0][0] = tri.get(0).get(0);
+  for (int i = 1; i < n; i++) { // 第0行只有一个元素
+    for (int j = 0; j < i + 1; j++) {
+      int val = tri.get(i).get(j);
+      f[i][j] = Integer.MAX_VALUE;
+      if (j != 0) f[i][j] = f[i - 1][j - 1] + val;
+      if (j != i) f[i][j] = Math.min(f[i][j], f[i - 1][j] + val); // 只要j在(0,i)之间，则上一步会执行，f[i][j]不再为MAX_VALUE，故这一步的min判断不可省
+    }
+  }
+  for (int i = 0; i < n; i++) ans = Math.min(ans, f[n - 1][i]);
+  return ans;
+}
+```
+
+*Time Complexity:* $\mathcal{O}(n^2)$
+
+*Space Complexity:* $\mathcal{O}(n^2)$
+
+采用滚动数组的技巧改用一维数组：==为了不覆盖仍需要的值，其中一个循环的遍历方向改为倒序==
+
++ $j$​ 的循环改为倒序：
+
+  ```java
+  public int minimumTotal(List<List<Integer>> tri) {
+    int n = tri.size();
+    int ans = Integer.MAX_VALUE;
+    int[] f = new int[n];
+    f[0] = tri.get(0).get(0);
+    for (int i = 1; i < n; i++) { 
+      for (int j = i; j >= 0; j--) {
+        int val = tri.get(i).get(j);
+        if (j == i) f[j] = f[j-1] + val;
+        if (j < i && j > 0) f[j] = Math.min(f[j-1], f[j]) + val;
+        if (j == 0) f[j] += val;
+      }
+    }
+    for (int i = 0; i < n; i++) ans = Math.min(ans, f[i]);
+    return ans;
+  }
+  ```
+
++ $i$​​ 的循环改为倒序：==**代码最简单，表现也好**==
+
+  ```java
+  public int minimumTotal(List<List<Integer>> tri) {
+    int n = tri.size();
+    int[] f = new int[n];
+    for (int i = 0; i < n; i++) f[i] = tri.get(tri.size()-1).get(i); // 即f初始化为tri的最后一行
+    for (int i = n-2; i >= 0; i--) { 
+      for (int j = 0; j <= i; j++) {
+        int val = tri.get(i).get(j);
+        f[j] = Math.min(f[j], f[j+1]) + val;
+      }
+    }
+    return f[0];
+  }
+  ```
+
++ 在原代码上直接将其中一维改为 $2$，任何在该维的 `f[i]` 改成 `f[i&1]` 或者 `f[i%2]` 即可（推荐前者，在不同架构的机器上，运算效率更加稳定）
+
+  ```java
+  public int minimumTotal(List<List<Integer>> tri) {
+    int n = tri.size();
+    int ans = Integer.MAX_VALUE;
+    int[][] f = new int[2][n];
+    f[0][0] = tri.get(0).get(0);
+    for (int i = 1; i < n; i++) {
+      for (int j = 0; j < i + 1; j++) {
+        int val = tri.get(i).get(j);
+        f[i & 1][j] = Integer.MAX_VALUE;
+        if (j != 0) f[i & 1][j] = Math.min(f[i & 1][j], f[(i - 1) & 1][j - 1] + val);
+        if (j != i) f[i & 1][j] = Math.min(f[i & 1][j], f[(i - 1) & 1][j] + val);
+      }
+    }
+    for (int i = 0; i < n; i++) ans = Math.min(ans, f[(n - 1) & 1][i]);
+    return ans;
+  }
+  ```
 
 ******
 
