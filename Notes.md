@@ -398,6 +398,11 @@ Map<Character, Integer> toInt = new
   对于动态规划的复杂度/计算量分析，有多少个状态，复杂度/计算量就是多少。
 
   因此一维 DP 的复杂度通常是线性的，而二维 DP 的复杂度通常是平方的。
+  
++ **如何从二维数组降到一维数组？**
+
+  + 根据状态依赖调整迭代/循环的方向
+  + 将其中一维直接改成 $2$，任何在该维的 `f[i]` 改成 `f[i&1]` 或者 `f[i%2]` 即可（推荐前者，在不同架构的机器上，运算效率更加稳定）     [[0120]](#[0120] Triangle)
 
 ********
 
@@ -405,7 +410,7 @@ Map<Character, Integer> toInt = new
 
 + Pascal's Triangle：[[0118]](#[0118] Pascal's Triangle)     [[0119]](#[0119] Pascal's Triangle II)     [[0120]](#[0120] Triangle)
 
-+ 路径问题：[[0062]](#[0062] Unique Paths)     [[0063]](#[0063] Unique Paths II)     [[0064]](#[0064] Minimum Path Sum)     [[0120]](#[0120] Triangle)     [[0931]]()     [[1289]]()     [[1575]]()     [[0576]]()     [[1301]]()
++ 路径问题：[[0062]](#[0062] Unique Paths)     [[0063]](#[0063] Unique Paths II)     [[0064]](#[0064] Minimum Path Sum)     [[0120]](#[0120] Triangle)     [[0931]](#[0931] Minimum Falling Path Sum)     [[1289]]()     [[1575]]()     [[0576]]()     [[1301]]()
 + 回文串
 
 ******
@@ -1857,6 +1862,19 @@ public int minimumTotal(List<List<Integer>> tri) {
     return ans;
   }
   ```
+
+******
+
+##### [0931] Minimum Falling Path Sum
+
+Given an `n x n` array of integers `matrix`, return *the **minimum sum** of any **falling path** through* `matrix`.
+
+A **falling path** starts at any element in the first row and chooses the element in the next row that is either directly below or diagonally left/right. Specifically, the next element from position `(row, col)` will be `(row + 1, col - 1)`, `(row + 1, col)`, or `(row + 1, col + 1)`.
+
+*分析：*与[[0120]](#[0120] Triangle)相比，放松了一个限制：不必只能从 [0,0] 出发，而是第一行任一元素。因此，问题分为两部分：
+
++ 枚举第一行元素作为起点；
++ 定义函数 `find`
 
 ******
 
