@@ -1754,6 +1754,15 @@ Given a `triangle` array, return *the minimum path sum from top to bottom*.
 For each step, you may move to an adjacent number of the row below. More formally, if you are on index `i` on the current row, you may move to either index `i` or index `i + 1` on the next row.
 
 ==还是DP在Pascal's Triangle的应用==
+
+*分析：*
+
+与[0064]相比，发生以下变化：
+
++ 矩阵形状发生改变（其实只影响列数 $j$​ 的范围）；
++ 移动方向由「向下」和「向右」改为「向下」和「向右下」；
++ 终点不再限制为最后一行最后一列（多了一个遍历矩阵 `f` 最后一行的循环）。
+
 $$
 \begin{gathered}
 \underline{2} \\
@@ -1787,6 +1796,7 @@ public int minimumTotal(List<List<Integer>> tri) {
   f[0][0] = tri.get(0).get(0);
   for (int i = 1; i < n; i++) { // 第0行只有一个元素
     for (int j = 0; j < i + 1; j++) {
+      // 内部循环体写法一：
       int val = tri.get(i).get(j);
       f[i][j] = Integer.MAX_VALUE;
       if (j != 0) f[i][j] = f[i - 1][j - 1] + val;
@@ -1798,7 +1808,32 @@ public int minimumTotal(List<List<Integer>> tri) {
 }
 ```
 
-*Time Complexity:* $\mathcal{O}(n^2)$
+最内层的循环体也可写为：
+
+```java
+// 内部循环体写法二：
+int val = tri.get(i).get(j);
+if (j == 0) // 只能由上方元素转移得来
+    f[i][j] = f[i - 1][j] + val;
+else if (j == i) // 只能由左上方元素转移得来
+    f[i][j] = f[i-1][j-1] + val;
+else
+    f[i][j] = Math.min(f[i-1][j], f[i-1][j-1]) + val;
+```
+
+或者参考[0064]的写法：
+
+```java
+// 内部循环体写法三：
+int val = tri.get(i).get(j);
+int top  = j != i ? f[i - 1][j] + val : Integer.MAX_VALUE;
+int leftTop = j != 0 ? f[i - 1][j - 1] + val : Integer.MAX_VALUE;
+f[i][j] = Math.min(top, leftTop);
+```
+
+内部循环体三种写法performance相同。
+
+*Time Complexity:* $\mathcal{O}(n^2)$​​​
 
 *Space Complexity:* $\mathcal{O}(n^2)$
 
@@ -1871,10 +1906,94 @@ Given an `n x n` array of integers `matrix`, return *the **minimum sum** of any 
 
 A **falling path** starts at any element in the first row and chooses the element in the next row that is either directly below or diagonally left/right. Specifically, the next element from position `(row, col)` will be `(row + 1, col - 1)`, `(row + 1, col)`, or `(row + 1, col + 1)`.
 
-*分析：*与[[0120]](#[0120] Triangle)相比，放松了一个限制：不必只能从 [0,0] 出发，而是第一行任一元素。因此，问题分为两部分：
+*分析：*
 
-+ 枚举第一行元素作为起点；
-+ 定义函数 `find`
+与[[0120]](#[0120] Triangle)相比，放松了两个限制：
+
++ 不必只能从 [0,0] 出发，而是第一行任一元素；
++ 可以向左下方 / 正下方 / 右下方移动。
+
+因此，问题分为两部分：
+
++ 枚举第一行元素作为起点；  $\implies \mathcal{O}(n)$
++ 模仿[0120]的代码，定义函数 `find()`，传入「矩阵」和「起点在第一行中的下标」，返回以该起点得到的最小路径和。$\implies \mathcal{O}(n^2)$
+
+最终答案为所有返回的最小路径和的最小值。此时，TC为 $\mathcal{O}(n^3)$。本题数据只有 $10^2$，因此计算量是 $10^6$，是可以过的。(即使是最严格的 OJ 中最简单的题目，也会提供 1s 的运行时间，超过这个时间才算超时。计算器 1s 内极限的处理速度是 $10^8$，但为了尽可能不出现错误提交，使用技巧时尽量和 $10^7$​ 进行比较)
+
+```java
+int MAX = Integer.MAX_VALUE;
+public int minFallingPathSum(int[][] matrix) {
+  int n = matrix.length;
+  int ans = MAX;
+  for (int i = 0; i < n; i++) ans = Math.min(ans, find(matrix, i));
+  return ans;
+}
+
+public int find(int[][] matrix, int idx) {
+  int n = matrix.length;
+  int ans = MAX;
+  int[][] f = new int[n][n];
+  // f矩阵的第一行除了本次寻找的起点为原矩阵matrix中的对应值，其余全置为MAX
+  for (int i = 0; i < n; i++) f[0][i] = i == idx ? matrix[0][i] : MAX;
+  for (int i = 1; i < n; i++) { // 第0行只有一个元素
+    for (int j = 0; j < n; j++) {
+      int val = matrix[i][j];
+      f[i][j] = MAX;
+      // 下面if判断中，与MAX比较，是防止其值为MAX的情况下再加val导致overflow
+      if (f[i - 1][j] != MAX) f[i][j] = f[i - 1][j] + val; // 由上方移动得来
+      if (j - 1 >= 0 && f[i - 1][j - 1] != MAX) f[i][j] = Math.min(f[i][j], f[i - 1][j - 1] + val); // 由左上方移动得来
+      if (j + 1 < n && f[i - 1][j + 1] != MAX) f[i][j] = Math.min(f[i][j], f[i - 1][j + 1] + val); // 由右上方移动得来
+    }
+  }
+  // 到此，f矩阵已填完所有值。遍历f矩阵的最后一行找到最小值即为答案
+  for (int i = 0; i < n; i++) ans = Math.min(ans, f[n - 1][i]);
+  return ans;
+}
+```
+
+因为最内层循环涉及到三个值取最小，不再使用[0120]中的写法二和写法三。
+
+```java
+if (j == 0 && f[i - 1][j] != MAX && f[i - 1][j + 1] != MAX) // 只能从上方和右上方得来
+  f[i][j] = Math.min(f[i - 1][j], f[i - 1][j + 1]) + val;
+else if (j == n-1 && f[i - 1][j] != MAX && f[i - 1][j - 1] != MAX) // 只能从上方和左上方得来
+  f[i][j] = Math.min(f[i - 1][j], f[i - 1][j - 1]) + val;
+else if (f[i - 1][j] != MAX && f[i - 1][j - 1] != MAX && f[i - 1][j + 1] != MAX)
+  f[i][j] = Math.min(f[i-1][j], Math.max(f[i-1][j-1], f[i-1][j+1])) + val;
+```
+
+*Time Complexity:* $\mathcal{O}(n^3)$​​​​
+
+*Space Complexity:* $\mathcal{O}(n^2)$​
+
+==在刚做完[0064]和[0120]的情况下，都会因为起点的改变而开始纠结起点，但反而**让算法复杂度会上升一个级别。**==
+
+其实，这题也就是常规的路径题，==对于起点的不确定性，只需改动矩阵 `f` 的初始化即可，从而省去枚举起点的复杂度 $\mathcal{O}(n)$​。==
+
+```java
+public int minFallingPathSum(int[][] matrix) {
+  int n = matrix.length;
+  int[][] f = new int[n][n];
+  // 初始化：对于首行而言，每个位置的「最小成本」就是其「矩阵值」
+  for (int i = 0; i < n; i++) f[0][i] = matrix[0][i];
+  // 从第二行开始，根据题目给定的条件进行转移
+  for (int i = 1; i < n; i++) {
+    for (int j = 0; j < n; j++) {
+      int val = matrix[i][j];
+      f[i][j] = f[i - 1][j] + val;
+      if (j - 1 >= 0) f[i][j] = Math.min(f[i][j], f[i-1][j-1] + val);
+      if (j + 1 <  n) f[i][j] = Math.min(f[i][j], f[i-1][j+1] + val);
+    }
+  }
+  int ans = Integer.MAX_VALUE;
+  for (int i = 0; i < n; i++) ans = Math.min(ans, f[n-1][i]);
+  return ans;
+}
+```
+
+*Time Complexity:* $\mathcal{O}(n^2)$​​​​​
+
+*Space Complexity:* $\mathcal{O}(n^2)$​
 
 ******
 
