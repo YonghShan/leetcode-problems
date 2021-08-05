@@ -410,7 +410,44 @@ Map<Character, Integer> toInt = new
 
 + Pascal's Triangle：[[0118]](#[0118] Pascal's Triangle)     [[0119]](#[0119] Pascal's Triangle II)     [[0120]](#[0120] Triangle)
 
-+ 路径问题：[[0062]](#[0062] Unique Paths)     [[0063]](#[0063] Unique Paths II)     [[0064]](#[0064] Minimum Path Sum)     [[0120]](#[0120] Triangle)     [[0931]](#[0931] Minimum Falling Path Sum)     [[1289]]()     [[1575]]()     [[0576]]()     [[1301]]()
++ 路径问题：[[0062]](#[0062] Unique Paths)     [[0063]](#[0063] Unique Paths II)     [[0064]](#[0064] Minimum Path Sum)     [[0120]](#[0120] Triangle)     [[0931]](#[0931] Minimum Falling Path Sum)     [[1289]](#[1289] Minimum Falling Path Sum II)     [[1575]]()     [[0576]]()     [[1301]]()
+
+  ==Template==:<a name="DP路径Template"></a>
+
+  ```java
+  public int DP(int[][] arr) {
+    // Step 1: 定义dp array
+    int n = arr.length;
+    int[][] f = new int[n][n];
+  
+    // Step 2: 初始化dp array，两种情况：
+    if (起点固定为arr[0][0]) {
+      f[0][0] = arr[0][0]
+    } else if (起点为第一行任一元素) {
+      for (int i = 0; i < n; i++) f[0][i] = arr[0][i];
+    }
+  
+    // Step 3: 从第二行进行状态转移
+    for (int i = 1; i < n; i++) { // 从f的第二行开始更新
+      for (int j = 0; j < n; j++) {
+        f[i][j] = Integer.MAX_VALUE;
+        int val = arr[i][j];
+        // 具体根据移动方向的限制而定：正下方/左下方/右下方/非同列
+        ...
+      }
+    }
+  
+    // Step 4: 取结果，两种情况：
+    if (终点固定为arr[n-1][n-1]) {
+      return f[n-1][n-1];
+    } else if (终点为f array最后一行中的最小值) {
+      int ans = Integer.MAX_VALUE;
+      for (int i = 0; i < n; i++) ans = Math.min(ans, f[n-1][i]);
+      return ans;
+    }
+  }
+  ```
+
 + 回文串
 
 ******
@@ -1911,14 +1948,14 @@ A **falling path** starts at any element in the first row and chooses the elemen
 与[[0120]](#[0120] Triangle)相比，放松了两个限制：
 
 + 不必只能从 [0,0] 出发，而是第一行任一元素；
-+ 可以向左下方 / 正下方 / 右下方移动。
++ 可以向「左下方」 / 「正下方」 / 「右下方」移动。
 
 因此，问题分为两部分：
 
 + 枚举第一行元素作为起点；  $\implies \mathcal{O}(n)$
 + 模仿[0120]的代码，定义函数 `find()`，传入「矩阵」和「起点在第一行中的下标」，返回以该起点得到的最小路径和。$\implies \mathcal{O}(n^2)$
 
-最终答案为所有返回的最小路径和的最小值。此时，TC为 $\mathcal{O}(n^3)$。本题数据只有 $10^2$，因此计算量是 $10^6$，是可以过的。(即使是最严格的 OJ 中最简单的题目，也会提供 1s 的运行时间，超过这个时间才算超时。计算器 1s 内极限的处理速度是 $10^8$，但为了尽可能不出现错误提交，使用技巧时尽量和 $10^7$​ 进行比较)
+最终答案为所有返回的最小路径和的最小值。此时，TC为 $\mathcal{O}(n^3)$​。本题数据只有 $10^2$​，因此计算量是 $10^6$​，是可以过的。<u>(即使是最严格的 OJ 中最简单的题目，也会提供 1s 的运行时间，超过这个时间才算超时。计算器 1s 内极限的处理速度是 $10^8$​，但为了尽可能不出现错误提交，使用技巧时尽量和 $10^7$​​​ 进行比较)</u>
 
 ```java
 int MAX = Integer.MAX_VALUE;
@@ -1968,7 +2005,7 @@ else if (f[i - 1][j] != MAX && f[i - 1][j - 1] != MAX && f[i - 1][j + 1] != MAX)
 
 ==在刚做完[0064]和[0120]的情况下，都会因为起点的改变而开始纠结起点，但反而**让算法复杂度会上升一个级别。**==
 
-其实，这题也就是常规的路径题，==对于起点的不确定性，只需改动矩阵 `f` 的初始化即可，从而省去枚举起点的复杂度 $\mathcal{O}(n)$​。==
+其实，这题也就是常规的路径题，==对于起点的不确定性，只需改动矩阵 `f` 的初始化即可，从而省去枚举起点的复杂度 $\mathcal{O}(n)$​​。== *DP状态转移部分 $\mathcal{O}(n^2)$ 是无法再优化的。*
 
 ```java
 public int minFallingPathSum(int[][] matrix) {
@@ -1993,7 +2030,133 @@ public int minFallingPathSum(int[][] matrix) {
 
 *Time Complexity:* $\mathcal{O}(n^2)$​​​​​
 
-*Space Complexity:* $\mathcal{O}(n^2)$​
+*Space Complexity:* $\mathcal{O}(n^2)$​​
+
+******
+
+##### [1289] Minimum Falling Path Sum II
+
+Given a square grid of integers `arr`, a *falling path with non-zero shifts* is a choice of exactly one element from each row of `arr`, such that no two elements chosen in adjacent rows are in the same column.
+
+Return the minimum sum of a falling path with non-zero shifts.
+
+*分析：*与[[0931]](#[0931] Minimum Falling Path Sum)相比，这道题的“非零偏移下降路径”其实就是规定了路径不能朝「正下方」移动，其余所有方向都可以。==**因此在更新DP数组当前行的值时，需要枚举上一行除同一列以外的所有列（for循环）**==。仍可以使用[Template](#DP路径Template)求解。
+
+```java
+public int minFallingPathSum(int[][] arr) {
+  // Step 1: 定义dp array
+  int n = arr.length;
+  int[][] f = new int[n][n];
+
+  // Step 2: 初始化dp array：起点为第一行任一元素
+  for (int i = 0; i < n; i++) f[0][i] = arr[0][i];
+
+  // Step 3: 从第二行进行状态转移
+  for (int i = 1; i < n; i++) { // 从f的第二行开始更新
+    for (int j = 0; j < n; j++) {
+      f[i][j] = Integer.MAX_VALUE;
+      int val = arr[i][j];
+      // 具体根据移动方向的限制而定：非同列（需要枚举上一行除同一列以外的所有列）
+      for (int k = 0; k < n; k++) {
+        if (k != j) f[i][j] = Math.min(f[i][j], f[i-1][k] + val);
+      }
+    }
+  }
+
+  // Step 4: 取结果：终点为f array最后一行中的最小值
+  int ans = Integer.MAX_VALUE;
+  for (int i = 0; i < n; i++) ans = Math.min(ans, f[n-1][i]);
+  return ans;
+}
+```
+
+*Time Complexity:* $\mathcal{O}(n^3)$     题目范围为 $10^2$​，因此计算量为 $10^6$，可以通过。​​
+
+*Space Complexity:* $\mathcal{O}(n^2)$​​​
+
+*优化：*和[0931]一样，DP状态转移部分 $\mathcal{O}(n^2)$​​ 是无法再优化的。因此，只能优化<u>每次转移时，枚举上一行所有列（除同列）</u>。==**最佳**==  ==**Clever Trick**==
+
+其实细想就可以发现，当我们在计算某行的状态值的时候，只会用到「上一行」的两个值:**「最小值」**和**「次小值」**。
+
+如，当我们已经处理完第 $i-1$ 行的状态值:
+
+假设第 $i-1$ 行状态中的最小值对应的列下标是 $i_1$，次小值对应的列下标是 $i_2$ 。
+
+那么当我们处理第 $i$ 行时，显然有：
+
+- 处理第 $i$ 行中列下标为 $i_1$ 的状态值时，由于不能选择「正上方」的数字，用到的是**次小值**。转移方程为：
+  $$
+  f[i][j] = f[i-1][i_2] + arr[i][j]
+  $$
+
+- 处理第 $i$ 行其他列下标的状态值时，这时候用到的是**最小值**。转移方程为：
+  $$
+  f[i][j] = f[i-1][i_1] + arr[i][j]
+  $$
+
+<img src="/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/[1289].png" style="zoom:50%;" />
+
+```java
+int MAX = Integer.MAX_VALUE;
+public int minFallingPathSum(int[][] arr) {
+  // Step 1: 定义dp array
+  int n = arr.length;
+  int[][] f = new int[n][n];
+
+  // i1代表最小值的列下标；i2代表次小值的列下标
+  int i1 = -1, i2 = -1;
+
+  // Step 2: 初始化dp array：起点为第一行任一元素；找到第一行的i1和i2。
+  for (int i = 0; i < n; i++) {
+    // 初始化dp array
+    int val = arr[0][i];
+    f[0][i] = val;
+    // 更新 i1 和 i2
+    if (val < (i1 == -1 ? MAX : f[0][i1])) {
+      i2 = i1;
+      i1 = i;
+    } else if (val < (i2 == -1 ? MAX : f[0][i2])) {
+      i2 = i;
+    }
+  } 
+
+  // Step 3: 从第二行进行状态转移
+  for (int i = 1; i < n; i++) { // 从f的第二行开始更新
+    // 每到新的一行，也需要找该行的最小值 ti1 和次小值 ti2
+    int ti1 = -1, ti2 = -1;
+
+    for (int j = 0; j < n; j++) {
+      f[i][j] = MAX;
+      int val = arr[i][j];
+      // 更新动规值
+      // 可以选择上一行「最小值」的列选择「最小值」i1
+      if (j != i1)
+        f[i][j] = f[i - 1][i1] + val;
+      // 不能选择上一行「最小值」的列选择「次小值」i2
+      else
+        f[i][j] = f[i - 1][i2] + val;
+
+      // 更新本行的最小值ti1和次小值ti2
+      if (f[i][j] < (ti1 == -1 ? MAX : f[i][ti1])) {
+        ti2 = ti1;
+        ti1 = j;
+      } else if (f[i][j] < (ti2 == -1 ? MAX : f[i][ti2])) {
+        ti2 = j;
+      }
+    }
+    // 本行遍历结束，利用当前行最小值ti1和次小值ti2更新i1和i2
+    i1 = ti1;
+    i2 = ti2;
+  }
+
+  // Step 4: 取结果：终点为f array最后一行中的最小值，即f[n-1][i1]
+  return f[n-1][i1];
+}
+```
+
+*Time Complexity:* $\mathcal{O}(n^2)$​​​​​
+
+*Space Complexity:* $\mathcal{O}(n^2)$​​
 
 ******
 
