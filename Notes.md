@@ -402,15 +402,63 @@ Map<Character, Integer> toInt = new
 + **如何从二维数组降到一维数组？**
 
   + 根据状态依赖调整迭代/循环的方向
-  + 将其中一维直接改成 $2$，任何在该维的 `f[i]` 改成 `f[i&1]` 或者 `f[i%2]` 即可（推荐前者，在不同架构的机器上，运算效率更加稳定）     [[0120]](#[0120] Triangle)
+  + 将其中一维直接改成 $2$​，任何在该维的 `f[i]` 改成 `f[i&1]` 或者 `f[i%2]` 即可（推荐前者，在不同架构的机器上，运算效率更加稳定）     [[0120]](#[0120] Triangle)
+
+*******
+
+##### Memoization
+
+记忆化搜索，其本质是「递归」（通常是自顶而上的解决）。是降低递归复杂度的技巧，可以保证递归的做法在数据范围较大的情况下也可以AC。比如，DFS 通常要求数据范围在30左右，而利用 Memoization 辅助的DFS则可以通过数据范围 $10^2$ 的题目。
+
+需要掌握 Memoization 最重要的一个原因是，其是「动态规划」的前置思考。当在不能轻易地猜到「状态定义」以及推导「状态转移方程」时，都可以先使用Memoization求解，再改成DP。==因此，能够使用Memoization求解的前提也是：**问题本身具有无后效性**。==
+
+**如何根据「Memoization」解法写出「Dynamic Programming」解法：**
+
+1. 从 DFS 方法签名出发。分析哪些入参是可变的，将其作为 DP 数组的维度；将返回值作为 DP 数组的存储值。
+
+   $\implies$​ 对应DP的「状态定义」
+
+2. 从 DFS 的主逻辑可以抽象中单个状态的计算方法。
+
+   $\implies$​ 对应DP的「状态转移方程」
+
+到目前为止，我们已经掌握了两种求解「动态规划」问题的方法：
+
+1. 根据经验猜一个「状态定义」，然后根据「状态定义」去推导一个「状态转移方程」。
+
+2. 先写一个「记忆化搜索」解法，再将「记忆化搜索」改写成「动态规划」。
+
+由于「动态规划」的状态定义猜测，是一门很讲求经验的技能。因此对于那些你接触过的模型，我建议你使用第一种方式。
+
+如果遇到一道你从来没接触过的题目时，我建议你先想想「记忆化搜索」该如何实现，然后反推出「动态规划」。
+
+**这里说的想想「记忆化搜索」该如何实现，不需要真正动手实现一个「记忆化搜索」解法，而只需要想清楚，如果使用「记忆化搜索」的话，我的 DFS 函数签名如何设计即可。**
+
+**当搞清楚「记忆化搜索」的函数签名设计之后，「状态定义」部分基本就已经出来了，之后的「状态转移方程」就还是一样的分析方法。**
+
+当然，如果你觉得「记忆化搜索」更好实现的话，大可直接使用「记忆化搜索」求解，不一定需要将其转化为「动态规划」。
+
+因为由「记忆化搜索」直接转过来的「动态规划」，两者复杂度是一样的。而且通常「记忆化搜索」的实现难度通常要低很多。
+
+[[1575]](#[1575] Count All Possible Routes)
 
 ********
 
-##### Application
+##### Applications
 
 + Pascal's Triangle：[[0118]](#[0118] Pascal's Triangle)     [[0119]](#[0119] Pascal's Triangle II)     [[0120]](#[0120] Triangle)
 
-+ 路径问题：[[0062]](#[0062] Unique Paths)     [[0063]](#[0063] Unique Paths II)     [[0064]](#[0064] Minimum Path Sum)     [[0120]](#[0120] Triangle)     [[0931]](#[0931] Minimum Falling Path Sum)     [[1289]](#[1289] Minimum Falling Path Sum II)     [[1575]]()     [[0576]]()     [[1301]]()
++ 路径问题：
+
+  + 类型一：**特定「起点」，明确且有限的「移动方向」（转移状态），求解所有状态中的最优值。**
+
+    *解释：*给定了某个「形状」的数组（三角形或者矩形），使用 **题目给定的起点** 或者 **自己枚举的起点** 出发，再结合题目给定的具体转移规则（往下方/左下方/右下方进行移动）进行转移。
+
+    [[0062]](#[0062] Unique Paths)     [[0063]](#[0063] Unique Paths II)     [[0064]](#[0064] Minimum Path Sum)     [[0120]](#[0120] Triangle)     [[0931]](#[0931] Minimum Falling Path Sum)     [[1289]](#[1289] Minimum Falling Path Sum II)     
+
+  + 类型二：只是告诉了我们移动规则，没有告诉我们具体该如何移动。
+
+    [[1575]](#[1575] Count All Possible Routes)     [[0576]]()     [[1301]]()
 
   ==Template==:<a name="DP路径Template"></a>
 
@@ -2156,7 +2204,289 @@ public int minFallingPathSum(int[][] arr) {
 
 *Time Complexity:* $\mathcal{O}(n^2)$​​​​​
 
-*Space Complexity:* $\mathcal{O}(n^2)$​​
+*Space Complexity:* $\mathcal{O}(n^2)$​​​
+
+******
+
+##### [1575] Count All Possible Routes
+
+You are given an array of **distinct** positive integers locations where `locations[i]` represents the position of city `i`. You are also given integers `start`, `finish` and `fuel` representing the starting city, ending city, and the initial amount of fuel you have, respectively.
+
+At each step, if you are at city `i`, you can pick any city `j` such that `j != i` and `0 <= j < locations.length` and move to city `j`. Moving from city `i` to city `j` reduces the amount of fuel you have by `|locations[i] - locations[j]|`. Please notice that `|x|` denotes the absolute value of `x`.
+
+Notice that `fuel` **cannot** become negative at any point in time, and that you are **allowed** to visit any city more than once (including `start` and `finish`).
+
+Return *the count of all possible routes from* `start` *to* `finish`. Since the answer may be too large, return it modulo `10^9 + 7`.
+
+![](/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/[1575].png)
+
+*分析：*首先这道题不是传统的DP第一类路径问题。在还没有接触第二类路径问题时，很容易想到利用DFS解决。本题的数据范围虽然也只有 $10^2$​，但是单纯的DFS由于是指数级别的复杂度，通常数据范围不超过30。因此，如果使用DFS，要引入记忆化搜索（Memoization）。
+
++ Solution 1: DFS + Memoization
+
+  + **DFS的实现步骤（重点是如何找Base case）**
+
+    如果要实现 DFS 的话，通常有以下几个步骤：
+
+    1. 设计好递归函数的「入参」和「出参」
+    2. 设置好递归函数的出口（Base Case）==最难的一步==
+    3. 编写「最小单元」处理逻辑
+
+    **首先要明确，所谓的找 Base Case，其实是在确定什么样的情况下，算一次有效/无效。**
+
+    **对于本题，找 Base Case 其实就是在确定：什么样的情况下，不能算作一条路径；什么样的情况下，可以算作 1 条路径。然后再在 DFS 过程中，不断的累加有效情况（算作路径数量为 1）的个数作为答案。**
+
+    这是 DFS 的本质，也是找 Base Case 的思考过程。
+
+    回到本题，对于 **有效情况** 的确立，十分简单直接，如果我们当前所在的位置 $i$ 就是目的地 $finish$ 的话，那就算成是一条有效路径，我们可以对路径数量进行 +1。
+
+    那么如何确立 **无效情况** 呢？
+
+    一个直观的感觉是当油量消耗完，所在位置又不在 $finish$，那么就算走到头了，算是一次「无效情况」，可以终止递归。
+
+    逻辑上这没有错，但是存在油量始终无法为零的情况：
+    $$
+    \begin{aligned}
+    &locations = [1,2,3,5] \\
+    &start = 0 \\ 
+    &finish = 3 \\
+    &fuel = 1
+    \end{aligned}
+    $$
+    我们当前位置在 0，想要到达 3，但是油量为 1，无法移动到任何位置。
+
+    也就是如果我们只考虑 $fuel = 0$ 作为 Base Case 的话，递归可能无法终止。
+
+    因此还要增加一个限制条件：**油量不为 0，但无法再移动到任何位置，也算是一次「无效情况」，可以终止递归。**
+
+  + **Memoization所需要的缓存器的设计（即什么数据需要被memo）**
+
+    我们用 $cache[i][fuel]$ 代表从位置 $i$ 出发，当前剩余的油量为 $fuel$​ 的前提下，到达目标位置的「路径数量」。
+
+    之所以能采取「缓存中间结果」这样的做法，是因为「在 $i$ 和 $fuel$ 确定的情况下，其到达目的地的路径数量是唯一确定的」。
+
+  ```java
+  int mod = 1000000007;
+  
+  // 缓存器：用于记录「特定状态」下的中间结果
+  // cache[i][fuel] 代表从位置 i 出发，当前剩余的油量为 fuel 的前提下，到达目标位置的「路径数量」
+  int[][] cache;
+  
+  public int countRoutes(int[] ls, int start, int end, int fuel) {
+    int n = ls.length;
+  
+    // 初始化缓存器
+    // 之所以要初始化为 -1，是为了区分「某个状态下路径数量为 0」和「某个状态尚未没计算过」两种情况
+    cache = new int[n][fuel + 1];
+    for (int i = 0; i < n; i++) Arrays.fill(cache[i], -1);
+  
+    return dfs(ls, start, end, fuel);
+  }
+  
+  /**
+   * 计算「路径数量」
+   * @param ls   入参 locations数组
+   * @param u    当前所在位置（用ls中的下标表示）
+   * @param end  目标位置（用ls中的下标表示）
+   * @param fuel 剩余油量
+   * @return     在位置 u 出发，油量为 fuel 的前提下，到达 end 的「路径数量」
+   */
+  int dfs(int[] ls, int u, int end, int fuel) {
+    // 如果缓存器中已经有答案，直接返回
+    if (cache[u][fuel] != -1) return cache[u][fuel];
+  
+    int n = ls.length;
+    // base case 1：如果油量为 0，且不在目标位置 ==>> 将结果 0 写入缓存器并返回
+    if (fuel == 0 && u != end) {
+      cache[u][fuel] = 0;
+      return 0;
+    } 
+  
+    // base case 2：油量不为 0，且无法到达任何位置 ==>> 将结果 0 写入缓存器并返回
+    boolean hasNext = false;
+    for (int i = 0; i < n; i++) { // 遍历locations中的n-1个城市
+      if (i != u) { // 非当前所在城市
+        int need = Math.abs(ls[u] - ls[i]); // 计算从当前城市过去所需的fuel
+        if (fuel >= need) {
+          hasNext = true;
+          break;
+        }
+      }
+    }
+    // 如果 u = end，那么本身就算一条路径 ---- 非常无语，但testcase就是这么设置的
+    if (fuel != 0 && !hasNext) return cache[u][fuel] = u == end ? 1 : 0;
+  
+    // 计算油量为 fuel，从位置 u 到 end 的路径数量
+    // 由于每个点都可以经过多次，如果 u = end，那么本身就算一条路径 ---- 非常无语，但testcase就是这么设置的
+    int sum = u == end ? 1 : 0;
+    for (int i = 0; i < n; i++) {
+      if (i != u) {
+        int need = Math.abs(ls[i] - ls[u]);
+        if (fuel >= need) {
+          sum += dfs(ls, i, end, fuel - need);
+          sum %= mod; // 此处就开始mod是防止此时sum就overflow
+        }
+      }
+    }
+    cache[u][fuel] = sum;
+    return sum;
+  }
+  ```
+
+  *Time Complexity:* 最坏情况下共有 $n\times fuel$ 个状态需要计算（填满整个 $cache$ 数组）。每计算一个状态需要遍历一次 $locations$ 数组，复杂度为 $\mathcal{O}(n)$ $\implies$ 整体复杂度为 $\mathcal{O}(n^2\times fuel)$
+
+  *Space Complexity:* $\mathcal{O}(n^2\times fuel)$​
+
+  *优化：***简化「无效情况」**
+
+  考虑一个问题：**如果我们从某个位置 出发，不能一步到达目标位置的话，有可能使用多步到达目标位置吗？**也就是一步不行的话，多步可以吗？答案是不可以。
+
+  假设当前位置的 $locations[i]$ 为 $a$，目标位置的 $locations[finish]$ 为 $b$，两者差值的绝对值为 $need$，而当前油量是 $fuel$。不能一步到达，说明 $need > fuel$。
+
+  而我们每次移动到新的位置，消耗的油量 $cost$ 都是两个位置的差值绝对值。正因为 $cost \ge 0$，因此移动到新位置后的油量 $fuel^{'} \le fuel$。换句话说，即使从位置 $i$ 移动到新位置，也无法改变 $need \ge fuel$ 的性质。
+
+  $\implies$ 如果在某个位置 $u$ 出发，不能一步到达目的地 $finish$​，将永远无法到达目的地。
+
+  ```java
+  int mod = 1000000007;
+  
+  // 缓存器：用于记录「特定状态」下的中间结果
+  // cache[i][fuel] 代表从位置 i 出发，当前剩余的油量为 fuel 的前提下，到达目标位置的「路径数量」
+  int[][] cache;
+  
+  public int countRoutes(int[] ls, int start, int end, int fuel) {
+    int n = ls.length;
+  
+    // 初始化缓存器
+    // 之所以要初始化为 -1，是为了区分「某个状态下路径数量为 0」和「某个状态尚未没计算过」两种情况
+    cache = new int[n][fuel + 1];
+    for (int i = 0; i < n; i++) Arrays.fill(cache[i], -1);
+  
+    return dfs(ls, start, end, fuel);
+  }
+  
+  /**
+   * 计算「路径数量」
+   * @param ls   入参 locations数组
+   * @param u    当前所在位置（用ls中的下标表示）
+   * @param end  目标位置（用ls中的下标表示）
+   * @param fuel 剩余油量
+   * @return     在位置 u 出发，油量为 fuel 的前提下，到达 end 的「路径数量」
+   */
+  int dfs(int[] ls, int u, int end, int fuel) {
+    // 如果缓存器中已经有答案，直接返回
+    if (cache[u][fuel] != -1) return cache[u][fuel];
+  
+    // base case：如果一步到达不了，说明从位置 u 不能到达 end 位置 ==>> 将结果 0 写入缓存器并返回
+    int need = Math.abs(ls[u] - ls[end]);
+    if (need > fuel) {
+      cache[u][fuel] = 0;
+      return 0;
+    } 
+  
+    int n = ls.length;
+    // 计算油量为 fuel，从位置 u 到 end 的路径数量
+    // 由于每个点都可以经过多次，如果 u = end，那么本身就算一条路径 ---- 非常无语，但testcase就是这么设置的
+    int sum = u == end ? 1 : 0;
+    for (int i = 0; i < n; i++) {
+      if (i != u) {
+        need = Math.abs(ls[i] - ls[u]);
+        if (fuel >= need) {
+          sum += dfs(ls, i, end, fuel - need);
+          sum %= mod; // 此处就开始mod是防止此时sum就overflow
+        }
+      }
+    }
+    cache[u][fuel] = sum;
+    return sum;
+  }
+  ```
+
+  *Time Complexity:* 最坏情况下共有 $n\times fuel$ 个状态需要计算（填满整个 $cache$ 数组）。每计算一个状态需要遍历一次 $locations$ 数组，复杂度为 $\mathcal{O}(n)$ $\implies$ 整体复杂度为 $\mathcal{O}(n^2\times fuel)$
+
+  *Space Complexity:* $\mathcal{O}(n^2\times fuel)$​
+
++ Solution 2: ==**将「记忆化搜索」改成「动态规划」**==
+
+  我们重点关注下我们的 DFS 方法签名设计：
+
+  ```java
+  int dfs(int[] ls, int u, int end, int fuel) {}
+  ```
+
+  其中，参数 `ls` 和参数 `end` 分别代表源输入的 `locations` 和 `finish`，在整个 DFS 过程都不会变化，属于不变参数。而参数 `u` 和参数 `fuel` 则是代表了 DFS 过程中的当前位置和当前油量，属于变化参数。
+
+  因此我们可以定一个二维数组 $f[][]$，来分别表示两个可变参数。第一维代表当前位置（对应 `locations` 数组的下标），第二维代表当前剩余油量。二维数组中存储的就是我们的 DFS 方法的返回值（从 `u` 到 `end` 在油量为 `fuel` 的情况下的路径数量）。
+
+  同时结合题意，不难得知维度的取值范围：
+
+  - 第一维的取值范围为 $[0,locations.length)$
+  - 第二维的取值范围为 $[0,fuel]$
+
+  **做完这一步的”翻译“工作，我们就得到了「动态规划」的「状态定义」:** $f[i][j]$ 代表从位置 $i$ 出发，当前剩余油量为 $j$ 的前提下，到达目的地的路径数量。**不知道你是否发现，这个「状态定义」和我们「记忆化搜索」中的缓存器的定义是一致的。**
+
+  接下来我们要从 DFS 中”翻译“出「状态转移方程」。
+
+  所谓的「状态转移方程」其实就是指如何从一个状态转移到另外一个状态。而我们的 DFS 主逻辑就是完成这个转移的：**DFS 中的主逻辑很简单：枚举所有的位置，看从当前位置 出发，可以到达的位置有哪些。**
+
+  **于是我们很容易就可以得出状态转移方程：**
+  $$
+  f[i][fuel]=\sum_{k=0,k\neq i}^{n-1}{f[k][fuel-need]}
+  $$
+  其中，$k$ 代表当在位置 $i$ 且油量为 $fuel$ 的状态时枚举的「下一位置」，$need$ 代表从 $i$ 到达 $k$ 需要的油量。
+
+  对应的代码为
+
+  ```java
+  // 此时我们要求从位置i到位置end在油量为fuel的情况下的路径数，初始定为0
+  f[i][fuel] = 0;
+  // 枚举所有的城市，取得它们到位置end在油量为fuel-need的情况下的路径数，累加即为f[i][fuel]
+  for (int k = 0; k < n; k++) {
+    if (k != i) {
+      int need = Math.abs(ls[i] - ls[k]);
+      if (fuel >= need) f[i][fuel] += f[k][fuel - need];
+    }
+  }
+  ```
+
+  从状态转移方程可以发现，在计算 $f[i][fuel]$ 的时候依赖于 $f[k][fuel-need]$（即 $f[k][fuel-need]$ 的值已经得到）。虽然 $i$ 和 $k$ 并无严格的大小关系，但是 $fuel$ 和 $fuel-need$ 具有严格的大小关系（$fuel \ge fuel-need$​）。因此我们需要先从小到大枚举油量这一维。==**外层循环fuel（从小到大），内层循环城市（无所谓顺序），内外层顺序不可变。**==
+
+  ```java
+  int mod = 1000000007;
+  public int countRoutes(int[] ls, int start, int end, int fuel) {
+    int n = ls.length;
+  
+    // f[i][j] 代表从位置 i 出发，当前油量为 j 时，到达目的地的路径数
+    int[][] f = new int[n][fuel + 1];
+  
+    // 对于本身位置就在目的地的状态，路径数为 1
+    for (int i = 0; i <= fuel; i++) f[end][i] = 1;
+  
+    // 从状态转移方程可以发现 f[i][fuel]=f[i][fuel]+f[k][fuel-need]
+    // 在计算 f[i][fuel] 的时候依赖于 f[k][fuel-need]
+    // 其中 i 和 k 并无严格的大小关系
+    // 而 fuel 和 fuel-need 具有严格大小关系：fuel >= fuel-need
+    // 因此外层循环fuel（从小到大），内层循环城市（无所谓顺序），内外层顺序不可变
+    for (int cur = 0; cur <= fuel; cur++) {
+      for (int i = 0; i < n; i++) {
+        for (int k = 0; k < n; k++) {
+          if (i != k) {
+            int need = Math.abs(ls[i] - ls[k]);
+            if (cur >= need) {
+              f[i][cur] += f[k][cur-need];
+              f[i][cur] %= mod;
+            }
+          }
+        }
+      }
+    }
+    return f[start][fuel];
+  }
+  ```
+
+  *Time Complexity:* 最坏情况下共有 $n\times fuel$ 个状态需要计算（填满整个 $cache$ 数组）。每计算一个状态需要遍历一次 $locations$ 数组，复杂度为 $\mathcal{O}(n)$ $\implies$ 整体复杂度为 $\mathcal{O}(n^2\times fuel)$
+
+  *Space Complexity:* $\mathcal{O}(n^2\times fuel)$​
 
 ******
 
