@@ -440,7 +440,9 @@ Map<Character, Integer> toInt = new
 
 因为由「记忆化搜索」直接转过来的「动态规划」，两者复杂度是一样的。而且通常「记忆化搜索」的实现难度通常要低很多。
 
-[[1575]](#[1575] Count All Possible Routes)
+==**总结：**Recursion with Memoization对于大部分的input，其速度都会更快（即使两者复杂度相同），但DP更利于debug，因为可以将DP数组直观地输出，发现哪里出错。==
+
+[[1575]](#[1575] Count All Possible Routes)     [[0576]](#[0576] Out of Boundary Paths)
 
 ********
 
@@ -1430,7 +1432,8 @@ Trie (can be pronounced "try" or "tree") or prefix tree is a tree data structure
 
 ##### [0062] Unique Paths
 
-A robot is located at the top-left corner of a $m\times n$ ==$(1\le m,n\le 100)$== grid (marked 'Start' in the diagram below). The robot can only move either down or right at any point in time. The robot is trying to reach the bottom-right corner of the grid (marked 'Finish' in the diagram below). How many possible unique paths are there?
+> A robot is located at the top-left corner of a $m\times n$ ==$(1\le m,n\le 100)$== grid (marked 'Start' in the diagram below). The robot can only move either down or right at any point in time. The robot is trying to reach the bottom-right corner of the grid (marked 'Finish' in the diagram below). How many possible unique paths are there?
+>
 
 ![](/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/[0062].png)
 
@@ -1540,7 +1543,8 @@ public int uniquePathsWithObstacles(int[][] obstacleGrid) {
 
 ##### [0064] Minimum Path Sum
 
-Given a `m x n` `grid` filled with non-negative numbers, find a path from top left to bottom right, which minimizes the sum of all numbers along its path. Note: You can only move either down or right at any point in time.
+> Given a `m x n` `grid` filled with non-negative numbers, find a path from top left to bottom right, which minimizes the sum of all numbers along its path. Note: You can only move either down or right at any point in time.
+>
 
 在 [[0062]](#[0062] Unique Paths) 的基础上，增加了路径成本概念。
 
@@ -1701,7 +1705,9 @@ int getIdx(int x, int y) {
 
 ##### [0118] Pascal's Triangle
 
-给定行数 `numRows`，填帕斯卡三角：一开始就是按照Iteration做的，看了Solution发现其实可以理解为DP。
+> 给定行数 `numRows`，填帕斯卡三角
+
+一开始就是按照Iteration做的，看了Solution发现其实可以理解为DP。
 
 ![](/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/[0118]_3.jpeg)
 
@@ -1736,7 +1742,8 @@ $\implies$ 总的次数为$1+2+3+\dots+numRows = \frac{numRows(numRows+1)}{2} = 
 
 ##### [0119] Pascal's Triangle II
 
-给定 `rowIndex`，返回帕斯卡三角（0-indexed）该行的内容。
+> 给定 `rowIndex`，返回帕斯卡三角（0-indexed）该行的内容。
+>
 
 + Solution 1: Recursion
 
@@ -1834,9 +1841,10 @@ $\implies$ 总的次数为$1+2+3+\dots+numRows = \frac{numRows(numRows+1)}{2} = 
 
 ##### [0120] Triangle
 
-Given a `triangle` array, return *the minimum path sum from top to bottom*.
-
-For each step, you may move to an adjacent number of the row below. More formally, if you are on index `i` on the current row, you may move to either index `i` or index `i + 1` on the next row.
+> Given a `triangle` array, return *the minimum path sum from top to bottom*.
+>
+> For each step, you may move to an adjacent number of the row below. More formally, if you are on index `i` on the current row, you may move to either index `i` or index `i + 1` on the next row.
+>
 
 ==还是DP在Pascal's Triangle的应用==
 
@@ -1987,9 +1995,10 @@ f[i][j] = Math.min(top, leftTop);
 
 ##### [0931] Minimum Falling Path Sum
 
-Given an `n x n` array of integers `matrix`, return *the **minimum sum** of any **falling path** through* `matrix`.
-
-A **falling path** starts at any element in the first row and chooses the element in the next row that is either directly below or diagonally left/right. Specifically, the next element from position `(row, col)` will be `(row + 1, col - 1)`, `(row + 1, col)`, or `(row + 1, col + 1)`.
+> Given an `n x n` array of integers `matrix`, return *the **minimum sum** of any **falling path** through* `matrix`.
+>
+> A **falling path** starts at any element in the first row and chooses the element in the next row that is either directly below or diagonally left/right. Specifically, the next element from position `(row, col)` will be `(row + 1, col - 1)`, `(row + 1, col)`, or `(row + 1, col + 1)`.
+>
 
 *分析：*
 
@@ -2084,9 +2093,10 @@ public int minFallingPathSum(int[][] matrix) {
 
 ##### [1289] Minimum Falling Path Sum II
 
-Given a square grid of integers `arr`, a *falling path with non-zero shifts* is a choice of exactly one element from each row of `arr`, such that no two elements chosen in adjacent rows are in the same column.
-
-Return the minimum sum of a falling path with non-zero shifts.
+> Given a square grid of integers `arr`, a *falling path with non-zero shifts* is a choice of exactly one element from each row of `arr`, such that no two elements chosen in adjacent rows are in the same column.
+>
+> Return the minimum sum of a falling path with non-zero shifts.
+>
 
 *分析：*与[[0931]](#[0931] Minimum Falling Path Sum)相比，这道题的“非零偏移下降路径”其实就是规定了路径不能朝「正下方」移动，其余所有方向都可以。==**因此在更新DP数组当前行的值时，需要枚举上一行除同一列以外的所有列（for循环）**==。仍可以使用[Template](#DP路径Template)求解。
 
@@ -2210,13 +2220,14 @@ public int minFallingPathSum(int[][] arr) {
 
 ##### [1575] Count All Possible Routes
 
-You are given an array of **distinct** positive integers locations where `locations[i]` represents the position of city `i`. You are also given integers `start`, `finish` and `fuel` representing the starting city, ending city, and the initial amount of fuel you have, respectively.
-
-At each step, if you are at city `i`, you can pick any city `j` such that `j != i` and `0 <= j < locations.length` and move to city `j`. Moving from city `i` to city `j` reduces the amount of fuel you have by `|locations[i] - locations[j]|`. Please notice that `|x|` denotes the absolute value of `x`.
-
-Notice that `fuel` **cannot** become negative at any point in time, and that you are **allowed** to visit any city more than once (including `start` and `finish`).
-
-Return *the count of all possible routes from* `start` *to* `finish`. Since the answer may be too large, return it modulo `10^9 + 7`.
+> You are given an array of **distinct** positive integers locations where `locations[i]` represents the position of city `i`. You are also given integers `start`, `finish` and `fuel` representing the starting city, ending city, and the initial amount of fuel you have, respectively.
+>
+> At each step, if you are at city `i`, you can pick any city `j` such that `j != i` and `0 <= j < locations.length` and move to city `j`. Moving from city `i` to city `j` reduces the amount of fuel you have by `|locations[i] - locations[j]|`. Please notice that `|x|` denotes the absolute value of `x`.
+>
+> Notice that `fuel` **cannot** become negative at any point in time, and that you are **allowed** to visit any city more than once (including `start` and `finish`).
+>
+> Return *the count of all possible routes from* `start` *to* `finish`. Since the answer may be too large, return it modulo `10^9 + 7`.
+>
 
 ![](/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/[1575].png)
 
@@ -2486,7 +2497,78 @@ Return *the count of all possible routes from* `start` *to* `finish`. Since the 
 
   *Time Complexity:* 最坏情况下共有 $n\times fuel$ 个状态需要计算（填满整个 $cache$ 数组）。每计算一个状态需要遍历一次 $locations$ 数组，复杂度为 $\mathcal{O}(n)$ $\implies$ 整体复杂度为 $\mathcal{O}(n^2\times fuel)$
 
-  *Space Complexity:* $\mathcal{O}(n^2\times fuel)$​
+  *Space Complexity:* $\mathcal{O}(n^2\times fuel)$​​
+
+*******
+
+##### [0576] Out of Boundary Paths
+
+> There is an `m x n` grid with a ball. The ball is initially at the position `[startRow, startColumn]`. You are allowed to move the ball to one of the four adjacent cells in the grid (possibly out of the grid crossing the grid boundary). You can apply **at most** `maxMove` moves to the ball.
+>
+> Given the five integers `m`, `n`, `maxMove`, `startRow`, `startColumn`, return the number of paths to move the ball out of the grid boundary. Since the answer can be very large, return it **modulo** `10^9 + 7`.
+
+```java
+Input: m = 1, n = 3, maxMove = 3, startRow = 0, startColumn = 1
+Output: 12
+```
+
+<img src="/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/[0576].png" style="zoom:75%;" />
+
+*分析：*已知有两种「动态规划」求解方法，直接猜「状态定义」或者通过「记忆化搜索」改写。因为这题不是DP路径问题类型一，不好直接猜。因此，先尝试Memoization（并不是完整地写出来，而是考虑用到的DFS函数如何设计）。
+
+结合题目，Memoization的DFS函数可以设计为：
+
+```java
+int dfs(int m, int n, int x, int y, int k) {}
+```
+
+其中，`m` 和 `n` 是题目原输入，用来表示矩阵是几行几列的，属于「不变参数」；`(x, y)` 代表当前所在的位置； `k` 代表最多的移动次数；返回值代表从起始位置 `(x, y)` 在最多步数 `k` 的条件下将球移出界的路径数量。
+
+为了方便，将 `(x, y)` 根据以下规则映射为 `index` :
+
+```java
+index = x * n + y;
+(x, y) = (index / n, index % n);
+```
+
+根据我们的「技巧解法」，我们可以设计一个二维数组 $f[][]$ 作为我们的 dp 数组：
+
+- 第一维代表 DFS 可变参数中的 $(x, y)$​ 所对应的 $index$。取值范围为 $[0, m*n)$
+- 第二维代表 DFS 可变参数中的 $k$​。取值范围为 $[0,N]$
+
+**dp 数组中存储的就是我们 DFS 的返回值：路径数量。**
+
+根据 dp 数组中的维度设计和存储目标值，我们可以得知「状态定义」为：$f[i][j]$ 代表从位置 $i$ 出发，可用步数不超过 $k$ 时的路径数量。
+
+至此，我们没有实现「记忆化搜索」，只是设计了 DFS 函数的签名，就已经得出我们的「状态定义」了，接下来需要考虑「转移方程」。
+
+当有了「状态定义」之后，我们需要从「最后一步」来推导出「转移方程」：
+
+由于题目允许往四个方向进行移动。因此我们的最后一步也要统计四个相邻的方向。假设我们当前位置为 $(x,y)$，而 $(x,y)$ 四个方向的相邻格子均不超出矩形。即有：
+
+ $(x, y)$ **出发的路径数量** = **上方** $(x-1, y)$ **的路径数量** + **下方** $(x+1,y)$ **的路径数量** + **左方** $(x,y-1)$ **的路径数量** + **右方** $(x,y+1)$ **的路径数量**
+
+由此可得我们的状态转移方程：
+$$
+f[(x,y)][step]=f[(x-1,y)][step-1]+f[(x+1,y)][step-1]+f[(x,y-1)][step-1]+f[(x,y+1)][step-1]
+$$
+PS. 转移方程中 dp 数组的第一维存储的是 $(x,y)$ 对应的 $index$。
+
+从转移方程中我们发现，更新 $f[i][j]$ 依赖于 $f[][j-1]$，因此我们转移过程中需要将最大移动步数进行**从小到大**枚举。
+
+至此，我们已经完成求解「路径规划」问题的两大步骤：「状态定义」&「转移方程」。
+
+但这还不是所有，我们还需要一些**「有效值」**来滚动下去（DP数组的初始化方式）。因为观察我们的「转移方程」可以发现，整个转移过程是一个累加过程，如果没有一些有效的状态（非零值）进行初始化的话，整个递推过程并没有意义。
+
+那么哪些值可以作为成为初始化状态呢？
+
+显然，当我们已经位于矩阵边缘的时候，我们可以一步跨出矩阵，这算作一条路径。同时，由于我们能够往四个方向进行移动，因此不同的边缘格子会有不同数量的路径。
+
+<img src="/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/[0576]_2.png" style="zoom:50%;" />
+
+换句话说，我们需要先对边缘格子进行初始化操作，预处理每个边缘格子直接走出矩阵的路径数量。目的是为了我们整个 DP 过程可以有效的递推下去。
+
+
 
 ******
 
@@ -2496,7 +2578,9 @@ Return *the count of all possible routes from* `start` *to* `finish`. Since the 
 
 ##### [0142] Linked List Cycle II
 
-Given a linked list, return the node where the cycle begins. If there is no cycle, return `null`. **Notice** that you **should not modify** the linked list.    分别引自[[0141]](#[0141] Linked List Cycle)的两个方法
+> Given a linked list, return the node where the cycle begins. If there is no cycle, return `null`. **Notice** that you **should not modify** the linked list.    
+
+分别引自[[0141]](#[0141] Linked List Cycle)的两个方法
 
 + Solution 1: Use HashSet $\implies \mathcal{O}(n)\ \&\ \mathcal{O}(n)$​
 
