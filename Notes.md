@@ -2567,11 +2567,51 @@ PS. 转移方程中 dp 数组的第一维存储的是 $(x,y)$ 对应的 $index$�
 
 那么哪些值可以作为成为初始化状态呢？
 
-显然，当我们已经位于矩阵边缘的时候，我们可以一步跨出矩阵，这算作一条路径。同时，由于我们能够往四个方向进行移动，因此不同的边缘格子会有不同数量的路径。
+显然，当我们已经位于矩阵边缘的时候，我们可以一步跨出矩阵，这算作一条路径。同时，由于我们能够往四个方向进行移动，因此不同的边缘格子会有不同数量的路径。==对于非边缘的格子，一步是出不了界的。而步数多于1步时，则可以利用相邻的边缘格子的值来获得路径数量。所以并不需要初始化。==
 
-<img src="/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/[0576]_2.png" style="zoom:50%;" />
+<img src="/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/[0576]_2.png" style="zoom:25%;" />
 
 换句话说，我们需要先对边缘格子进行初始化操作，预处理每个边缘格子直接走出矩阵的路径数量。目的是为了我们整个 DP 过程可以有效的递推下去。
+
+*e.g.* $1\times 3$ grid, maxMove = 3 所对应的初始化后的 $f[][]$​ 为：
+$$
+\begin{gathered}
+\begin{bmatrix}
+[0 & 3 & 3 & 3] \\
+[0 & 2 & 2 & 2] \\
+[0 & 3 & 3 & 3] \\
+\end{bmatrix}
+\ \ 
+\begin{bmatrix}
+[0 & 3 & 0 & 0] \\
+[0 & 2 & 0 & 0] \\
+[0 & 3 & 0 & 0] \\
+\end{bmatrix} \\ 
+\quad\quad\quad\quad\quad\color{red}{\sqrt{}}\quad\quad\quad\quad\quad\quad\quad \times
+\end{gathered}
+$$
+对于 $f[][]$​​ 的第一行，其对应的值为grid的第一格 $(0,0) \rightarrow index=0\times 3+0=0$​ 在maxMove分别为 $0,1,2,3$​ 时的初始值。对于 $f[][]$​ 的第二行，其对应的值为grid的第二格 $(0,1)\rightarrow index=0\times3+1=1$ 在maxMove分别为 $0,1,2,3$ 时的初始值。对于 $f[][]$ 的第三行，其对应的值为grid的第三格 $(0,2)\rightarrow index=0\times3+2=2$ 在maxMove分别为 $0,1,2,3$​​ 时的初始值。
+
+不可以只初始化 $maxMove=1$ 的情况（即上面右边）。==对于 $maxMove > 1$ 的元素也要初始化的原因是，题目要求的是移动步数不超过 $maxMove$，而不是一定要移动完 $maxMove$。==
+
+```java
+int mod = (int)1e9+7;
+int n, N;
+public int findPaths(int m, int n, int maxMove, int startRow, int startColumn) {
+  this.n = n;
+  this.N = maxMove;
+  
+  // f[i][j]代表从index = i(对应的坐标为(i/n, i%n))的起始位置在步数不超过j的条件下，移出界的路径数量
+  int[][] f = new int[m * n][N + 1]; 
+  
+  // 初始化边缘格子在maxMove=[1,N]的条件下移出界的路径数量
+  for (int i = 0; i < m; i++) {
+    for (int j = 0; j < n; j++) {
+      
+    }
+  }
+}
+```
 
 
 
