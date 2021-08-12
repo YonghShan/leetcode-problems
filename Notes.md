@@ -408,7 +408,7 @@ Map<Character, Integer> toInt = new
 
 ##### Memoization
 
-记忆化搜索，其本质是「递归」（通常是自顶而上的解决）。是降低递归复杂度的技巧，可以保证递归的做法在数据范围较大的情况下也可以AC。比如，DFS 通常要求数据范围在30左右，而利用 Memoization 辅助的DFS则可以通过数据范围 $10^2$ 的题目。
+记忆化搜索，其本质是「递归」（通常是自顶而上的解决）。是降低递归复杂度的技巧（==将递归的复杂度降到和DP一致==），可以保证递归的做法在数据范围较大的情况下也可以AC。比如，DFS 通常要求数据范围在30左右，而利用 Memoization 辅助的DFS则可以通过数据范围 $10^2$​ 的题目。
 
 需要掌握 Memoization 最重要的一个原因是，其是「动态规划」的前置思考。当在不能轻易地猜到「状态定义」以及推导「状态转移方程」时，都可以先使用Memoization求解，再改成DP。==因此，能够使用Memoization求解的前提也是：**问题本身具有无后效性**。==
 
@@ -436,11 +436,17 @@ Map<Character, Integer> toInt = new
 
 **当搞清楚「记忆化搜索」的函数签名设计之后，「状态定义」部分基本就已经出来了，之后的「状态转移方程」就还是一样的分析方法。**
 
-当然，如果你觉得「记忆化搜索」更好实现的话，大可直接使用「记忆化搜索」求解，不一定需要将其转化为「动态规划」。
+当然，如果你觉得「记忆化搜索」更好实现的话，大可直接使用「记忆化搜索」求解，不一定需要将其转化为「动态规划」。因为由「记忆化搜索」直接转过来的「动态规划」，两者复杂度是一样的。而且通常「记忆化搜索」的实现难度通常要低很多。
 
-因为由「记忆化搜索」直接转过来的「动态规划」，两者复杂度是一样的。而且通常「记忆化搜索」的实现难度通常要低很多。
++ **Memoization会比DP快的原因:**
 
-==**总结：**Recursion with Memoization对于大部分的input，其速度都会更快（即使两者复杂度相同），但DP更利于debug，因为可以将DP数组直观地输出，发现哪里出错。==
+  在 DP 中我们很少会去考虑剪枝，或者很难得到一个很好的剪枝效果。而 DFS 通常会一直往下搜索，得到一个「合法值」，然后利用这个合法值直接减掉一些不必要的递归树。但是 DP 本质是通过 BFS 来得到起始状态到目标状态的拓扑序，无法像 DFS 那样先得到一个合法值。
+
+  另外，以[1575]和[0576]为例，在使用Memoization时，都可以对base case剪枝。DP 解法却更近似于原始未剪枝的Memoizaition。
+
++ **总结：**
+
+  ==Recursion with Memoization对于大部分的input，其速度都会更快（即使两者复杂度相同），但DP更利于debug，因为可以将DP数组直观地输出，发现哪里出错。==
 
 [[1575]](#[1575] Count All Possible Routes)     [[0576]](#[0576] Out of Boundary Paths)
 
@@ -450,17 +456,17 @@ Map<Character, Integer> toInt = new
 
 + Pascal's Triangle：[[0118]](#[0118] Pascal's Triangle)     [[0119]](#[0119] Pascal's Triangle II)     [[0120]](#[0120] Triangle)
 
-+ 路径问题：
++ 路径问题：[宫水三叶的刷题日记](https://mp.weixin.qq.com/s/flnaRo6VnvkeUQoRDkin9w)
 
   + 类型一：**特定「起点」，明确且有限的「移动方向」（转移状态），求解所有状态中的最优值。**
 
     *解释：*给定了某个「形状」的数组（三角形或者矩形），使用 **题目给定的起点** 或者 **自己枚举的起点** 出发，再结合题目给定的具体转移规则（往下方/左下方/右下方进行移动）进行转移。
 
-    [[0062]](#[0062] Unique Paths)     [[0063]](#[0063] Unique Paths II)     [[0064]](#[0064] Minimum Path Sum)     [[0120]](#[0120] Triangle)     [[0931]](#[0931] Minimum Falling Path Sum)     [[1289]](#[1289] Minimum Falling Path Sum II)     
+    [[0062]](#[0062] Unique Paths)     [[0063]](#[0063] Unique Paths II)     [[0064]](#[0064] Minimum Path Sum)     [[0120]](#[0120] Triangle)     [[0931]](#[0931] Minimum Falling Path Sum)     [[1289]](#[1289] Minimum Falling Path Sum II)     [[1301]]()
 
-  + 类型二：只是告诉了我们移动规则，没有告诉我们具体该如何移动。
+  + 类型二：只是告诉了我们移动规则，没有告诉我们具体该如何移动，即不明确但有限的「移动方向」。
 
-    [[1575]](#[1575] Count All Possible Routes)     [[0576]]()     [[1301]]()
+    [[1575]](#[1575] Count All Possible Routes)     [[0576]]()     
 
   ==Template==:<a name="DP路径Template"></a>
 
@@ -1519,7 +1525,7 @@ public int uniquePathsWithObstacles(int[][] obstacleGrid) {
   f[0][0] = obstacleGrid[0][0] == 1 ? 0 : 1; // 题目说了机器人初始位于top-left conner，test case还把obstacleGrid[0][0]有可能是障碍物，无语。。。
   for (int i = 0; i < m; i++) {
     for (int j = 0; j < n; j++) {
-      // 对于obstacleGrid[i][j]为1的f[i][j]，不需要更新，初始即为1
+      // 对于obstacleGrid[i][j]为1的f[i][j]，不需要更新，初始即为0
       if (obstacleGrid[i][j] != 1) { 
         if (i > 0 && j > 0) {
           f[i][j] = f[i][j-1] + f[i-1][j];
@@ -1556,7 +1562,7 @@ public int uniquePathsWithObstacles(int[][] obstacleGrid) {
 
 1. 当前位置只能通过 **「往下」** 移动而来，即有 `f[i][j] = f[i-1][j] + grid[i][j]`  *i.e. 第一纵列 (j=0)*
 2. 当前位置只能通过 **「往右」** 移动而来，即有 `f[i][j] = f[i][j-1] + grid[i][j]`  *i.e. 第一横行 (i=0)*
-3. 当前位置既能通过 **「往下」** 也能 **「往右」** 移动而来，即有 `f[i][j] = min(f[i][j-1],f[i-1][j]) + grid[i][j]`
+3. 当前位置既能通过 **「往下」** 也能 **「往右」** 移动而来，即有 `f[i][j] = min(f[i][j-1],f[i-1][j]) + grid[i][j] = min(f[i][j-1] + grid[i][j], f[i-1][j] + grid[i][j])`
 
 ```java
 public int minPathSum(int[][] grid) {        
@@ -2516,13 +2522,26 @@ Output: 12
 
 *分析：*已知有两种「动态规划」求解方法，直接猜「状态定义」或者通过「记忆化搜索」改写。因为这题不是DP路径问题类型一，不好直接猜。因此，先尝试Memoization（并不是完整地写出来，而是考虑用到的DFS函数如何设计）。
 
+单纯的Recursion解法为: $\mathcal{O}(4^N)\ \&\ \mathcal{O}(N)$​​
+
+```java
+public int findPaths(int m, int n, int N, int x, int y) {
+  if (x == m || y == n || x < 0 || y < 0) return 1;
+  if (N == 0) return 0;
+  return findPaths(m, n, N - 1, x - 1, y)
+    + findPaths(m, n, N - 1, x + 1, y)
+    + findPaths(m, n, N - 1, x, y - 1)
+    + findPaths(m, n, N - 1, x, y + 1);
+}
+```
+
 结合题目，Memoization的DFS函数可以设计为：
 
 ```java
-int dfs(int m, int n, int x, int y, int k) {}
+int dfs(int m, int n, int N, int x, int y) {}
 ```
 
-其中，`m` 和 `n` 是题目原输入，用来表示矩阵是几行几列的，属于「不变参数」；`(x, y)` 代表当前所在的位置； `k` 代表最多的移动次数；返回值代表从起始位置 `(x, y)` 在最多步数 `k` 的条件下将球移出界的路径数量。
+其中，`m` 和 `n` 是题目原输入，用来表示矩阵是几行几列的，属于「不变参数」；`(x, y)` 代表当前所在的位置； `N` 代表最多的移动次数；返回值代表从起始位置 `(x, y)` 在最多步数 `k` 的条件下将球移出界的路径数量。
 
 为了方便，将 `(x, y)` 根据以下规则映射为 `index` :
 
@@ -2601,17 +2620,120 @@ public int findPaths(int m, int n, int maxMove, int startRow, int startColumn) {
   this.n = n;
   this.N = maxMove;
   
-  // f[i][j]代表从index = i(对应的坐标为(i/n, i%n))的起始位置在步数不超过j的条件下，移出界的路径数量
+  // f[i][j]代表从index = i(对应的grid坐标为(x, y) = (index / n, index % n))的起始位置在步数不超过j的条件下，移出界的路径数量
   int[][] f = new int[m * n][N + 1]; 
   
   // 初始化边缘格子在maxMove=[1,N]的条件下移出界的路径数量
-  for (int i = 0; i < m; i++) {
-    for (int j = 0; j < n; j++) {
-      
+  for (int x = 0; x < m; x++) {
+    for (int y = 0; y < n; y++) {
+      // 位于grid边缘的格子满足以下四个特征:
+      if (x == 0) add(x, y, f);
+      if (x == m - 1) add(x, y, f);
+      if (y == 0) add(x, y, f);
+      if (y == n - 1) add(x, y, f);
     }
   }
+  
+  // 定义可移动的四个方向
+  int[][] dirs = new int[][]{{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+  
+  // 从小到大枚举「可移动步数」
+  for (int step = 2; step <= N; step++) {
+    // 枚举所有格子
+    for (int idx = 0; idx < m * n; idx++) {
+      int x = parseIndex(idx)[0], y = parseIndex(idx)[1];
+      for (int[] dir : dirs) {
+        int newX = x + dir[0], newY = y + dir[1];
+        // 如果位置有「相邻格子」，则「相邻格子」参与状态转移
+        if (newX >= 0 && newX <= m - 1 && newY >= 0 && newY <= n - 1) {
+          f[idx][step] += f[getIndex(newX, newY)][step - 1];
+          f[idx][step] %= mod;
+        }
+      }
+    }
+  }
+  
+  // 最终结果为从起始点触发，最大移动步数不超 N 的路径数量
+  return f[getIndex(startRow, startColumn)][N];
+}
+
+// 为每个边缘格子添加一条路径(初始值+1)
+void add(int x, int y, int[][] f) {
+  int idx = getIndex(x, y);
+  for (int step = 1; step <= N; step++) f[idx][step]++;
+}
+
+// 将(x, y)转换为index
+int getIndex(int x, int y) {
+  return x * n + y;
+}
+
+// 将index解析回(x, y)
+int[] parseIndex(int idx) {
+  return new int[]{idx / n, idx % n};
 }
 ```
+
+*Time Complexity:* $\mathcal{O}(m * n * maxMove)$​
+
+*Space Complexity:* $\mathcal{O}(m * n * maxMove)$
+
+********
+
+##### [1301] Number of Paths with Max Score
+
+> You are given a square `board` of characters. You can move on the board starting at the bottom right square marked with the character `'S'`.
+>
+> You need to reach the top left square marked with the character `'E'`. The rest of the squares are labeled either with a numeric character `1, 2, ..., 9` or with an obstacle `'X'`. In one move you can go up, left or up-left (diagonally) only if there is no obstacle there.
+>
+> Return a list of two integers: the first integer is the maximum sum of numeric characters you can collect, and the second is the number of such paths that you can take to get that maximum sum, **taken modulo** `10^9 + 7`.
+>
+> In case there is no path, return `[0, 0]`.
+
+*分析：*==**[0062] / [0063] / [0064]的综合题**==  规定了「起点」、「终点」以及「移动方向」，设置了「路径成本」和「障碍」，最终结果要求包含最大路径成本以及获得该最大成本的路径数 $\implies$ 两个单独的DP数组记录信息*（没有必要用一个DP数组去完全两个任务，只会因为增加维度而增加难度）*
+
++ 最大路径成本问题：
+
+  「状态定义」：$f[(x,y)]=f[index]$​​​：从起点 $(0,0)$​​​ 到下标为 $index=x*n+y$​​​​ 的grid的最大路径成本；
+
+  「状态转移方程」：$f[(x,y)]=max(f[(x+1,y)],f[(x,y+1)],f[(x+1,y+1)])+board[(x,y)]$​
+
+  ==与[0063]中的技巧类似，将「障碍」所对应的动规值设为 INF。==
+
+  $\implies f[0]$ 即为最终答案 
+
++ 最大路径成本路径数问题：
+
+  「状态定义」：$g[(x,y)]=g[index]$​：使得从起点 $(0,0)$​ 到下标为 $index=x*n+y$​​ 的grid的路径成本最大的路径数量；
+
+  「状态转移方程」：稍麻烦，分析见下
+
+  由于某个位置可以由「下方」、「右方」和「右下方」三个位置转移而来。**同时**  $f[(x,y)]$ **是由三个位置的最大值转移过来，那么相应的** $g[(x,y)]$ **应该取到最大得分的转移位置的方案数。**
+
+  ==**需要注意，最大值不一定是由一个位置得出。**==**如果有多个位置同时能取到最大得分，那么方案数应该是多个位置的方案数之和。**
+
+  *e.g.* 如果可到达 $(x,y)$ 的三个位置 $((x+1,y),(x,y+1),(x+1,y+1))$ 的最大得分为 $3,4,5$，到达三个位置的方案数为 $1,2,2$ ，
+
+  那么可得：
+  $$
+  \left\{
+  \begin{array}{ll}
+        f[(x,y)]=5+board[(x,y)]\\
+        g[(x,y)]=2\\
+  \end{array} 
+  \right.
+  $$
+  但如果三个位置的最大得分为 $3，5，5$，到达三个位置的方案数为 $1，2，2$ 的话。由于同时取得最大值的位置有两个，那么方案数也应该是两个位置方案数之和。
+
+  即有：
+  $$
+  \left\{
+  \begin{array}{ll}
+        f[(x,y)]=5+board[(x,y)]\\
+        g[(x,y)]=2+2\\
+  \end{array} 
+  \right.
+  $$
 
 
 
