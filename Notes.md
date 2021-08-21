@@ -3340,7 +3340,7 @@ $$
     f[0] = true;
     // 状态转移：再处理「考虑其他物品」的情况
     for (int i = 1; i < n; i++) {
-      for (int c = target; c >= target; c--) {
+      for (int c = target; c >= 0; c--) {
         // 不选：
         boolean ns = f[c];
         // 选：

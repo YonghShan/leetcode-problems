@@ -3,8 +3,8 @@
  * @date 8/21/21 - 00:07
  */
 public class Solution2_2 {
-    /* Runtime: 35ms (faster than 62.56%)   O(n * target)
-       Memory: 48.8MB (less than 35.51%)    O(target)
+    /* Runtime: 36ms (faster than 61.63%)   O(n * target)
+       Memory: 38.5MB (less than 84.94%)    O(target)
      */
     public boolean canPartition(int[] nums) {
         int n = nums.length;

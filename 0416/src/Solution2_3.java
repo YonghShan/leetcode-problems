@@ -3,8 +3,8 @@
  * @date 8/21/21 - 00:07
  */
 public class Solution2_3 {
-    /* Runtime: 35ms (faster than 62.56%)   O(n * target)
-       Memory: 48.8MB (less than 35.51%)    O(target)
+    /* Runtime: 19ms (faster than 79.51%)   O(n * target)
+       Memory: 38.6MB (less than 81.89%)    O(target)
      */
     public boolean canPartition(int[] nums) {
         int n = nums.length;
@@ -21,7 +21,7 @@ public class Solution2_3 {
         f[0] = true;
         // 状态转移：再处理「考虑其他物品」的情况
         for (int i = 1; i < n; i++) {
-            for (int c = target; c >= target; c--) {
+            for (int c = target; c >= 0; c--) {
                 // 不选：
                 boolean ns = f[c];
                 // 选：
