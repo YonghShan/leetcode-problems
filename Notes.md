@@ -3250,9 +3250,111 @@ $$
 
 **通常使用「首行」来初始化「有效值」：**对于本题，显然可以通过「先处理第一个物品」来得到「有效值」，即令 $f[0][nums[0]] = true$，代表当仅考虑第 $1$ 件物品时，只有容量为 $nums[0]$ 的背包才符合「恰好」的要求，故置为 $true$。
 
-但因为无法确保背包的容量一定大于 $nums[0]$ （也就是第一个物品过大，永远无法装入背包的情况），因此增加一个「不考虑任何物品」的情况讨论，也就是**将「物品编号」从 0 开始调整为从 1 开始**。
+但因为无法确保背包的容量一定大于 $nums[0]$ （也就是第一个物品过大，永远无法装入背包的情况），因此增加一个**「不考虑任何物品」**的情况讨论，也就是**将「物品编号」从 0 开始调整为从 1 开始**。
 
-原本 $f[0][]$ 代表只考虑第一件物品、$f[1][]$ 代表考虑第一件和第二件物品；调整后 $f[0][]$ 代表不考虑任何物品、$f[1][]$ 代表只考虑第一件物品......这种技巧本质上还是利用了「哨兵」的思想。
+原本 $f[0][]$ 代表只考虑第一件物品、$f[1][]$ 代表考虑第一件和第二件物品；调整后 $f[0][]$ 代表不考虑任何物品、$f[1][]$​ 代表只考虑第一件物品......这种技巧本质上还是利用了「哨兵」的思想。
+
++ $dp[N][C+1]$​ 解法
+
+  ```java
+  public boolean canPartition(int[] nums) {
+    int n = nums.length;
+  
+    // 「等和子集」的和必然是总和的一半
+    int sum = 0;
+    for (int num : nums) sum += num;
+    // 总和为奇数，则必然不能被分成两个「等和子集」
+    if (sum % 2 != 0) return false;
+    int target = sum / 2;
+  
+    boolean[][] f = new boolean[n+1][target+1];
+    // 初始化：先处理「不考虑任何物品」的情况（即dp数组的第一横行的初始值）
+    f[0][0] = true;
+    // 状态转移：再处理「考虑其他物品」的情况
+    for (int i = 1; i < n; i++) {
+      for (int c = 0; c <= target; c++) {
+        // 不选：
+        boolean ns = f[i-1][c];
+        // 选：
+        boolean s = c >= nums[i] ? f[i-1][c-nums[i]] : false;
+        f[i][c] = ns | s;
+      }
+    }
+  
+    return f[n-1][target];
+  }
+  ```
+
+  + *Time Complexity:* $\mathcal{n*target}$
+  + *Space Complexity:* $\mathcal{O}(n*target)$
+
++ 「滚动数组」
+
+  ```java
+  public boolean canPartition(int[] nums) {
+    int n = nums.length;
+  
+    // 「等和子集」的和必然是总和的一半
+    int sum = 0;
+    for (int num : nums) sum += num;
+    // 总和为奇数，则必然不能被分成两个「等和子集」
+    if (sum % 2 != 0) return false;
+    int target = sum / 2;
+  
+    boolean[][] f = new boolean[2][target+1];
+    // 初始化：先处理「不考虑任何物品」的情况（即dp数组的第一横行的初始值）
+    f[0][0] = true;
+    // 状态转移：再处理「考虑其他物品」的情况
+    for (int i = 1; i < n; i++) {
+      for (int c = 0; c <= target; c++) {
+        // 不选：
+        boolean ns = f[(i-1)&1][c];
+        // 选：
+        boolean s = c >= nums[i] ? f[(i-1)&1][c-nums[i]] : false;
+        f[i&1][c] = ns | s;
+      }
+    }
+  
+    return f[(n-1)&1][target];
+  }
+  ```
+
+  + *Time Complexity:* $\mathcal{n*target}$
+  + *Space Complexity:* $\mathcal{O}(target)$
+
++ 「一维空间优化」
+
+  ```java
+  public boolean canPartition(int[] nums) {
+    int n = nums.length;
+  
+    // 「等和子集」的和必然是总和的一半
+    int sum = 0;
+    for (int num : nums) sum += num;
+    // 总和为奇数，则必然不能被分成两个「等和子集」
+    if (sum % 2 != 0) return false;
+    int target = sum / 2;
+  
+    boolean[] f = new boolean[target+1];
+    // 初始化：先处理「不考虑任何物品」的情况（即dp数组的第一横行的初始值）
+    f[0] = true;
+    // 状态转移：再处理「考虑其他物品」的情况
+    for (int i = 1; i < n; i++) {
+      for (int c = target; c >= target; c--) {
+        // 不选：
+        boolean ns = f[c];
+        // 选：
+        boolean s = c >= nums[i] ? f[c-nums[i]] : false;
+        f[c] = ns | s;
+      }
+    }
+  
+    return f[target];
+  }
+  ```
+
+  + *Time Complexity:* $\mathcal{n*target}$
+  + *Space Complexity:* $\mathcal{O}(target)$
 
 ******
 

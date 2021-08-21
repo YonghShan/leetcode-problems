@@ -1,10 +1,10 @@
 /**
  * @author YonghShan
- * @date 8/20/21 - 21:37
+ * @date 8/20/21 - 21:36
  */
-public class Solution3 {
-    /* Runtime: 20ms (faster than 77.62%)   O(n * target)
-       Memory: 38.5MB (less than 81.89%)    O(n * target)
+public class Solution1_2 {
+    /* Runtime: 33ms (faster than 64.73%)   O(n * target)
+       Memory: 38.5MB (less than 81.89%)    O(target)
      */
     public boolean canPartition(int[] nums) {
         int n = nums.length;
@@ -16,20 +16,20 @@ public class Solution3 {
         if (sum % 2 != 0) return false;
         int target = sum / 2;
 
-        int[] f = new int[target+1];
+        int[][] f = new int[2][target+1];
         // 初始化：先处理「考虑第一件物品」的情况（即dp数组的第一横行的初始值）
-        for (int c = 0; c <= target; c++) f[c] = c >= nums[0] ? nums[0] : 0;
+        for (int c = 0; c <= target; c++) f[0][c] = c >= nums[0] ? nums[0] : 0;
         // 状态转移：再处理「考虑其他物品」的情况
         for (int i = 1; i < n; i++) {
-            for (int c = target; c >= 0; c--) {
+            for (int c = 0; c <= target; c++) {
                 // 不选：
-                int ns = f[c];
+                int ns = f[(i-1)&1][c];
                 // 选：
-                int s = c > nums[i] ? f[c-nums[i]] + nums[i] : 0;
-                f[c] = Math.max(ns, s);
+                int s = c >= nums[i] ? f[(i-1)&1][c-nums[i]] + nums[i] : 0;
+                f[i&1][c] = Math.max(ns, s);
             }
         }
 
-        return f[target] == target;
+        return f[(n-1)&1][target] == target;
     }
 }
