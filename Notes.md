@@ -1,6 +1,8 @@
-### ***Concepts***
 
-#### Time Complexity
+
+## ***Concepts***
+
+### Time Complexity
 
 $1 < klogn < log^kn < n< nlogn = log(n!) < n^k < k^n < n! < n^n$
 
@@ -8,9 +10,9 @@ $1 < klogn < log^kn < n< nlogn = log(n!) < n^k < k^n < n! < n^n$
 
 *****
 
-#### Algorithms
+### Algorithms
 
-##### ***Floyd's Algorithm***
+#### ***Floyd's Algorithm***
 
 + Phase 1: tortoise 一步一node；hare 一步二nodes    $\implies$    两者在intersection相遇
 + Phase 2: ==因为intersection并不一定是the entrance of the cycle，所以还需要Phase 2== tortoise 回到起点一步一node；hare 待在intersection一步一node    $\implies$    两者在entrance相遇
@@ -19,7 +21,7 @@ $1 < klogn < log^kn < n< nlogn = log(n!) < n^k < k^n < n! < n^n$
 
 ******
 
-#####  String-searching algorithms
+####  String-searching algorithms
 
 Best [String-searching algorithms](https://en.wikipedia.org/wiki/String-searching_algorithm#Single-pattern_algorithms) have a linear execution time in average. 
 
@@ -102,9 +104,9 @@ $$
 
 ******
 
-#### Bitwise Operation 位操作
+### Bitwise Operation 位操作
 
-##### ***Two's complement 补码***
+#### ***Two's complement 补码***
 
 + 表示：$-x=\neg x+1$ 
 
@@ -140,7 +142,7 @@ $$
 
 ******
 
-##### ***Bit Shifts 移位***
+#### ***Bit Shifts 移位***
 
 + [Arithmetic shift](https://en.wikipedia.org/wiki/Arithmetic_shift)
 
@@ -172,7 +174,7 @@ $$
 
 *****
 
-##### ***XOR (exclusive OR) 异或***
+#### ***XOR (exclusive OR) 异或***
 
 + 表示：$\oplus$（数学符号）、^（程序符号）
 
@@ -234,7 +236,7 @@ $$
 
 ******
 
-##### ***Useful operations***
+#### ***Useful operations***
 
 + $x \& (-x)$ : Get / isolate the rightmost 1-bit
 
@@ -252,9 +254,9 @@ $$
 
 ******
 
-#### 基本数据类型 / 数据结构 / 数据对象 之间的相互转换 (Conversion)
+### 基本数据类型 / 数据结构 / 数据对象 之间的相互转换 (Conversion)
 
-##### ***Integer 与 Binary String 相互转换***
+#### ***Integer 与 Binary String 相互转换***
 
 + `Integer.parseInt(String s, int radix)` - 输出一个十进制数，其中`int radix `表示`String s`的进制
 
@@ -274,7 +276,7 @@ $$
 
 ******
 
-##### List 与 Array 相互转换
+#### List 与 Array 相互转换
 
 + `List<String>` 与 `char[]`：
 
@@ -290,9 +292,9 @@ $$
 
 ********
 
-#### Data Structure
+### Data Structure
 
-##### ***TreeSet 和 HashSet的区别***
+#### ***TreeSet 和 HashSet的区别***
 
 + 对于HashSet，Search / Insert / Delete all takes $\mathcal{O}(1)$；
 
@@ -304,14 +306,14 @@ The essential difference between the hash set and the tree set is that ==keys in
 
 *****
 
-##### ***关于ArrayList和LinkedList的选用***
+#### ***关于ArrayList和LinkedList的选用***
 
 + Search by value - `indexOf()`: Time complexity都为$\mathcal{O}(n)$，但是ArrayList将元素连续地存放在一起，而LinkedList则是在内存中随机存放，所以ArrayList实际运行会更快；
 + Get element by index - `get()`: ArrayList只需$\mathcal{O}(1)$ as the array has random access property, 可以直接访问任意index而不需要从头遍历（也是因为ArrayList在内存中是连续存储），但是LinkedList需要$\mathcal{O}(n)$，it needs to iterate through each element to reach a given index。
 
 *****
 
-##### ***PriorityQueue & Min/Max Heap***
+#### ***PriorityQueue & Min/Max Heap***
 
 + PriorityQueue: 从队首获取元素时，总是获取优先级最高的元素
 
@@ -345,7 +347,7 @@ The essential difference between the hash set and the tree set is that ==keys in
 
 ******
 
-##### HashMap定义时初始化
+#### HashMap定义时初始化
 
 ```java
 Map<Character, Integer> toInt = new HashMap<>() {
@@ -367,9 +369,9 @@ Map<Character, Integer> toInt = new
 
 *****
 
-#### Dynamic Programming
+### Dynamic Programming
 
-##### Techniques
+#### Techniques
 
 + **如何确定可以使用动态规划来解决的？**
 
@@ -413,16 +415,20 @@ Map<Character, Integer> toInt = new
 
   因此一维 DP 的复杂度通常是线性的，而二维 DP 的复杂度通常是平方的。
   
-+ **如何从二维数组降到一维数组？**
++ **如何从二维数组降到一维数组或者其中一维降为常数？**
 
-  + 根据状态依赖调整迭代/循环的方向
-  + 将其中一维直接改成 $2$​，任何在该维的 `f[i]` 改成 `f[i&1]` 或者 `f[i%2]` 即可（推荐前者，在不同架构的机器上，运算效率更加稳定）     [[0120]](#[0120] Triangle)
+  + 「一维空间优化」：经过分析，根据状态依赖，调整迭代/循环的方向
+  + 「滚动数组」：当计算「某一行」的时候只需要依赖「前一行」时，可以根据==当前的行号是偶数还是奇数来交替使用第 $0$​ 行还是第 $1$​ 行==。因此将其中一维直接改成 $2$​​​，并将任何在该维的 `f[i]` 改成 `f[i&1]` 或者 `f[i%2]` 即可（推荐前者，在不同架构的机器上，运算效率更加稳定）。
+  
+  ==**注意：**== 这种技巧只会降低「空间复杂度」，不会改变「时间复杂度」。
+  
+  [[0120]](#[0120] Triangle)
 
 *******
 
-##### Memoization
+#### Memoization
 
-记忆化搜索，其本质是「递归」（通常是自顶而上的解决）。是降低递归复杂度的技巧（==将递归的复杂度降到和DP一致==），可以保证递归的做法在数据范围较大的情况下也可以AC。比如，DFS 通常要求数据范围在30左右，而利用 Memoization 辅助的DFS则可以通过数据范围 $10^2$​ 的题目。
+记忆化搜索，其本质是「递归」（通常是**自顶而上**的解决）。是降低递归复杂度的技巧（==将递归的复杂度降到和DP一致==），可以保证递归的做法在数据范围较大的情况下也可以AC。比如，DFS 通常要求数据范围在30左右，而利用 Memoization 辅助的DFS则可以通过数据范围 $10^2$​​ 的题目。
 
 需要掌握 Memoization 最重要的一个原因是，其是「动态规划」的前置思考。当在不能轻易地猜到「状态定义」以及推导「状态转移方程」时，都可以先使用Memoization求解，再改成DP。==因此，能够使用Memoization求解的前提也是：**问题本身具有无后效性**。==
 
@@ -461,72 +467,262 @@ Map<Character, Integer> toInt = new
 + **总结：**
 
   ==Recursion with Memoization对于大部分的input，其速度都会更快（即使两者复杂度相同），但DP更利于debug，因为可以将DP数组直观地输出，发现哪里出错。==
+  
+  「记忆化搜索」和「动态规划」思想上主要区别还是在于「自顶向下」和「自底向上」，实现上则是「递归」和「递推」。
 
 [[1575]](#[1575] Count All Possible Routes)     [[0576]](#[0576] Out of Boundary Paths)
 
 ********
 
-##### Applications
+#### Applications
 
-+ Pascal's Triangle：[[0118]](#[0118] Pascal's Triangle)     [[0119]](#[0119] Pascal's Triangle II)     [[0120]](#[0120] Triangle)
+##### Pascal's Triangle
 
-+ 路径问题：[宫水三叶的刷题日记](https://mp.weixin.qq.com/s/flnaRo6VnvkeUQoRDkin9w)
+[[0118]](#[0118] Pascal's Triangle)     [[0119]](#[0119] Pascal's Triangle II)     [[0120]](#[0120] Triangle)
 
-  + 类型一：**特定「起点」，明确且有限的「移动方向」（转移状态），求解所有状态中的最优值。**
+******
 
-    *解释：*给定了某个「形状」的数组（三角形或者矩形），使用 **题目给定的起点** 或者 **自己枚举的起点** 出发，再结合题目给定的具体转移规则（往下方/左下方/右下方进行移动）进行转移。
+##### 路径问题
 
-    [[0062]](#[0062] Unique Paths)     [[0063]](#[0063] Unique Paths II)     [[0064]](#[0064] Minimum Path Sum)     [[0120]](#[0120] Triangle)     [[0931]](#[0931] Minimum Falling Path Sum)     [[1289]](#[1289] Minimum Falling Path Sum II)     [[1301]]()
+[宫水三叶的刷题日记](https://mp.weixin.qq.com/s/flnaRo6VnvkeUQoRDkin9w)
 
-  + 类型二：只是告诉了我们移动规则，没有告诉我们具体该如何移动，即不明确但有限的「移动方向」。
+###### 类型一
 
-    [[1575]](#[1575] Count All Possible Routes)     [[0576]]()     
+**特定「起点」，明确且有限的「移动方向」（转移状态），求解所有状态中的最优值。**
 
-  ==Template==:<a name="DP路径Template"></a>
+*解释：*给定了某个「形状」的数组（三角形或者矩形），使用 **题目给定的起点** 或者 **自己枚举的起点** 出发，再结合题目给定的具体转移规则（往下方/左下方/右下方进行移动）进行转移。
+
+[[0062]](#[0062] Unique Paths)     [[0063]](#[0063] Unique Paths II)     [[0064]](#[0064] Minimum Path Sum)     [[0120]](#[0120] Triangle)     [[0931]](#[0931] Minimum Falling Path Sum)     [[1289]](#[1289] Minimum Falling Path Sum II)     [[1301]]()
+
+###### 类型二
+
+只是告诉了我们移动规则，没有告诉我们具体该如何移动，即**不明确但有限的「移动方向」**。
+
+[[1575]](#[1575] Count All Possible Routes)     [[0576]]()     
+
+###### Template
+
+```java
+public int DP(int[][] arr) {
+  // Step 1: 定义dp array
+  int n = arr.length;
+  int[][] f = new int[n][n];
+
+  // Step 2: 初始化dp array，两种情况：
+  if (起点固定为arr[0][0]) {
+    f[0][0] = arr[0][0]
+  } else if (起点为第一行任一元素) {
+    for (int i = 0; i < n; i++) f[0][i] = arr[0][i];
+  }
+
+  // Step 3: 从第二行进行状态转移
+  for (int i = 1; i < n; i++) { // 从f的第二行开始更新
+    for (int j = 0; j < n; j++) {
+      f[i][j] = Integer.MAX_VALUE;
+      int val = arr[i][j];
+      // 具体根据移动方向的限制而定：正下方/左下方/右下方/非同列
+      ...
+    }
+  }
+
+  // Step 4: 取结果，两种情况：
+  if (终点固定为arr[n-1][n-1]) {
+    return f[n-1][n-1];
+  } else if (终点为f array最后一行中的最小值) {
+    int ans = Integer.MAX_VALUE;
+    for (int i = 0; i < n; i++) ans = Math.min(ans, f[n-1][i]);
+    return ans;
+  }
+}
+```
+
+******
+
+##### 背包问题
+
+**背包问题是「动态规划」中十分经典的一类问题，背包问题本质上属于组合优化的「 NP完全问题」。**
+
+可以将「 NP完全问题」简单理解为「无法直接求解」的问题。例如「分解质因数」问题，我们无法像四则运算（加减乘除）那样，按照特定的逻辑进行求解。只能通过「穷举」+「验证」的方式进行求解。
+
+既然本质上是一个无法避免「穷举」的问题，自然会联想到「动态规划」，事实上背包问题也同时满足「无后效性」的要求。**这就是为什么「背包问题」会使用「动态规划」来求解的根本原因。**
+
+如果按照常见的「背包问题」的题型来抽象模型的话，「背包问题」大概是对应这样的一类问题：**泛指一类「给定价值与成本」，同时「限定决策规则」，在这样的条件下，如何实现价值最大化的问题。**
+
+******
+
+###### 01背包
+
+指**给定物品价值与体积**（对应了「给定价值与成本」），**在规定容量下**（对应了「限定决策规则」）**如何使得所选物品的总价值最大**。
+
+> 有 $N$​ 件物品和一个容量是 $C$​ 的背包。每件物品有且只有一件。第 $i$​ 件物品的体积是 $v[i]$​，价值是 $w[i]$​​。求解将哪些物品装入背包，可使这些物品的总体积不超过背包容量，且总价值最大。
+
+*e.g.* 
+
+```java
+Input: N = 3, C = 5, v = [4,2,3], w = [4,2,3]
+Output: 5
+Explanation: 不选第一件物品，选择第二件和第三件物品，可使价值最大。
+```
+
+如果使用在 [路径问题](#路径问题) 中学到的「技巧解法」来分析：
+
+设计一个 DFS 函数对所有的方案进行枚举的话，大概如下：
+
+```java
+int dfs (int[] v, int[] w, int i, int c);
+```
+
+其中 $v[]$​ 和 $w[]$​ 对应了输入的「物品体积」和「物品价值」，属于不变参数，无须考虑。而 $i$ 和 $c$ 分别代表「当前枚举到哪件物品」和「可使用的背包容量」。返回值（即「状态定义」）则是：**当有物品 $1$、 $2$、... $i$ 可供选择（即仅考虑前 $i$ 件物品）且可使用的背包容量不超过 $c$ 时， 背包的最大价值。**
+
+那么根据变化参数和返回值，可以抽象出 dp 数组：**一个二维数组，其中一维代表「当前枚举到哪件物品」，另外一维「当前可使用的背包容量」，数组内容是「最大价值」。**第一维的取值范围为 $i\in[0,N-1]$​​​​​，第二维的取值范围为 $c \in [0, C]$​​​​​。**因此，$dp[N-1][C]$​​​​​ 即为答案。**
+
+当有了状态定义之后，再根据「最后一步」选择来推导「状态转移方程」：**只需要考虑第 $i$​ 件物品如何选择即可：对于第 $i$​ 件物品，我们有「选」和「不选」两种决策。**
+
++ 「不选」方案的「最大价值」：**「不选」等效于我们只考虑前 $i-1$ 件物品，当前容量为 $c$ 的情况下的最大价值，即 $dp[i-1][c]$。**
+
++  「选」方案的「最大价值」：「选」方案必须满足一个前提：「当前剩余的背包容量」$\ge$「物品 $i$ 的体积」。**如果选了第 $i$ 件物品的话，代表消耗了 $v[i]$ 的背包容量，获取了  $w[i]$ 的价值，那么留给前 $i-1$ 件物品的背包容量就只剩 $c-v[i]$，因此最大价值为 $dp[i-1][c-v[i]]+w[i]$。**
+
+在「选」和「不选」之间取最大值，就是「考虑前 $i$​ 件物品，使用容量不超过 $c$​​」的条件下的「背包最大价值」。可得「状态转移方程」为：
+$$
+dp[i][c]=max(dp[i-1][c],dp[i-1][c-v[i]]+w[i])
+$$
+
++ $dp[N][C+1]$​​​​ 解法
 
   ```java
-  public int DP(int[][] arr) {
-    // Step 1: 定义dp array
-    int n = arr.length;
-    int[][] f = new int[n][n];
-  
-    // Step 2: 初始化dp array，两种情况：
-    if (起点固定为arr[0][0]) {
-      f[0][0] = arr[0][0]
-    } else if (起点为第一行任一元素) {
-      for (int i = 0; i < n; i++) f[0][i] = arr[0][i];
-    }
-  
-    // Step 3: 从第二行进行状态转移
-    for (int i = 1; i < n; i++) { // 从f的第二行开始更新
-      for (int j = 0; j < n; j++) {
-        f[i][j] = Integer.MAX_VALUE;
-        int val = arr[i][j];
-        // 具体根据移动方向的限制而定：正下方/左下方/右下方/非同列
-        ...
+  public int maxValue(int N, int C, int[] v, int[] w) {
+    // 根据两个维度的取值范围new dp数组
+  	int[][] dp = new int[N][C+1];
+    // 初始化：先处理「考虑第一件物品」的情况（即dp数组的第一横行的初始值）
+    for (int c = 0; c <= C; i++) dp[0][c] = c >= v[0] ? w[0] : 0;
+    // 状态转移：再处理「考虑其余物品」的情况
+    for (int i = 1; i < N; i++) {
+      for (int c = 0; c <= C; c++) {
+        // 不选第i件物品
+        int ns = dp[i-1][c];
+        // 满足前提：选第i件物品
+        int s = c >= v[i] ? dp[i-1][c-v[i]] + w[i] : 0;
+        dp[i][c] = Math.mac(ns, s);
       }
     }
-  
-    // Step 4: 取结果，两种情况：
-    if (终点固定为arr[n-1][n-1]) {
-      return f[n-1][n-1];
-    } else if (终点为f array最后一行中的最小值) {
-      int ans = Integer.MAX_VALUE;
-      for (int i = 0; i < n; i++) ans = Math.min(ans, f[n-1][i]);
-      return ans;
-    }
+    return dp[N-1][C];
   }
   ```
 
-+ 回文串
+  针对上面的例子，最终dp数组的内容为：
+  $$
+  \begin{gathered}
+  \small\color{blue}
+  \begin{matrix}
+  \ \ \ 0\ &1\ &2\ &3\ &4\ &5
+  \end{matrix}\\
+  \begin{matrix}
+  \small\color{blue}0 \\ 
+  \small\color{blue}1 \\
+  \small\color{blue}2 \\
+  \end{matrix}
+  \begin{bmatrix}
+  [0&0&0&0&4&4] \\
+  [0&0&2&2&4&4] \\
+  [0&0&2&2&4&\color{red}\bold5\color{black}] \\
+  \end{bmatrix}
+  \end{gathered}
+  $$
+  *Time Complexity:* $\mathcal{O}(N*C)$​
+
+  *Space Complexity:* $\mathcal{O}(N*C)$
+
++ 「滚动数组」：$dp[2][C+1]$​​
+
+  根据「转移方程」，计算第 $i$ 行格子只需要第 $i-1$ 行中的某些值。也就是计算「某一行」的时候只需要依赖「前一行」。因此可以用一个只有两行的数组来存储中间结果，根据当前计算的行号是偶数还是奇数来交替使用第 0 行和第 1 行。
+
+  ```java
+  public int maxValue(int N, int C, int[] v, int[] w) {
+  	int[][] dp = new int[2][C+1];
+    // 初始化：先处理「考虑第一件物品」的情况（即dp数组的第一横行的初始值）
+    for (int c = 0; c <= C; i++) dp[0][c] = c >= v[0] ? w[0] : 0;
+    // 状态转移：再处理「考虑其余物品」的情况
+    for (int i = 1; i < N; i++) {
+      for (int c = 0; c <= C; c++) {
+        // 不选第i件物品
+        int ns = dp[(i-1)&1][c];
+        // 满足前提：选第i件物品
+        int s = c >= v[i] ? dp[(i-1)&1][c-v[i]] + w[i] : 0;
+        dp[i&1][c] = Math.mac(ns, s);
+      }
+    }
+    return dp[(N-1)&1][C];
+  }
+  ```
+
+  *Time Complexity:* $\mathcal{O}(N*C)$
+
+  *Space Complexity:* $\mathcal{O}(C)$
+
++ 「一维空间优化」：$dp[C+1]$​
+
+  不难发现当求解第 $i$ 行格子的值时，不仅是只依赖第 $i-1$ 行，还明确只依赖第 $i-1$ 行的第 $c$ 个格子和第 $c-v[i]$ 个格子（也就是对应着第 $i$ 个物品「不选」和「选」的两种情况）。换句话说，只依赖于「上一个格子的位置」以及「上一个格子的左边位置」。
+
+  <img src="/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/背包问题_1.jpg" style="zoom:50%;" />
+
+  因此，只要将求解第 $i$ 行格子的顺序「从 $0$ 到 $c$」改为「从 $c$ 到 $0$」，就可以将原本 2 行的二维数组压缩到一行（转换为一维数组）。
+
+  **这样做的空间复杂度和「滚动数组」优化的空间复杂度是一样的。但仍然具有意义，而且这样的「一维空间」优化，是求解其他背包问题的基础，需要重点掌握。**
+
+  ```java
+  public int maxValue(int N, int C, int[] v, int[] w) {
+  	int[] dp = new int[C+1];
+    // 初始化：先处理「考虑第一件物品」的情况（即dp数组的第一横行的初始值）
+    for (int c = 0; c <= C; i++) dp[c] = c >= v[0] ? w[0] : 0;
+    // 状态转移：再处理「考虑其余物品」的情况
+    for (int i = 1; i < N; i++) {
+      for (int c = C; c >= 0; c--) {
+        // 不选第i件物品
+        int ns = dp[c];
+        // 选第i件物品
+        int s = dp[c-v[i]] + w[i];
+        dp[i&1][c] = Math.mac(ns, s);
+      }
+    }
+    return dp[C];
+  }
+  ```
+
+  *Time Complexity:* $\mathcal{O}(N*C)$
+
+  *Space Complexity:* $\mathcal{O}(C)$
+
+************
+
+###### 完全背包
+
+###### 多重背包
+
+###### 混合背包
+
+###### 分组背包
+
+###### 多维背包
+
+###### 树形背包
+
+###### 背包求方案数
+
+###### 背包求具体方案
+
+###### 泛化背包
+
+******
+
+##### 回文串
 
 ******
 
 ******
 
-#### Iteration & Recursion
+### Iteration & Recursion
 
-##### ***关于Recursion的Top-down和Bottom-up***
+#### ***关于Recursion的Top-down和Bottom-up***
 
 + If recursive calls before conditional check, then it's bottom up. 
 + If recursive calls after conditional check, then it's top down.
@@ -535,9 +731,9 @@ Map<Character, Integer> toInt = new
 
 ******
 
-#### String
+### String
 
-##### Built-in Method
+#### Built-in Method
 
 + `trim()` : Returns a string whose value is this string, with any leading and trailing whitespace removed.
 + `split(String reg)` : Splits this string around matches of the given [regular expression](https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html#sum).
@@ -545,7 +741,7 @@ Map<Character, Integer> toInt = new
 
 *****
 
-##### Regular Expression
+#### Regular Expression
 
 + 常用：
 
@@ -590,7 +786,7 @@ Map<Character, Integer> toInt = new
 
 *****
 
-##### StringBuilder
+#### StringBuilder
 
 + StringBuilder的三种清空方式：==方法一最慢，方法二和三差不多==
     + 重新 `new StringBuilder()`；
@@ -604,9 +800,9 @@ Map<Character, Integer> toInt = new
 
 ****
 
-#### Two-Pointer Technique
+### Two-Pointer Technique
 
-##### ***Scenario I***
+#### ***Scenario I***
 
 To summarize, one of the typical scenarios to use two-pointer technique is that you want to
 
@@ -624,7 +820,7 @@ And it is worth noting that this technique is often used in a ==sorted== array.
 
 ********
 
-##### ***Scenario II***
+#### ***Scenario II***
 
 This is a very common scenario of using the two-pointer technique when you need:
 
@@ -648,9 +844,9 @@ Similar to the previous scenario, you might sometimes need to **sort** the array
 
 ********
 
-#### Tree
+### Tree
 
-##### ***Terminology used in trees***
+#### ***Terminology used in trees***
 
 - Depth of node - the number of edges from the tree's root node to the node （从root到自己）
 - Height of node - the number of edges on the longest path between that node and a leaf （从自己到leaf）
@@ -658,7 +854,7 @@ Similar to the previous scenario, you might sometimes need to **sort** the array
 
 ********
 
-##### ***Binary Search Tree的三个基本operations***
+#### ***Binary Search Tree的三个基本operations***
 
  ==TC都为$\mathcal{O}(heights)$, $heights$可以为$n$也可以为$logn$==
 
@@ -678,7 +874,7 @@ Similar to the previous scenario, you might sometimes need to **sort** the array
 
 *******
 
-##### ***Height-balanced (or self-balancing) BST***
+#### ***Height-balanced (or self-balancing) BST***
 
 + Definition: 
 
@@ -700,9 +896,9 @@ In Java, you may use a ==TreeSet== or a ==TreeMap== as a self-balancing BST.
 
 *****
 
-#### Misc.
+### Misc.
 
-##### 判断char是否为空字符或者空格
+#### 判断char是否为空字符或者空格
 
 + 空字符：`char == '\0'`
 + 空格: `Character.isSpace(char)` 或者 `char == ' '`
@@ -721,9 +917,9 @@ In Java, you may use a ==TreeSet== or a ==TreeMap== as a self-balancing BST.
 
 **********
 
-### ***Problems***
+## *Problems*
 
-#### Binary Search
+### Binary Search
 
 ##### [0719] Find K-th Smallest Pair Distance
 
@@ -768,7 +964,7 @@ In Java, you may use a ==TreeSet== or a ==TreeMap== as a self-balancing BST.
 
 ****
 
-#### Binary Tree Traversal
+### Binary Tree Traversal
 
 ##### [0098] Validate Binary Search Tree
 
@@ -826,7 +1022,7 @@ In Java, you may use a ==TreeSet== or a ==TreeMap== as a self-balancing BST.
 
 ********
 
-#### Bitwise Operation
+### Bitwise Operation
 
 ##### [0067] Add Binary
 
@@ -1255,7 +1451,7 @@ class Solution {
 
 ********
 
-#### Design Data Structure
+### Design Data Structure
 
 ##### [0208] Implement Trie (Prefix Tree)
 
@@ -1448,9 +1644,150 @@ Trie (can be pronounced "try" or "tree") or prefix tree is a tree data structure
 
 *******
 
-#### Dynamic Programming
+### Dynamic Programming
 
-##### [0062] Unique Paths
+#### Pascal's Triangle
+
+##### [0118] Pascal's Triangle
+
+> 给定行数 `numRows`，填帕斯卡三角
+
+一开始就是按照Iteration做的，看了Solution发现其实可以理解为DP。
+
+![](/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/[0118]_3.jpeg)
+
+*性质：*
+
++ 每行第一个和最后一个元素一定为1；
++ $f(i,j) = f(i-1,j-1)+f(i-1,j)$, where $f(i,j)$ is the element in the $i^{th}$ row and $j^{th}$ column of Pascal's triangle.
+
+```java
+public List<List<Integer>> generate(int numRows) {
+  List<List<Integer>> res = new ArrayList<>();
+
+  for (int i = 0; i < numRows; i++) {
+    List<Integer> row = new ArrayList<>();
+    row.add(1);  // the first digit is always 1
+
+    for (int j = 1; j < i; j++) 
+      row.add(res.get(i-1).get(j-1) + res.get(i-1).get(j));
+
+    if (i > 0) row.add(1); // Once the length of this row is bigger than 1, then the last digit is always 1
+    res.add(row);
+  }
+}
+```
+
+*Time Complexity Analysis:*
+
+很明显outer loop runs numRows times；而每一次inner loop循环的次数等于rowIndex (因为帕斯卡三角第一行有一个元素，第二行有两个元素，...)
+$\implies$ 总的次数为$1+2+3+\dots+numRows = \frac{numRows(numRows+1)}{2} = \frac{numRows^2}{2} + \frac{numRows}{2} \implies \mathcal{O}(numRows^2)$
+
+******
+
+##### [0119] Pascal's Triangle II
+
+> 给定 `rowIndex`，返回帕斯卡三角（0-indexed）该行的内容。
+
++ Solution 1: Recursion
+
+  ```java
+  public List<Integer> getRow(int rowIndex) {
+    if (rowIndex > 1) prev = getRow(rowIndex-1);  // 提前取好getRow(rowIndex-1)，不然重复取getRow(rowIndex-1)会导致TLE
+  
+    List<Integer> res = new ArrayList<>();
+    res.add(1);
+    for (int i = 1; i < rowIndex; i++) {
+      res.add(prev.get(i-1) + prev.get(i));
+    }
+    if (rowIndex > 0) res.add(1);
+    return res;
+  }
+  ```
+
+  *Time Complexity:* $\mathcal{O}(rowIndex^2)$   ?
+
+  *Space Complexity:* $\mathcal{O}(rowIndex^2)$ for stack
+
++ Solution 2: DP with 2D array
+
+  ```java
+  public List<Integer> getRow(int rowIndex) {
+      // 这里dp并没有选择Integer[]，而为了保持初始值为0，选择int[]
+      int[][] dp = new int[rowIndex+1][rowIndex+1]; // 是从第0行开始的，所以宽度为rowIndex+1
+      // 将每行行首赋为1
+      for (int i = 0; i < rowIndex+1; i++) dp[i][0] = 1;
+      // 更新：
+      for (int i = 1; i < dp.length; i++) // 从第二行开始更新
+          for (int j = 1; j < rowIndex+1; j++)
+              dp[i][j] = dp[i-1][j-1] + dp[i-1][j];
+      // 将int[]转为List
+      List<Integer> res = Arrays.stream(dp[rowIndex]).boxed().collect(Collectors.toList()); // 也可以在上面更新时当j=rowIndex时，将dp[i][j]存入List
+      return res;
+  }
+  ```
+
+  *Time Complexity:* $\mathcal{O}(rowIndex^2)$  
+
+  *Space Complexity:* $\mathcal{O}(rowIndex^2)$ for 2D DP array
+
++ Solution 3: DP with 1D array （滚动数组）
+
+  ```java
+  public List<Integer> getRow(int rowIndex) {
+      Integer[] dp = new Integer[rowIndex + 1]; // 这里dp是Integer[]，方便之后转为list！
+    	// 但因为Integer[]的初始值为null，所以需要重新初始化
+      Arrays.fill(dp,1);
+      for(int i = 2;i < dp.length;i++) // 从第三行开始更新
+          for(int j = i - 1;j > 0;j--) // 需要依据前面的值来更新自己，所以要倒着更新
+              dp[j] = dp[j] + dp[j - 1];
+    	// 将Integer[]转为List
+      List<Integer> res = Arrays.asList(dp);
+      return res;
+  }
+  ```
+
+  *Time Complexity:* $\mathcal{O}(rowIndex^2)$  
+
+  *Space Complexity:* $\mathcal{O}(rowIndex)$ for 1D DP array
+
++ Solution 4: Maths
+
+  The entry in the $n^{th}$ row and $k^{th}$ column of Pascal's triangle is denoted $\dbinom{n}{r}$ and $\dbinom{n}{r}=\dbinom{n-1}{r-1}+\dbinom{n-1}{r}$.
+
+  已知 $\dbinom{n}{r}=\dfrac{n!}{r!(n-r)!}$ ，则
+  $$
+  \begin{gathered}
+  \frac{\dbinom{n}{r}}{\dbinom{n}{r-1}} = \frac{\dfrac{n!}{r!(n-r)!}}{\dfrac{n!}{(r-1)!(n-r+1)!}} = \frac{n-r+1}{r} \\
+  \implies \dbinom{n}{r} = \frac{n-r+1}{r}\dbinom{n}{r-1}
+  \end{gathered}
+  $$
+  $\implies$ 并不一定需要上一行的元素才能计算出本行的元素，==同一行也可以根据前一个元素计算出后一位元素==。
+
+  ```java
+  public List<Integer> getRow(int rowIndex) {
+      int i = rowIndex;
+      List<Integer> res = new ArrayList<>();;
+      res.add(1);
+      for (int j = 0; j < rowIndex; j++) {
+          res.add((int) ((res.get(j) * (long) (rowIndex-(j+1)+1)) / (j+1)));
+      }
+  
+      return res;
+  }
+  ```
+
+  *Time Complexity:* $\mathcal{O}(rowIndex)$  
+
+  *Space Complexity:* $\mathcal{O}(rowIndex)$​ 
+
+********
+
+#### 路径问题
+
+##### 类型一
+
+###### [0062] Unique Paths
 
 > A robot is located at the top-left corner of a $m\times n$ ==$(1\le m,n\le 100)$== grid (marked 'Start' in the diagram below). The robot can only move either down or right at any point in time. The robot is trying to reach the bottom-right corner of the grid (marked 'Finish' in the diagram below). How many possible unique paths are there?
 >
@@ -1526,7 +1863,7 @@ public int uniquePaths(int m, int n) {
 
 ******
 
-##### [0063] Unique Paths II
+###### [0063] Unique Paths II
 
 和[0062]相比，区别在于机器人行进的格子中可能有障碍物。An obstacle and space is marked as `1` and `0` respectively in the grid.
 
@@ -1561,7 +1898,7 @@ public int uniquePathsWithObstacles(int[][] obstacleGrid) {
 
 ************
 
-##### [0064] Minimum Path Sum
+###### [0064] Minimum Path Sum
 
 > Given a `m x n` `grid` filled with non-negative numbers, find a path from top left to bottom right, which minimizes the sum of all numbers along its path. Note: You can only move either down or right at any point in time.
 >
@@ -1721,145 +2058,9 @@ int getIdx(int x, int y) {
 1. 不存在负权边：使用 Dijkstra 算法求解 
 2. 存在负权边：使用 Bellman Ford 或 SPFA 求解
 
-******
-
-##### [0118] Pascal's Triangle
-
-> 给定行数 `numRows`，填帕斯卡三角
-
-一开始就是按照Iteration做的，看了Solution发现其实可以理解为DP。
-
-![](/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/[0118]_3.jpeg)
-
-*性质：*
-
-+ 每行第一个和最后一个元素一定为1；
-+ $f(i,j) = f(i-1,j-1)+f(i-1,j)$, where $f(i,j)$ is the element in the $i^{th}$ row and $j^{th}$ column of Pascal's triangle.
-
-```java
-public List<List<Integer>> generate(int numRows) {
-  List<List<Integer>> res = new ArrayList<>();
-
-  for (int i = 0; i < numRows; i++) {
-    List<Integer> row = new ArrayList<>();
-    row.add(1);  // the first digit is always 1
-
-    for (int j = 1; j < i; j++) 
-      row.add(res.get(i-1).get(j-1) + res.get(i-1).get(j));
-
-    if (i > 0) row.add(1); // Once the length of this row is bigger than 1, then the last digit is always 1
-    res.add(row);
-  }
-}
-```
-
-*Time Complexity Analysis:*
-
-很明显outer loop runs numRows times；而每一次inner loop循环的次数等于rowIndex (因为帕斯卡三角第一行有一个元素，第二行有两个元素，...)
-$\implies$ 总的次数为$1+2+3+\dots+numRows = \frac{numRows(numRows+1)}{2} = \frac{numRows^2}{2} + \frac{numRows}{2} \implies \mathcal{O}(numRows^2)$
-
-******
-
-##### [0119] Pascal's Triangle II
-
-> 给定 `rowIndex`，返回帕斯卡三角（0-indexed）该行的内容。
->
-
-+ Solution 1: Recursion
-
-  ```java
-  public List<Integer> getRow(int rowIndex) {
-    if (rowIndex > 1) prev = getRow(rowIndex-1);  // 提前取好getRow(rowIndex-1)，不然重复取getRow(rowIndex-1)会导致TLE
-  
-    List<Integer> res = new ArrayList<>();
-    res.add(1);
-    for (int i = 1; i < rowIndex; i++) {
-      res.add(prev.get(i-1) + prev.get(i));
-    }
-    if (rowIndex > 0) res.add(1);
-    return res;
-  }
-  ```
-
-  *Time Complexity:* $\mathcal{O}(rowIndex^2)$   ?
-
-  *Space Complexity:* $\mathcal{O}(rowIndex^2)$ for stack
-
-+ Solution 2: DP with 2D array
-
-  ```java
-  public List<Integer> getRow(int rowIndex) {
-      // 这里dp并没有选择Integer[]，而为了保持初始值为0，选择int[]
-      int[][] dp = new int[rowIndex+1][rowIndex+1]; // 是从第0行开始的，所以宽度为rowIndex+1
-      // 将每行行首赋为1
-      for (int i = 0; i < rowIndex+1; i++) dp[i][0] = 1;
-      // 更新：
-      for (int i = 1; i < dp.length; i++) // 从第二行开始更新
-          for (int j = 1; j < rowIndex+1; j++)
-              dp[i][j] = dp[i-1][j-1] + dp[i-1][j];
-      // 将int[]转为List
-      List<Integer> res = Arrays.stream(dp[rowIndex]).boxed().collect(Collectors.toList()); // 也可以在上面更新时当j=rowIndex时，将dp[i][j]存入List
-      return res;
-  }
-  ```
-
-  *Time Complexity:* $\mathcal{O}(rowIndex^2)$  
-
-  *Space Complexity:* $\mathcal{O}(rowIndex^2)$ for 2D DP array
-
-+ Solution 3: DP with 1D array （滚动数组）
-
-  ```java
-  public List<Integer> getRow(int rowIndex) {
-      Integer[] dp = new Integer[rowIndex + 1]; // 这里dp是Integer[]，方便之后转为list！
-    	// 但因为Integer[]的初始值为null，所以需要重新初始化
-      Arrays.fill(dp,1);
-      for(int i = 2;i < dp.length;i++) // 从第三行开始更新
-          for(int j = i - 1;j > 0;j--) // 需要依据前面的值来更新自己，所以要倒着更新
-              dp[j] = dp[j] + dp[j - 1];
-    	// 将Integer[]转为List
-      List<Integer> res = Arrays.asList(dp);
-      return res;
-  }
-  ```
-
-  *Time Complexity:* $\mathcal{O}(rowIndex^2)$  
-
-  *Space Complexity:* $\mathcal{O}(rowIndex)$ for 1D DP array
-
-+ Solution 4: Maths
-
-  The entry in the $n^{th}$ row and $k^{th}$ column of Pascal's triangle is denoted $\dbinom{n}{r}$ and $\dbinom{n}{r}=\dbinom{n-1}{r-1}+\dbinom{n-1}{r}$.
-
-  已知 $\dbinom{n}{r}=\dfrac{n!}{r!(n-r)!}$ ，则
-  $$
-  \begin{gathered}
-  \frac{\dbinom{n}{r}}{\dbinom{n}{r-1}} = \frac{\dfrac{n!}{r!(n-r)!}}{\dfrac{n!}{(r-1)!(n-r+1)!}} = \frac{n-r+1}{r} \\
-  \implies \dbinom{n}{r} = \frac{n-r+1}{r}\dbinom{n}{r-1}
-  \end{gathered}
-  $$
-  $\implies$ 并不一定需要上一行的元素才能计算出本行的元素，==同一行也可以根据前一个元素计算出后一位元素==。
-  
-  ```java
-  public List<Integer> getRow(int rowIndex) {
-      int i = rowIndex;
-      List<Integer> res = new ArrayList<>();;
-      res.add(1);
-      for (int j = 0; j < rowIndex; j++) {
-          res.add((int) ((res.get(j) * (long) (rowIndex-(j+1)+1)) / (j+1)));
-      }
-  
-      return res;
-  }
-  ```
-
-  *Time Complexity:* $\mathcal{O}(rowIndex)$  
-  
-  *Space Complexity:* $\mathcal{O}(rowIndex)$​ 
-
 *******
 
-##### [0120] Triangle
+###### [0120] Triangle
 
 > Given a `triangle` array, return *the minimum path sum from top to bottom*.
 >
@@ -1950,7 +2151,7 @@ f[i][j] = Math.min(top, leftTop);
 
 *Space Complexity:* $\mathcal{O}(n^2)$
 
-采用滚动数组的技巧改用一维数组：==为了不覆盖仍需要的值，其中一个循环的遍历方向改为倒序==
+采用技巧改用一维数组或将二维中的任一维降为常数：==为了不覆盖仍需要的值，其中一个循环的遍历方向改为倒序==
 
 + $j$​ 的循环改为倒序：
 
@@ -2013,7 +2214,7 @@ f[i][j] = Math.min(top, leftTop);
 
 ******
 
-##### [0931] Minimum Falling Path Sum
+###### [0931] Minimum Falling Path Sum
 
 > Given an `n x n` array of integers `matrix`, return *the **minimum sum** of any **falling path** through* `matrix`.
 >
@@ -2111,14 +2312,14 @@ public int minFallingPathSum(int[][] matrix) {
 
 ******
 
-##### [1289] Minimum Falling Path Sum II
+###### [1289] Minimum Falling Path Sum II
 
 > Given a square grid of integers `arr`, a *falling path with non-zero shifts* is a choice of exactly one element from each row of `arr`, such that no two elements chosen in adjacent rows are in the same column.
 >
 > Return the minimum sum of a falling path with non-zero shifts.
 >
 
-*分析：*与[[0931]](#[0931] Minimum Falling Path Sum)相比，这道题的“非零偏移下降路径”其实就是规定了路径不能朝「正下方」移动，其余所有方向都可以。==**因此在更新DP数组当前行的值时，需要枚举上一行除同一列以外的所有列（for循环）**==。仍可以使用[Template](#DP路径Template)求解。
+*分析：*与[[0931]](#[0931] Minimum Falling Path Sum)相比，这道题的“非零偏移下降路径”其实就是规定了路径不能朝「正下方」移动，其余所有方向都可以。==**因此在更新DP数组当前行的值时，需要枚举上一行除同一列以外的所有列（for循环）**==。仍可以使用[Template](#Template)求解。
 
 ```java
 public int minFallingPathSum(int[][] arr) {
@@ -2238,7 +2439,193 @@ public int minFallingPathSum(int[][] arr) {
 
 ******
 
-##### [1575] Count All Possible Routes
+###### [1301] Number of Paths with Max Score
+
+> You are given a square `board` of characters. You can move on the board starting at the bottom right square marked with the character `'S'`.
+>
+> You need to reach the top left square marked with the character `'E'`. The rest of the squares are labeled either with a numeric character `1, 2, ..., 9` or with an obstacle `'X'`. In one move you can go up, left or up-left (diagonally) only if there is no obstacle there.
+>
+> Return a list of two integers: the first integer is the maximum sum of numeric characters you can collect, and the second is the number of such paths that you can take to get that maximum sum, **taken modulo** `10^9 + 7`.
+>
+> In case there is no path, return `[0, 0]`.
+
+*分析：*==**[0062] / [0063] / [0064]的综合题**==  规定了「起点」、「终点」以及「移动方向」，设置了「路径成本」和「障碍」，最终结果要求包含最大路径成本以及获得该最大成本的路径数 $\implies$ 两个单独的DP数组记录信息*（没有必要用一个DP数组去完全两个任务，只会因为增加维度而增加难度）*
+
++ 最大路径成本问题：
+
+  「状态定义」：$f[(x,y)]=f[index]$​​​​：从起点 $(n-1,n-1)$​​​​ 到下标为 $index=x*n+y$​​​​​ 的grid的最大路径成本；
+
+  「状态转移方程」：$f[(x,y)]=max(f[(x+1,y)],f[(x,y+1)],f[(x+1,y+1)])+board[(x,y)]$​
+
+  ==与[0063]中的技巧类似，将「障碍」所对应的动规值设为 INF。==
+
+  $\implies f[0]$ 即为最终答案 
+
++ 最大路径成本路径数问题：
+
+  「状态定义」：$g[(x,y)]=g[index]$​​：使得从起点 $(n-1,n-1)$​​ 到下标为 $index=x*n+y$​​​ 的grid的路径成本最大的路径数量；
+
+  「状态转移方程」：稍麻烦，分析见下
+
+  由于某个位置可以由「下方」、「右方」和「右下方」三个位置转移而来。**同时**  $f[(x,y)]$ **是由三个位置的最大值转移过来，那么相应的** $g[(x,y)]$ **应该取到最大得分的转移位置的方案数。**
+
+  ==**需要注意，最大值不一定是由一个位置得出。**==**如果有多个位置同时能取到最大得分，那么方案数应该是多个位置的方案数之和。**
+
+  *e.g.* 如果可到达 $(x,y)$ 的三个位置 $((x+1,y),(x,y+1),(x+1,y+1))$ 的最大得分为 $3,4,5$，到达三个位置的方案数为 $1,2,2$ ，
+
+  那么可得：
+  $$
+  \left\{
+  \begin{array}{ll}
+        f[(x,y)]=5+board[(x,y)]\\
+        g[(x,y)]=2\\
+  \end{array} 
+  \right.
+  $$
+  但如果三个位置的最大得分为 $3，5，5$，到达三个位置的方案数为 $1，2，2$ 的话。由于同时取得最大值的位置有两个，那么方案数也应该是两个位置方案数之和。
+
+  即有：
+  $$
+  \left\{
+  \begin{array}{ll}
+        f[(x,y)]=5+board[(x,y)]\\
+        g[(x,y)]=2+2\\
+  \end{array} 
+  \right.
+  $$
+
+==**注意：**== 不同于Template中，将DP数组初始化和状态转移分开由两个循环完成。本题中DP数组的初始化和状态转移所需要的for循环结构完全一致，且状态转移只会用到已经初始化的元素，故将两者写在同一个for循环结构中，只需注意初始化部分写在状态转移部分之前。
+
+```java
+int n;
+int INF = Integer.MIN_VALUE;
+int mod = (int)1e9 + 7;
+public int[] pathsWithMaxScore(List<String> board) {
+  n = board.size();
+
+  // 将 board 转为二维数组
+  char[][] c = new char[n][n];
+  for (int i = 0; i < n; i++) c[i] = board.get(i).toCharArray();
+
+  // f(i) 代表从右下角起点 (n-1, n-1) 到位置 index 的最大得分
+  int[] f = new int[n * n];
+  // g(i) 代表从右下角起点 (n-1, n-1) 到位置 index 并取到最大得分的方案数量
+  int[] g = new int[n * n];
+
+  // 开始从起点位置 (n - 1, n - 1) 开始初始化和状态转移
+  for (int x = n - 1; x >= 0; x--) {
+    for (int y = n - 1; y >= 0; y--) {
+      // 1.初始化部分：
+      int idx = getIndex(x, y);
+
+      // 1.1 如果为起点： 
+      // g[idx] = 1 : 从起点(n-1, n-1)到起点的路径肯定存在一条，这样我们就有了一个「有效值」可以滚动下去
+      // f[idx] = 0 : 代表在起点得分为 0
+      if (c[x][y] == 'S') {
+        g[idx] = 1; 
+        continue;
+      }
+
+      // 1.2 如果为障碍点：
+      // g[idx] = 0   : 「障碍点」不可访问，路径为 0
+      // f[idx] = INF : 「障碍点」不可访问，得分为无效值
+      if (c[x][y] == 'X') {
+        f[idx] = INF;
+        continue;
+      }
+
+      // 2. 状态转移：
+      // 如果是第一个格子 (0, 0)（即终点），这时候位置得分为 0
+      int val = c[x][y] == 'E' ? 0 : c[x][y] - '0';
+      
+      // u 代表当前位置的「最大得分」；t 代表取得最大得分的「方案数」
+      int u = INF, t = 0;
+
+      // “合法”定义为「不出界」
+      // 即使将“合法”定义为「不出界且不为障碍物」（即if中多个判断：c[][] != 'X'），初始化中仍需要1.2
+      // 2.1 「如果「下方格子」合法，尝试从「下方格子」进行转移：
+      if (x + 1 < n) {
+        int cur = f[getIndex(x + 1, y)] + val;
+        int cnt = g[getIndex(x + 1, y)];
+        int[] res = update(cur, cnt, u, t);
+        u = res[0];
+        t = res[1];
+      }
+
+      // 2.2 如果「右边格子」合法，尝试从「右边格子」进行转移：
+      if (y + 1 < n) {
+        int cur = f[getIndex(x, y + 1)] + val;
+        int cnt = g[getIndex(x, y + 1)];
+        int[] res = update(cur, cnt, u, t);
+        u = res[0];
+        t = res[1];
+      }
+
+      // 2.3 如果「右下角格子」合法，尝试从「右下角格子」进行转移：
+      if (x + 1 < n && y + 1 < n) {
+        int cur = f[getIndex(x + 1, y + 1)] + val;
+        int cnt = g[getIndex(x + 1, y + 1)];
+        int[] res = update(cur, cnt, u, t);
+        u = res[0];
+        t = res[1];
+      }
+
+      // 更新 dp 值
+      f[idx] = u < 0 ? INF : u; // u 会小于0是因为当前格子只能由「障碍点」转移而来
+      g[idx] = t;
+    }
+  }
+
+  // System.out.println(Arrays.toString(f));
+
+  // 构造答案：
+  int[] ans = new int[2];
+  if (f[getIndex(0, 0)] == INF) { // 如果终点不可达（动规值为 INF）时，写入 (0, 0)
+    ans[0] = 0;
+    ans[1] = 0;
+  } else {
+    ans[0] = f[getIndex(0, 0)];
+    ans[1] = g[getIndex(0, 0)];
+  }
+  return ans;
+}
+
+int getIndex(int x, int y) {
+  return x * n + y;
+}
+
+int[] parseIndex(int index) {
+  return new int[]{index / n, index % n};
+}
+
+// 更新 dp 值: 单独写出来主要是因为g数组「状态转移方程」的特殊性
+int[] update(int cur, int cnt, int u, int t) {
+  // 起始答案为 [u, t] : u 为「最大得分」，t 为最大得分的「方案数」
+  int[] ans = new int[]{u, t};
+
+  // 如果当前值大于 u，更新「最大得分」和「方案数」
+  if (cur > u) {
+    ans[0] = cur;
+    ans[1] = cnt;
+  // 如果当前值等于 u，增加「方案数」
+  } else if (cur == u && cur != INF) { // 重要！！！
+    ans[1] += cnt;
+  }
+
+  ans[1] %= mod;
+  return ans;
+}
+```
+
+*Time Complexity:* $\mathcal{O}(n^2)$
+
+*Space Complexity:* $\mathcal{O}(n^2)$​
+
+**********
+
+##### 类型二
+
+###### [1575] Count All Possible Routes
 
 > You are given an array of **distinct** positive integers locations where `locations[i]` represents the position of city `i`. You are also given integers `start`, `finish` and `fuel` representing the starting city, ending city, and the initial amount of fuel you have, respectively.
 >
@@ -2521,7 +2908,7 @@ public int minFallingPathSum(int[][] arr) {
 
 *******
 
-##### [0576] Out of Boundary Paths
+###### [0576] Out of Boundary Paths
 
 > There is an `m x n` grid with a ball. The ball is initially at the position `[startRow, startColumn]`. You are allowed to move the ball to one of the four adjacent cells in the grid (possibly out of the grid crossing the grid boundary). You can apply **at most** `maxMove` moves to the ball.
 >
@@ -2609,6 +2996,15 @@ PS. 转移方程中 dp 数组的第一维存储的是 $(x,y)$ 对应的 $index$�
 *e.g.* $1\times 3$ grid, maxMove = 3 所对应的初始化后的 $f[][]$​ 为：
 $$
 \begin{gathered}
+\small\color{blue}
+\begin{matrix}
+\ \ \ 0\ &1\ &2\ &3\ &\quad\quad0\ &1\ &2\ &3
+\end{matrix} \\
+\begin{matrix}
+\small\color{blue}0 \\
+\small\color{blue}1 \\ 
+\small\color{blue}2 \\
+\end{matrix}
 \begin{bmatrix}
 [0 & 3 & 3 & 3] \\
 [0 & 2 & 2 & 2] \\
@@ -2692,176 +3088,177 @@ int[] parseIndex(int idx) {
 
 *Space Complexity:* $\mathcal{O}(m * n * maxMove)$
 
-********
+*******
 
-##### [1301] Number of Paths with Max Score
+#### 背包问题
 
-> You are given a square `board` of characters. You can move on the board starting at the bottom right square marked with the character `'S'`.
->
-> You need to reach the top left square marked with the character `'E'`. The rest of the squares are labeled either with a numeric character `1, 2, ..., 9` or with an obstacle `'X'`. In one move you can go up, left or up-left (diagonally) only if there is no obstacle there.
->
-> Return a list of two integers: the first integer is the maximum sum of numeric characters you can collect, and the second is the number of such paths that you can take to get that maximum sum, **taken modulo** `10^9 + 7`.
->
-> In case there is no path, return `[0, 0]`.
+##### 01背包
 
-*分析：*==**[0062] / [0063] / [0064]的综合题**==  规定了「起点」、「终点」以及「移动方向」，设置了「路径成本」和「障碍」，最终结果要求包含最大路径成本以及获得该最大成本的路径数 $\implies$ 两个单独的DP数组记录信息*（没有必要用一个DP数组去完全两个任务，只会因为增加维度而增加难度）*
+###### [0416] Partition Equal Subset Sum
 
-+ 最大路径成本问题：
+> Given a **non-empty** array `nums` containing **only positive integers**, find if the array can be partitioned into two subsets such that the sum of elements in both subsets is equal.
 
-  「状态定义」：$f[(x,y)]=f[index]$​​​​：从起点 $(n-1,n-1)$​​​​ 到下标为 $index=x*n+y$​​​​​ 的grid的最大路径成本；
-
-  「状态转移方程」：$f[(x,y)]=max(f[(x+1,y)],f[(x,y+1)],f[(x+1,y+1)])+board[(x,y)]$​
-
-  ==与[0063]中的技巧类似，将「障碍」所对应的动规值设为 INF。==
-
-  $\implies f[0]$ 即为最终答案 
-
-+ 最大路径成本路径数问题：
-
-  「状态定义」：$g[(x,y)]=g[index]$​​：使得从起点 $(n-1,n-1)$​​ 到下标为 $index=x*n+y$​​​ 的grid的路径成本最大的路径数量；
-
-  「状态转移方程」：稍麻烦，分析见下
-
-  由于某个位置可以由「下方」、「右方」和「右下方」三个位置转移而来。**同时**  $f[(x,y)]$ **是由三个位置的最大值转移过来，那么相应的** $g[(x,y)]$ **应该取到最大得分的转移位置的方案数。**
-
-  ==**需要注意，最大值不一定是由一个位置得出。**==**如果有多个位置同时能取到最大得分，那么方案数应该是多个位置的方案数之和。**
-
-  *e.g.* 如果可到达 $(x,y)$ 的三个位置 $((x+1,y),(x,y+1),(x+1,y+1))$ 的最大得分为 $3,4,5$，到达三个位置的方案数为 $1,2,2$ ，
-
-  那么可得：
-  $$
-  \left\{
-  \begin{array}{ll}
-        f[(x,y)]=5+board[(x,y)]\\
-        g[(x,y)]=2\\
-  \end{array} 
-  \right.
-  $$
-  但如果三个位置的最大得分为 $3，5，5$，到达三个位置的方案数为 $1，2，2$ 的话。由于同时取得最大值的位置有两个，那么方案数也应该是两个位置方案数之和。
-
-  即有：
-  $$
-  \left\{
-  \begin{array}{ll}
-        f[(x,y)]=5+board[(x,y)]\\
-        g[(x,y)]=2+2\\
-  \end{array} 
-  \right.
-  $$
-
-==**注意：**== 不同于Template中，将DP数组初始化和状态转移分开由两个循环完成。本题中DP数组的初始化和状态转移所需要的for循环结构完全一致，且状态转移只会用到已经初始化的元素，故将两者写在同一个for循环结构中，只需注意初始化部分写在状态转移部分之前。
+*e.g.*
 
 ```java
-int n;
-int INF = Integer.MIN_VALUE;
-int mod = (int)1e9 + 7;
-public int[] pathsWithMaxScore(List<String> board) {
-  n = board.size();
-
-  // Convert List to Array
-  char[][] c = new char[n][n];
-  for (int i = 0; i < n; i++) c[i] = board.get(i).toCharArray();
-
-  int[] f = new int[n * n];
-  int[] g = new int[n * n];
-  // 开始从起点位置 (n - 1, n - 1) 开始初始化和状态转移
-  for (int x = n - 1; x >= 0; x--) {
-    for (int y = n - 1; y >= 0; y--) {
-      // 1.初始化部分：
-      int idx = getIndex(x, y);
-
-      // 1.1 如果为起点： 
-      if (c[x][y] == 'S') { // 
-        g[idx] = 1; // 从起点(n-1,n-1)到起点的路径肯定存在一条
-        continue;
-      }
-
-      // 1.2 如果为障碍点：
-      if (c[x][y] == 'X') {
-        f[idx] = INF;
-        continue;
-      }
-
-      // 2. 状态转移：
-      int val = c[x][y] == 'S' ? 0 : c[x][y] - '0';
-      int u = INF, t = 0;
-
-      // “合法”定义为「不出界」
-      // 但是如果将“合法”定义为「不出界且不为障碍物」（即if中多个判断：c[][] != 'X'），则初始化中不需要1.2
-      // 2.1 下方合法：
-      if (x + 1 < n) {
-        int cur = f[getIndex(x + 1, y)] + val;
-        int cnt = g[getIndex(x + 1, y)];
-        int[] res = update(cur, cnt, u, t);
-        u = res[0];
-        t = res[1];
-      }
-
-      // 2.2 右边格子合法：
-      if (y + 1 < n) {
-        int cur = f[getIndex(x, y + 1)] + val;
-        int cnt = g[getIndex(x, y + 1)];
-        int[] res = update(cur, cnt, u, t);
-        u = res[0];
-        t = res[1];
-      }
-
-      // 2.3 右下格子合法：
-      if (x + 1 < n && y + 1 < n) {
-        int cur = f[getIndex(x + 1, y + 1)] + val;
-        int cnt = g[getIndex(x + 1, y + 1)];
-        int[] res = update(cur, cnt, u, t);
-        u = res[0];
-        t = res[1];
-      }
-
-      f[idx] = u < 0 ? INF : u;
-      g[idx] = t;
-    }
-  }
-
-  // 构造答案：
-  int[] ans = new int[2];
-  if (f[getIndex(0, 0)] == INF) {
-    ans[0] = 0;
-    ans[1] = 0;
-  } else { 
-    ans[0] = f[getIndex(0, 0)];
-    ans[1] = g[getIndex(0, 0)];
-  }
-  return ans;
-}
-
-int getIndex(int x, int y) {
-  return x * n + y;
-}
-
-int[] parseIndex(int index) {
-  return new int[]{index / n, index % n};
-}
-
-int[] update(int cur, int cnt, int u, int t) {
-  int[] ans = new int[]{u, t};
-
-  if (cur > u) {
-    ans[0] = cur;
-    ans[1] = cnt;
-  } else if (cur == u && cur != INF) {
-    ans[1] += cnt;
-  }
-
-  ans[1] %= mod;
-  return ans;
-}
+Input: nums = [1, 5, 11, 5]
+Output: true
+Explanation: The array can be partitioned as [1, 5, 5] and [11].
 ```
 
+*思路：*
 
+**通常「背包问题」相关的题，都是在考察「建模」能力，也就是将问题转换为「背包问题」的能力**。
+
+由于本题是问能否将一个数组分成两个「等和」子集，问题等效于**「能否从数组中挑选若干个元素，使得元素总和等于所有元素总和的一半」**。
+
+这道题如果抽象成「背包问题」的话，应该是：**背包容量为 $target = sum/2$，每个数组元素的「价值」与「成本」相同（都是其数值大小），求能否刚好装满背包。**
+
+*转换为 「01背包」 问题：*
+
+由于每个数字（数组元素）只能被选一次，而且每个数字选择与否都会影响「成本」和「价值」，求解的问题也与「最大价值」相关。因此，可以使用「01 背包」的模型来做。
+
+当确定一个问题可以转化为「01 背包」之后，就可以直接套用「01 背包」的状态定义进行求解了。
+
+**注意：**<u>积累 DP 模型的意义，就是在于可以快速得到可靠的「状态定义」。</u>通用的 DP 技巧解法是基于完全没见过那样的题型才会选用的，而对于一些见过题型的 DP 题目，应该直接套用（或微调）该模型「状态定义」来做。
+
+因此，直接套用「01 背包」的状态定义：$f[i][j]$ 代表当仅考虑前 $i$ 个数值，且选择的数字的总和不可超过 $j$ 时，所能取到的最大价值（最大和）。
+
+当有了「状态定义」之后，结合最后一步，每个数字都有「选」和「不选」两种选择。因此，不难得出状态转移方程：
+$$
+f[i][j] = max(f[i-1][j],f[i-1][j-nums[i]]+nums[i])
+$$
+*解释：*
+$$
+\because f[i-1][j-nums[i]]<j-nums[i] \\
+\therefore f[i-1][j-nums[i]]+nums[i] < j-nums[i]+nums[i]=j
+$$
+
++ $dp[N][C+1]$ 解法：
+
+  ```java
+  public boolean canPartition(int[] nums) {
+    int n = nums.length;
+    
+    // 「等和子集」的和必然是总和的一半
+  	int sum = 0;
+    for (int num : nums) sum += num;
+    // 总和为奇数，则必然不能被分成两个「等和子集」
+    if (sum % 2 != 0) return false;
+    int target = sum / 2;
+    
+    int[][] f = new int[n][target+1];
+    // 初始化：先处理「考虑第一件物品」的情况（即dp数组的第一横行的初始值）
+    for (int c = 0; c <= target; c++) f[0][c] = c >= nums[0] ? nums[0] : 0;
+    // 状态转移：再处理「考虑其他物品」的情况
+    for (int i = 0; i < n; i++) {
+      for (int c = 0; c <= target; c++) {
+        // 不选：
+        int ns = f[i-1][c];
+        // 选：
+        int s = c >= nums[i] ? f[i-1][c-nums[i]] + nums[i] : 0;
+        f[i][c] = Math.max(ns, s);
+      }
+    }
+    
+    return f[n-1][target] == target;
+  }
+  ```
+
+  + *Time Complexity:* $\mathcal{O}(n*target)$
+  + *Space Complexity:* $\mathcal{O}(n*target)$
+
++ 「滚动数组」：
+
+  ```java
+  public boolean canPartition(int[] nums) {
+    int n = nums.length;
+    
+    // 「等和子集」的和必然是总和的一半
+  	int sum = 0;
+    for (int num : nums) sum += num;
+    // 总和为奇数，则必然不能被分成两个「等和子集」
+    if (sum % 2 != 0) return false;
+    int target = sum / 2;
+    
+    int[][] f = new int[2][target+1];
+    // 初始化：先处理「考虑第一件物品」的情况（即dp数组的第一横行的初始值）
+    for (int c = 0; c <= target; c++) f[0][c] = c >= nums[0] ? nums[0] : 0;
+    // 状态转移：再处理「考虑其他物品」的情况
+    for (int i = 1; i < n; i++) {
+      for (int c = 0; c <= target; c++) {
+        // 不选：
+        int ns = f[(i-1)&1][c];
+        // 选：
+        int s = c >= nums[i] ? f[(i-1)&1][c-nums[i]] + nums[i] : 0;
+        f[i&1][c] = Math.max(ns, s);
+      }
+    }
+    
+    return f[(n-1)&1][target] == target;
+  }
+  ```
+
+  + *Time Complexity:* $\mathcal{O}(n*target)$
+  + *Space Complexity:* $\mathcal{O}(target)$
+
++ 「一维空间优化」：
+
+  ```java
+  public boolean canPartition(int[] nums) {
+    int n = nums.length;
+    
+    // 「等和子集」的和必然是总和的一半
+  	int sum = 0;
+    for (int num : nums) sum += num;
+    // 总和为奇数，则必然不能被分成两个「等和子集」
+    if (sum % 2 != 0) return false;
+    int target = sum / 2;
+    
+    int[] f = new int[target+1];
+    // 初始化：先处理「考虑第一件物品」的情况（即dp数组的第一横行的初始值）
+    for (int c = 0; c <= target; c++) f[c] = c >= nums[0] ? nums[0] : 0;
+    // 状态转移：再处理「考虑其他物品」的情况
+    for (int i = 1; i < n; i++) {
+      for (int c = target; c >= 0; c--) {
+        // 不选：
+        int ns = f[c];
+        // 选：
+        int s = c > nums[i] ? f[c-nums[i]] + nums[i] : 0;
+        f[c] = Math.max(ns, s);
+      }
+    }
+    
+    return f[target] == target;
+  }
+  ```
+
+  + *Time Complexity:* $\mathcal{O}(n*target)$
+  + *Space Complexity:* $\mathcal{O}(target)$​
+
+上述的状态定义求得的是「能凑出来的最大价值」，而题目直观要求的其实是「能凑出来的最大价值是否刚好为 $target$」。
+
+因此，可以将「状态定义」进行修改，使其直接与所需答案相关联：$f[i][j]$ 代表考虑前 $i$ 个数值，选择的数字的总和是否刚好等于 $j$，即数组中存储的是「布尔类型」的动规值。
+
+相应的「状态转移方程」调整为：（两部分分别对应「选」第 $i$ 件物品和「不选」第 $i$ 件物品）
+$$
+f[i][j] = f[i-1][j] \or f[i-1][j-nums[i]]
+$$
+**当某个模型的「状态定义」进行了修改之后，除了考虑调整「转移方程」以外，还需要考虑修改「初始化」状态。**
+
+试考虑，创建的 $dp$ 数组存储的是布尔类型，初始值都是 $false$，这意味着无论怎么转移下去，都不可能产生一个 $true$，最终所有的状态都仍然是 $false$。换句话说，还需要一个有效值 来帮助整个过程能递推下去。
+
+**通常使用「首行」来初始化「有效值」：**对于本题，显然可以通过「先处理第一个物品」来得到「有效值」，即令 $f[0][nums[0]] = true$，代表当仅考虑第 $1$ 件物品时，只有容量为 $nums[0]$ 的背包才符合「恰好」的要求，故置为 $true$。
+
+但因为无法确保背包的容量一定大于 $nums[0]$ （也就是第一个物品过大，永远无法装入背包的情况），因此增加一个「不考虑任何物品」的情况讨论，也就是**将「物品编号」从 0 开始调整为从 1 开始**。
+
+原本 $f[0][]$ 代表只考虑第一件物品、$f[1][]$ 代表考虑第一件和第二件物品；调整后 $f[0][]$ 代表不考虑任何物品、$f[1][]$ 代表只考虑第一件物品......这种技巧本质上还是利用了「哨兵」的思想。
 
 ******
 
 ******
 
-#### Floyd's Algorithm
+### Floyd's Algorithm
 
 ##### [0142] Linked List Cycle II
 
@@ -2929,7 +3326,7 @@ int[] update(int cur, int cnt, int u, int t) {
 
 ******
 
-#### Greedy Algorithm
+### Greedy Algorithm
 
 ##### [0421] Maximum XOR of Two Numbers in an Array
 
@@ -3080,7 +3477,7 @@ int[] update(int cur, int cnt, int u, int t) {
 
 ******
 
-#### Hash
+### Hash
 
 ##### [0217] Contains Duplicate
 
@@ -3099,7 +3496,7 @@ int[] update(int cur, int cnt, int u, int t) {
 
 ******
 
-#### Rabin-Karp Algorithm
+### Rabin-Karp Algorithm
 
 ##### [0028] Implement strStr()
 
@@ -3321,7 +3718,7 @@ Summary :
 
 ******
 
-#### Recursion
+### Recursion
 
 ##### [0108] Convert (strictly increrasing) Sorted Array to (height-balanced) Binary Search Tree
 
@@ -3449,7 +3846,7 @@ if (s != null) {
 
 ******
 
-#### Reverse Polish Notation
+### Reverse Polish Notation
 
 ##### [0682] Baseball Game
 
@@ -3459,7 +3856,7 @@ if (s != null) {
 
 ******
 
-#### Sliding Window
+### Sliding Window
 
 ##### [0219] Contains Duplicate II
 
@@ -3489,7 +3886,7 @@ if (s != null) {
 
 *****
 
-#### Sort
+### Sort
 
 ##### [0220] Contains Duplicate III
 
@@ -3537,7 +3934,7 @@ if (s != null) {
 
 *****
 
-#### String
+### String
 
 ##### [0151] Reverse Words in a String
 
@@ -3788,7 +4185,7 @@ Given a string `s`, reverse the order of characters in each word within a senten
 
 ******
 
-#### Two-Pointer Technique
+### Two-Pointer Technique
 
 ##### [0019] Remove Nth Node From End of List
 
@@ -3798,7 +4195,8 @@ Given a string `s`, reverse the order of characters in each word within a senten
 
 ##### [0026] Remove Duplicates from Sorted Array
 
-Given an integer array `nums` sorted in **non-decreasing order**, remove the duplicates [**in-place**](https://en.wikipedia.org/wiki/In-place_algorithm) such that each unique element appears only **once**. The **relative order** of the elements should be kept the **same**. Return `k` *after placing the final result in the first* `k` *slots of* `nums`.
+> Given an integer array `nums` sorted in **non-decreasing order**, remove the duplicates [**in-place**](https://en.wikipedia.org/wiki/In-place_algorithm) such that each unique element appears only **once**. The **relative order** of the elements should be kept the **same**. Return `k` *after placing the final result in the first* `k` *slots of* `nums`.
+>
 
 + Solution 1: Brute Force $\implies \mathcal{O}(n^2)$
 
@@ -4297,7 +4695,7 @@ Given a binary array `nums`, return *the maximum number of consecutive* `1`*'s i
 
 ******
 
-#### Tricks
+### Tricks
 
 ##### [0160] Intersection of Two Linked Lists
 
@@ -4531,7 +4929,7 @@ Given an array, rotate the array to the right by `k` steps, where `k` is non-neg
 
 *****
 
-#### Misc.
+### Misc.
 
 ##### [0001] Two Sum
 
