@@ -420,7 +420,7 @@ Map<Character, Integer> toInt = new
   + 「一维空间优化」：经过分析，根据状态依赖，调整迭代/循环的方向
   + 「滚动数组」：当计算「某一行」的时候只需要依赖「前一行」时，可以根据==当前的行号是偶数还是奇数来交替使用第 $0$​ 行还是第 $1$​ 行==。因此将其中一维直接改成 $2$​​​，并将任何在该维的 `f[i]` 改成 `f[i&1]` 或者 `f[i%2]` 即可（推荐前者，在不同架构的机器上，运算效率更加稳定）。
   
-  ==**注意：**== 这种技巧只会降低「空间复杂度」，不会改变「时间复杂度」。
+  ==**注意：**== 「滚动数组」只会降低「空间复杂度」，不会改变「时间复杂度」。但是，「一维空间优化」同样可能降低「时间复杂度」。
   
   [[0120]](#[0120] Triangle)
 
@@ -554,7 +554,9 @@ public int DP(int[][] arr) {
 
 指**给定物品价值与体积**（对应了「给定价值与成本」），**在规定容量下**（对应了「限定决策规则」）**如何使得所选物品的总价值最大**。
 
-> 有 $N$​ 件物品和一个容量是 $C$​ 的背包。每件物品有且只有一件。第 $i$​ 件物品的体积是 $v[i]$​，价值是 $w[i]$​​。求解将哪些物品装入背包，可使这些物品的总体积不超过背包容量，且总价值最大。
+> 有 $N$​​ 件物品和一个容量是 $C$​​ 的背包。每件物品有且只有一件。第 $i$​​ 件物品的体积是 $v[i]$​​，价值是 $w[i]$​​​。
+>
+> 求解将哪些物品装入背包，可使这些物品的总体积不超过背包容量，且总价值最大。
 
 *e.g.* 
 
@@ -564,9 +566,7 @@ Output: 5
 Explanation: 不选第一件物品，选择第二件和第三件物品，可使价值最大。
 ```
 
-如果使用在 [路径问题](#路径问题) 中学到的「技巧解法」来分析：
-
-设计一个 DFS 函数对所有的方案进行枚举的话，大概如下：
+如果使用在 [路径问题](#路径问题) 中学到的「技巧解法」来分析：设计一个 DFS 函数对所有的方案进行枚举的话，大概如下：
 
 ```java
 int dfs (int[] v, int[] w, int i, int c);
@@ -628,9 +628,10 @@ $$
   \end{bmatrix}
   \end{gathered}
   $$
-  *Time Complexity:* $\mathcal{O}(N*C)$​
 
-  *Space Complexity:* $\mathcal{O}(N*C)$
+  + *Time Complexity:* $\mathcal{O}(N*C)$​​
+
+  + *Space Complexity:* $\mathcal{O}(N*C)$​
 
 + 「滚动数组」：$dp[2][C+1]$​​
 
@@ -655,17 +656,23 @@ $$
   }
   ```
 
-  *Time Complexity:* $\mathcal{O}(N*C)$
+  + *Time Complexity:* $\mathcal{O}(N*C)$​
 
-  *Space Complexity:* $\mathcal{O}(C)$
+  + *Space Complexity:* $\mathcal{O}(C)$​
 
-+ 「一维空间优化」：$dp[C+1]$​
++ 「一维空间优化」：$dp[C+1]$​​     **==重点==**
 
   不难发现当求解第 $i$ 行格子的值时，不仅是只依赖第 $i-1$ 行，还明确只依赖第 $i-1$ 行的第 $c$ 个格子和第 $c-v[i]$ 个格子（也就是对应着第 $i$ 个物品「不选」和「选」的两种情况）。换句话说，只依赖于「上一个格子的位置」以及「上一个格子的左边位置」。
 
   <img src="/Users/shanyonghao/IdeaProjects/LeetCodeProblems/Notes_img/背包问题_1.jpg" style="zoom:50%;" />
 
-  因此，只要将求解第 $i$ 行格子的顺序「从 $0$ 到 $c$」改为「从 $c$ 到 $0$」，就可以将原本 2 行的二维数组压缩到一行（转换为一维数组）。
+  因此，只要将求解第 $i$​ 行格子的顺序「从 $0$​ 到 $c$​」改为「从 $c$​ 到 $0$​」，就可以将原本 2 行的二维数组压缩到一行（转换为一维数组）。
+
+  故，「01背包」在采用「一维空间优化」解法时，「状态转移方程」修改为：
+  $$
+  dp[c]=max(dp[c], dp[c-v[i]]+w[i])
+  $$
+  同时，容量维度 $c$ 的遍历顺序为**==从大到小==**。
 
   **这样做的空间复杂度和「滚动数组」优化的空间复杂度是一样的。但仍然具有意义，而且这样的「一维空间」优化，是求解其他背包问题的基础，需要重点掌握。**
 
@@ -681,20 +688,257 @@ $$
         int ns = dp[c];
         // 选第i件物品
         int s = dp[c-v[i]] + w[i];
-        dp[i&1][c] = Math.mac(ns, s);
+        dp[c] = Math.mac(ns, s);
       }
     }
     return dp[C];
   }
   ```
 
-  *Time Complexity:* $\mathcal{O}(N*C)$
+  + *Time Complexity:* $\mathcal{O}(N*C)$​
 
-  *Space Complexity:* $\mathcal{O}(C)$
+  + *Space Complexity:* $\mathcal{O}(C)$​​
+
+**总结：** ==在众多背包问题中，「01背包」是最为核心的，且「01背包」的「一维空间优化」解法是几乎所有背包问题的基础，重点掌握。==
 
 ************
 
 ###### 完全背包
+
+在 0-1 背包问题的基础上，增加了每件物品可以选择多次的特点（在容量允许的情况下）。
+
+> 有 $N$ 种物品和一个容量为 $C$ 的背包，每种物品都有无限件。第 $i$ 件物品的体积是 $v[i]$，价值是 $w[i]$。
+>
+> 求解将哪些物品装入背包可使这些物品的费用总和不超过背包容量，且价值总和最大。
+
+*e.g.*
+
+```java
+Input: N = 2, C = 5, v = [1, 2], w = [1, 2]
+Output: 5
+Explanation: 选第一件物品 1， 再选两件物品 2，可使价值最大。
+```
+
+直接将 01 背包的「状态定义」拿过来用：**$dp[i][j]$​ 代表考虑前 $i$​ 件物品，放入一个容量为 $c$​ 的背包可以获得的最大价值。**
+
+由于每件物品可以被选择多次，因此对于某个 $dp[i][c]$​ 而言，其值应该为以下所有可能方案中的最大值：
+
+- 选择 0 件物品 $i$​​ 的最大价值，即 $dp[i-1][c]$​
+
+- 选择 1 件物品 $i$​ 的最大价值，即 $dp[i-1][c-v[i]]+w[i]$​
+
+- 选择 2 件物品 $i$​ 的最大价值，即 $dp[i-1][c-2*v[i]]+2*w[i]$​
+
+  $\dots$
+
+- 选择 k 件物品 $i$​ 的最大价值，即 $dp[i-1][c-k*v[i]]+k*w[i]$​
+
+由此，可以得出「状态转移方程」为：
+$$
+dp[i][c] = max(dp[i-1][c], dp[i-1][c-k*v[i]]+k*w[i]), 0 < k*v[i]\le c
+$$
+从「数学」的角度进一步简化上面的「状态转移方程」：
+
+1. 展开「完全背包」原本的「状态转移方程」：
+   $$
+   \begin{aligned}
+   dp[i][c] &= max(dp[i-1][c], \underline{dp[i-1][c-k*v[i]]+k*w[i]}),0 <k*v[i]\le c\\
+   &= max(dp[i-1][c], \underline{\color{blue}{dp[i-1][c-v[i]]+\bold{w[i]}},\color{green}{dp[i-1][c-2*v[i]]+\bold{2*w[i]}}\color{black}{+\dots} + \color{orange}{dp[i-1][c-k*v[i]]+\bold{k*w[i]}}}),0<k*v[i]\le c
+   \end{aligned}
+   $$
+
+2. 同理，$dp[i][c-v[i]]$​​ 的展开式为：
+   $$
+   dp[i][c-v[i]] = max(\underline{\color{blue}{dp[i-1][c-v[i]]},\color{green}{dp[i-1][c-2*v[i]]+\bold{w[i]}}\color{black}{+\dots} + \color{orange}{dp[i-1][c-k*v[i]]+\bold{(k-1)*w[i]}}}),0<k*v[i]\le c
+   $$
+
+3. 比较发现，上述两式的划线部分具有“等差”特性，总是相差 $w[i]$，因此
+   $$
+   dp[i][c] = max(dp[i-1][c],dp[i][c-v[i]]+w[i])
+   $$
+
+代码部分，分别提供对应两版「状态转移方程」的不同解法：
+
++ $dp[N][C+1]$​ 解法：
+
+  ```java
+  public int maxValue(int N, int C, int[] v, int[] w) {
+    int[][] dp = new int[N][C+1];
+    
+    // 先预处理「第一件物品」
+    for (int c = 0; c <= C; c++) {
+      // 显然当只有一件物品，在容量允许的情况下，能选多少件就选多少件
+      int maxK = j / v[0];
+      dp[0][c] = maxK * w[0];
+    }
+    
+    // 再处理「剩余物品」
+    for (int i = 1; i < N; i++) {
+      for (int c = 0; c <= C; c++) {
+        // 「不选」：选择 0 件物品 i
+        int ns = dp[i-1][c];
+        // 「选」：
+        int s = 0;
+        for (int k = 0; ; k++) { // 当v[i] = 1时，k可取到c
+          if (k * v[i] > c) break;
+          s = Math.max(s, dp[i-1][c-k*v[i]] + k*w[i]); 
+        }
+        dp[i][c] = Math.max(ns, s);
+      }
+    }
+    
+    return dp[N-1][C];
+  }
+  ```
+
+  + *Time Complexity:* $\mathcal{}(N*C*C)$​​​
+
+  + *Space Complexity:* $\mathcal{O}(N*C)$​​
+
+  ```java
+  public int maxValue(int N, int C, int[] v, int[] w) {
+    int[][] dp = new int[N][C+1];
+    
+    // 先预处理「第一件物品」
+    for (int c = 0; c <= C; c++) {
+      // 显然当只有一件物品，在容量允许的情况下，能选多少件就选多少件
+      int maxK = j / v[0];
+      dp[0][c] = maxK * w[0];
+    }
+    
+    // 再处理「剩余物品」
+    for (int i = 1; i < N; i++) {
+      for (int c = 0; c <= C; c++) {
+        // 「不选」：选择 0 件物品 i
+        int ns = dp[i-1][c];
+        // 「选」：
+        int s = c >= v[i] ? dp[i][c-v[i]] + w[i] : 0;
+        dp[i][c] = Math.max(ns, s);
+      }
+    }
+    
+    return dp[N-1][C];
+  }
+  ```
+
+  + *Time Complexity:* $\mathcal{O}(N*C)$​​​​
+
+  + *Space Complexity:* $\mathcal{O}(N*C)$​
+
++ 「滚动数组」：
+
+  ```java
+  public int maxValue(int N, int C, int[] v, int[] w) {
+    int[][] dp = new int[2][C+1];
+    
+    // 先预处理「第一件物品」
+    for (int c = 0; c <= C; c++) {
+      // 显然当只有一件物品，在容量允许的情况下，能选多少件就选多少件
+      int maxK = j / v[0];
+      dp[0][c] = maxK * w[0];
+    }
+    
+    // 再处理「剩余物品」
+    for (int i = 1; i < N; i++) {
+      for (int c = 0; c <= C; c++) {
+        // 「不选」：选择 0 件物品 i
+        int ns = dp[(i-1)&1][c];
+        // 「选」：
+        int s = 0;
+        for (int k = 0; ; k++) { // 当v[i] = 1时，k可取到c
+          if (k * v[i] > c) break;
+          s = Math.max(s, dp[(i-1)&1][c-k*v[i]] + k*w[i]); 
+        }
+        dp[i&1][c] = Math.max(ns, s);
+      }
+    }
+    
+    return dp[(N-1)&1][C];
+  }
+  ```
+
+  + *Time Complexity:* $\mathcal{O}(N*C*C)$​​​
+
+  + *Space Complexity:* $\mathcal{O}(C)$​​​
+
+  ```java
+  public int maxValue(int N, int C, int[] v, int[] w) {
+    int[][] dp = new int[2][C+1];
+    
+    // 先预处理「第一件物品」
+    for (int c = 0; c <= C; c++) {
+      // 显然当只有一件物品，在容量允许的情况下，能选多少件就选多少件
+      int maxK = j / v[0];
+      dp[0][c] = maxK * w[0];
+    }
+    
+    // 再处理「剩余物品」
+    for (int i = 1; i < N; i++) {
+      for (int c = 0; c <= C; c++) {
+        // 「不选」：选择 0 件物品 i
+        int ns = dp[(i-1)&1][c];
+        // 「选」：
+        int s = c >= v[i] ? dp[i&1][c-v[i]] + w[i] : 0;
+        dp[i&1][c] = Math.max(ns, s);
+      }
+    }
+    
+    return dp[(N-1)&1][C];
+  }
+  ```
+
+  + *Time Complexity:* $\mathcal{O}(N*C)$​​​
+
+  + *Space Complexity:* $\mathcal{O}(C)$​​
+
++ 「一维空间优化」：**==重点==**
+
+  虽然「完全背包」问题有两个版本的「状态转移方程」，但是对于「一维空间优化」解法，选择第二个化简后的「状态转移方程」进行 $i$ 维度的消除：
+  $$
+  dp[c] = max(dp[c], dp[c-v[i]]+w[i])
+  $$
+
+  ```java
+  public int maxValue(int N, int C, int[] v, int[] w) {
+    int[] dp = new int[C+1];
+    
+    for (int i = 0; i < N; i++) {
+      for (int c = 0; c <= C; c++) {  // 与「01背包」不同，依旧是从小到大遍历
+        // 「不选」：选择 0 件物品 i
+        int ns = dp[c];
+        // 「选」：
+        int s = c >= v[i] ? dp[c-v[i]] + w[i] : 0;
+        dp[i][c] = Math.max(ns, s);
+      }
+    }
+   
+    return dp[C];
+  }
+  ```
+
+
+  + *Time Complexity:* $\mathcal{O}(N*C)$​​
+  + *Space Complexity:* $\mathcal{O}(C)$​​​
+
+==**总结：**==
+
+- 0-1 背包问题的状态转换方程是：
+
+
+
+**由于计算 的时候，依赖于 。**
+
+**因此我们在改为「一维空间优化」时，需要确保 存储的是上一行的值，即确保 还没有被更新，所以遍历方向是从大到小。**
+
+- 完全背包问题的状态转移方程是：
+
+
+
+**由于计算 的时候，依赖于 。**
+
+**因此我们在改为「一维空间优化」时，需要确保 存储的是当前行的值，即确保 已经被更新，所以遍历方向是从小到大。**
+
+********
 
 ###### 多重背包
 
@@ -3354,7 +3598,13 @@ $$
   ```
 
   + *Time Complexity:* $\mathcal{n*target}$
-  + *Space Complexity:* $\mathcal{O}(target)$
+  + *Space Complexity:* $\mathcal{O}(target)$​
+
+通过将一个背包问题的「状态定义」从**「最多不超过 XX 容量」**修改为**「背包容量恰好为 XX」**，同时再把「有效值构造」出来，也即是将**「物品下标调整为从 1 开始，设置 为初始值」**。这其实是另外一类「背包问题」，它不对应「价值最大化」，对应的是「能否取得最大/特定价值」。这样的「背包问题」同样具有普遍性。
+
+*******
+
+
 
 ******
 
