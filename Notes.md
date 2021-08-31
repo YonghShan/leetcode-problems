@@ -737,7 +737,7 @@ Explanation: 选第一件物品 1， 再选两件物品 2，可使价值最大�
 $$
 dp[i][c] = max(dp[i-1][c], dp[i-1][c-k*v[i]]+k*w[i]), 0 < k*v[i]\le c
 $$
-从「数学」的角度进一步简化上面的「状态转移方程」：
+**从「数学」的角度进一步简化上面的「状态转移方程」：**<a name="「完全背包」一维方程推导"></a>
 
 1. 展开「完全背包」原本的「状态转移方程」：
    $$
@@ -908,7 +908,7 @@ $$
         int ns = dp[c];
         // 「选」：
         int s = c >= v[i] ? dp[c-v[i]] + w[i] : 0;
-        dp[i][c] = Math.max(ns, s);
+        dp[c] = Math.max(ns, s);
       }
     }
    
@@ -3614,6 +3614,262 @@ $$
 通过将一个背包问题的「状态定义」从**「最多不超过 XX 容量」**修改为**「背包容量恰好为 XX」**，同时再把「有效值构造」出来，也即是将**「物品下标调整为从 1 开始，设置 为初始值」**。这其实是另外一类「背包问题」，它不对应「价值最大化」，对应的是「能否取得最大/特定价值」。这样的「背包问题」同样具有普遍性。
 
 *******
+
+##### 完全背包
+
+###### [0279] Perfect Squares
+
+> Given an integer `n`, return *the least number of perfect square numbers that sum to* `n`.
+>
+> A **perfect square** is an integer that is the square of an integer; in other words, it is the product of some integer with itself. For example, `1`, `4`, `9`, and `16` are perfect squares while `3` and `11` are not.
+
+*思路：* 由于题目并没有限制相同的「完全平方数」只能使用一次，所以问题可以转换为：**给定了若干数字，每个数字可以被使用无限次，求凑出目标值 $n$ 所需要用到的最少数字个数是多少**。
+
+显示符合「完全背包」模型，将「状态定义」调整为：**$f[i][c]$ 为考虑前 $i$ 个数字，凑出数字总和 $c$ 所需要用到的最少数字数量**。
+
+不失一般性的分析 ，对于第 $i$ 个数字（假设数值为 $t$），有如下选择：
+
+- 选 0 个数字 $i$，此时有 $f[i][c]=f[i-1][c]$
+
+- 选 1 个数字 $i$，此时有 $f[i][c]=f[i-1][c-t]+1$ 
+
+- 选 2 个数字 $i$，此时有 $f[i][c]=f[i-1][c-2*t]+2$ 
+
+  $\dots$
+
+- 选 k 个数字 $i$，此时有 $f[i][c]=f[i-1][c-k*t]+k$
+
+因此，「状态转移方程」为：
+$$
+f[i][c]=min(f[i-1][c-k*t]+k),0\le k*t \le c
+$$
+当然，能够选择 $k$ 个数字 $i$ 的前提是，剩余的数字 $c-k*t$ 也能够被其他「完全平方数」凑出，即 $f[i-1][c-k*t]$ 为有意义的值。<u>*本题只要将无法凑成的情况保留为初始的0，就不用担心数组内会有非法值*</u> 
+
++ $dp[N][C+1]$ 解法
+
+  ```java
+  public int numSquares(int n) {
+    // 预处理出所有可能用到的「完全平方数」
+    int len = (int) Math.sqrt(n); // 转为int是为了向下取整     O(sqrt(n))
+    int[] perfectSquares = new int[len];
+    for (int i = 0; i < len; i++) perfectSquares[i] = (i + 1) * (i + 1);
+  
+    // f[i][c] 代表考虑前 i 个物品，凑出 c 所使用到的最小元素个数
+    int[][] f = new int[len][n + 1]; 
+    
+    // 处理「第一个完全平方数」的情况
+    for (int c = 0; c <= n; c++) f[0][c] = c;    
+    
+    // 处理「剩余数」的情况
+    for (int i = 1; i < len; i++) { // O(sqrt(n))
+      int t = perfectSquares[i]; 
+      for (int c = 0; c <= n; c++) { // O(n)
+        // 「不选」：
+        f[i][c] = f[i-1][c];
+        // 「选」：
+        for (int k = 1; k * t <= c; k++)  // O(n)
+          f[i][c] = Math.min(f[i][c], f[i-1][c- k*t]+k);
+      }
+    }
+    
+    return f[len-1][n];
+  }
+  ```
+
+  + *Time Complexity:* $\mathcal{O}(n^2\sqrt{n})$      *Java `Math.sqrt()` TC为 $\mathcal{O}(logn)(<\mathcal{O}(\sqrt{n}))$，这里取 $\mathcal{O}(\sqrt{n})$*  
+  + *Space Complexity:* $\mathcal{O}(n\sqrt{n})$ 
+
++ 「一维空间优化」
+
+  依旧是利用 $f[i][c]$ 的部分和 $f[i][c-t]$ (假设第 $i$ 个数字为 $t$) 之间的[等差特性](#「完全背包」一维方程推导)（总是相差1），将原「状态转移方程」修改为
+  $$
+  f[i][c] = min(f[i-1][c],f[i][c-t]+1)
+  $$
+  再进行 $i$ 的维度消除，可得
+  $$
+  f[c]=min(f[c],f[c-t]+1)
+  $$
+
+  ```java
+  public int numSquares(int n) {
+    // 不预处理出所有可能用到的「完全平方数」，而是之后再利用i枚举
+    int len = (int) Math.sqrt(n); // 转为int是为了向下取整     O(sqrt(n))
+  
+    // f[i][c] 代表考虑前 i 个物品，凑出 c 所使用到的最小元素个数
+    int[] f = new int[n + 1]; 
+  
+    // 处理「第一个完全平方数」的情况
+    for (int c = 0; c <= n; c++) f[c] = c;    
+    
+    // 处理「剩余数」的情况
+    for (int i = 1; i < len; i++) { // O(sqrt(n))
+      int t = (i+1)*(i+1);
+      // 「选」的前提是c>=t，而「不选」时不需要更改f数组，故c从t开始  O(n)
+      for (int c = t; c <= n; c++) f[c] = Math.min(f[c], f[c-t]+1);
+    }
+  
+    return f[n];
+  }
+  ```
+
+  + *Time Complexity:* $\mathcal{O}(n\sqrt{n})$      *Java `Math.sqrt()` TC为 $\mathcal{O}(logn)(<\mathcal{O}(\sqrt{n}))$，这里取 $\mathcal{O}(\sqrt{n})$*  
+  
+  + *Space Complexity:* $\mathcal{O}(n)$
++ 「一维空间优化」+ 状态转移时内外层维度交换
+
+  ```java
+  public int numSquares(int n) {
+    int[] dp = new int[n+1];
+  
+    for (int c = 1; c < n+1; c++) {      // O(n)
+      int iLen = (int) Math.sqrt(c);
+      int min = n; // 每计算一个新的c的dp，要重新置min，不然min还是上一个数的min，导致dp[]更新不了
+      for (int i = 0; i < iLen; i++) {   // O(sqrt(n))
+        int t = (i+1)*(i+1);
+        min = Math.min(min, dp[c-t]);
+      }
+      dp[c] = min+1;
+    }
+  
+    return dp[n];
+  }
+  ```
+  
+  + *Time Complexity:* $\mathcal{O}(n\sqrt{n})$      *Java `Math.sqrt()` TC为 $\mathcal{O}(logn)(<\mathcal{O}(\sqrt{n}))$，这里取 $\mathcal{O}(\sqrt{n})$*  
+  + *Space Complexity:* $\mathcal{O}(n)$
+
+==**比较：**== 均以 $n=12$ 和「二维」的角度进行分析 <u>*（橙色的数字表示未更新，为数字初始值）*</u>
+
++ 常规的「一维空间优化」解法：
+
+  按「横行」填充dp数组，整个过程如下：
+  $$
+  \begin{gathered}
+  \small\color{blue}
+  \begin{matrix}
+  \quad\quad\quad\ 0\ &1\ &2\ &3\ &4\ &5\ &6\ &7\ &8\ &9\ &10\ &11\ &12\
+  \end{matrix}\\
+  \begin{matrix}
+  \small\color{blue}\rightarrow0\color{red}(1) \\ 
+  \small\color{blue}\rightarrow1\color{red}(4) \\
+  \small\color{blue}\rightarrow2\color{red}(9) \\
+  \end{matrix}
+  \begin{bmatrix}
+  [0&1&2&3&4&5&6&7&8&9&10&11&12] \\
+  [\color{orange}0&\color{orange}0&\color{orange}0&\color{orange}0&1&2&3&4&2&3&4&5&3] \\
+  [\color{orange}0&\color{orange}0&\color{orange}0&\color{orange}0&\color{orange}0&\color{orange}0&\color{orange}0&\color{orange}0&\color{orange}0&1&2&3&3] \\
+  \end{bmatrix} \\
+  \implies dp=[0,1,2,3,1,2,3,4,2,1,2,3,3]
+  \end{gathered}
+  $$
+
++ 内外维度交换的「一维空间优化」解法：
+
+  按「竖列」填充dp数组，整个过程如下：
+  $$
+  \begin{gathered}
+  \small\color{blue}
+  \begin{matrix}
+  \quad\downarrow&\downarrow&\downarrow&\downarrow&\downarrow&\downarrow&\downarrow&\downarrow&\downarrow&\downarrow&\downarrow&\downarrow&\downarrow\\
+  \quad\ \ 0\ &1\ &2\ &3\ &4\ &5\ &6\ &7\ &8\ &9\ &10\ &11\ &12
+  \end{matrix}\\
+  \begin{matrix}
+  \small\color{blue}0\color{red}(1) \\ 
+  \small\color{blue}1\color{red}(4) \\
+  \small\color{blue}2\color{red}(9) \\
+  \end{matrix}
+  \begin{bmatrix}
+  [\color{orange}0&1&2&3&4&5&6&7&8&9&10&11&12] \\
+  [\color{orange}0&\color{orange}0&\color{orange}0&\color{orange}0&1&2&3&4&2&3&4&5&3] \\
+  [\color{orange}0&\color{orange}0&\color{orange}0&\color{orange}0&\color{orange}0&\color{orange}0&\color{orange}0&\color{orange}0&\color{orange}0&1&2&3&3] \\
+  \end{bmatrix} \\
+  \implies dp=[0,1,2,3,1,2,3,4,2,1,2,3,3]
+  \end{gathered}
+  $$
+
+==非DP的做法：==
+
+有一点可以肯定的是，能凑出 $n$ 的完全平方数的个数 $count$ 一定小于等于 $n$（至少可以保证由 $n$ 个 $1$ 凑出），且对于 $n$，需要考虑的完全平方数的范围为 $[1,\lfloor \sqrt{n} \rfloor]$。故从 $1$ 开始考虑 $count$，找到使 $is\_divided\_by(n,count)$ 为 $true$ 的最小的 $count$。 
+$$
+\begin{aligned}
+numSquares(n) &=
+\begin{equation}
+\mathop{\arg\min}_{count\in[1,2,\dots,n]}(is\_divided\_by(n,count))
+\end{equation} \\
+is\_divided\_by(n,count) &= is\_divided\_by(n-k,count-1)\ \exists\ k\in [1,\lfloor \sqrt{n} \rfloor]
+\end{aligned}
+$$
+*e.g.* 以 $n = 12$为例，展示 $is\_divided\_by(n,count)$ 的推导过程：
+$$
+\begin{aligned}
+\bold{count =1:}&\\
+&
+\begin{gathered}
+(12,1)\\\small\color{red}{false} 
+\end{gathered}\\ \\
+\bold{count = 2:}&\\
+&
+\begin{gathered}
+(12,2)\\
+\swarrow\quad\downarrow\quad\searrow\\
+(12-1,1)(12-4,1)(12-9,1)\\
+\small\color{red}{false}\quad\quad\quad\small\color{red}{false}\quad\quad\quad\small\color{red}{false}
+\end{gathered}\\ \\
+\bold{count = 3:}&\\
+&
+\begin{gathered}
+(12,3)\\
+\swarrow\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad
+\downarrow\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad
+\searrow\\
+(12-1,2)\quad\quad\quad\quad\quad\quad\quad\quad\quad
+(12-4,2)\quad\quad\quad\quad\quad\quad\quad\quad\quad
+(12-9,2)\\
+\swarrow\quad\quad\downarrow\quad\quad\searrow \quad\quad\quad\quad\quad\quad\quad
+\swarrow\quad\quad\downarrow\quad\quad\searrow \quad\quad\quad\quad\quad\quad\quad
+\swarrow\quad\quad\downarrow\quad\quad\searrow\\
+(11-1,1)(11-4,1)(11-9,1)\quad
+(8-1,1)(8-4,1)\xcancel{(8-9,1)}\quad
+\xcancel{(3-1,1)}\xcancel{(3-4,1)}\xcancel{(3-9,1)}\\
+\small\color{red}{false}\quad\quad\quad
+\small\color{red}{false}\quad\quad\quad
+\small\color{red}{false}
+\quad\quad\quad\quad
+\small\color{red}{false}\quad\quad\quad
+\small\color{red}{true}\quad\quad\quad
+\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad
+\end{gathered}
+\end{aligned}
+$$
+ 由上述推导过程可知：当 $count$ 枚举到 $3$ ，$(8-4,1)=true$ 时，即找到答案，不必再向后继续。
+
+```java
+private Set<Integer> perfectSquares = new HashSet<>(); 
+
+public int numSquares(int n) {
+  this.perfectSquares.clear();
+
+  for (int i = 1; i * i <= n; i++) perfectSquares.add(i * i);
+
+  int count = 1;
+  for (; count <= n; count++) {
+    if (is_divided_by(n, count)) return count;
+  }
+
+  return count;
+}
+
+public boolean is_divided_by(int n, int count) {
+  if (count == 1) return perfectSquares.contains(n);
+
+  for (Integer i : perfectSquares) {
+    if (is_divided_by(n-i, count-1)) return true;
+  }
+  return false;
+}
+```
+
+==总结：== 这种方法其实是在一个高度不断加深（$count$ 不断增加）的 $m$ - ary tree $(m=\lfloor \sqrt{n} \rfloor)$ 上进行 **DFS**，*i.e.* **Iterative Deepening DFS on a complete m-ary tree**.
 
 
 
