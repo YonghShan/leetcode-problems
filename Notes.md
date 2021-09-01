@@ -3871,7 +3871,8 @@ public boolean is_divided_by(int n, int count) {
 
 ==总结：== 这种方法其实是在一个高度不断加深（$count$ 不断增加）的 $m$ - ary tree $(m=\lfloor \sqrt{n} \rfloor)$ 上进行 **DFS**，*i.e.* **Iterative Deepening DFS on a complete m-ary tree**.
 
-
++ *Time Complexity:* 
++ *Space Complexity:* 
 
 ******
 
