@@ -3871,7 +3871,7 @@ public boolean is_divided_by(int n, int count) {
 
 ==总结：== 这种方法其实是在一个高度不断加深（$count$ 不断增加）的 $m$ - ary tree $(m=\lfloor \sqrt{n} \rfloor)$ 上进行 **DFS**，*i.e.* **Iterative Deepening DFS on a complete m-ary tree**.
 
-+ *Time Complexity:* 
++ *Time Complexity:* where `h` is the maximal number of recursion that could happen. As one might notice, the above formula actually resembles the formula to calculate the number of nodes in a complete N-ary tree. Indeed, the trace of recursive calls in the algorithm form a N-ary tree, where N is the number of squares in `square_nums`, *i.e.* \sqrt{n}*n*. In the worst case, we might have to traverse the entire tree to find the solution.
 + *Space Complexity:* 
 
 ******
