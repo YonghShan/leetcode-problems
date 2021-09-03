@@ -574,7 +574,7 @@ int dfs (int[] v, int[] w, int i, int c);
 
 那么根据变化参数和返回值，可以抽象出 dp 数组：**一个二维数组，其中一维代表「当前枚举到哪件物品」，另外一维「当前可使用的背包容量」，数组内容是「最大价值」。**第一维的取值范围为 $i\in[0,N-1]$​​​​​，第二维的取值范围为 $c \in [0, C]$​​​​​。**因此，$dp[N-1][C]$​​​​​ 即为答案。**
 
-当有了状态定义之后，再根据「最后一步」选择来推导「状态转移方程」：**只需要考虑第 $i$​ 件物品如何选择即可：对于第 $i$​ 件物品，我们有「选」和「不选」两种决策。**
+当有了「状态定义」之后，再根据「最后一步」选择来推导「状态转移方程」：**只需要考虑第 $i$​ 件物品如何选择即可：对于第 $i$​ 件物品，我们有「选」和「不选」两种决策。**
 
 + 「不选」方案的「最大价值」：**「不选」等效于我们只考虑前 $i-1$ 件物品，当前容量为 $c$ 的情况下的最大价值，即 $dp[i-1][c]$。**
 
@@ -3641,7 +3641,7 @@ $$
 $$
 f[i][c]=min(f[i-1][c-k*t]+k),0\le k*t \le c
 $$
-当然，能够选择 $k$ 个数字 $i$ 的前提是，剩余的数字 $c-k*t$ 也能够被其他「完全平方数」凑出，即 $f[i-1][c-k*t]$ 为有意义的值。<u>*本题只要将无法凑成的情况保留为初始的0，就不用担心数组内会有非法值*</u> 
+当然，能够选择 $k$ 个数字 $i$ 的前提是，剩余的数字 $c-k*t$ 也能够被其他「完全平方数」凑出，即 $f[i-1][c-k*t]$ 为有意义的值。<u>*本题只要将无法凑成的情况保留为数组初始的0，就不用担心数组内会有非法值*</u> 
 
 + $dp[N][C+1]$ 解法
 
@@ -3785,7 +3785,7 @@ $$
   \end{gathered}
   $$
 
-==非DP的做法：==
+==**非DP的做法：**==
 
 有一点可以肯定的是，能凑出 $n$ 的完全平方数的个数 $count$ 一定小于等于 $n$（至少可以保证由 $n$ 个 $1$ 凑出），且对于 $n$，需要考虑的完全平方数的范围为 $[1,\lfloor \sqrt{n} \rfloor]$。故从 $1$ 开始考虑 $count$，找到使 $is\_divided\_by(n,count)$ 为 $true$ 的最小的 $count$。 
 $$
@@ -3869,8 +3869,100 @@ public boolean is_divided_by(int n, int count) {
 
 ==总结：== 这种方法其实是在一个高度不断加深（$count$ 不断增加）的 $m$ - ary tree $(m=\lfloor \sqrt{n} \rfloor)$ 上进行 **DFS**，*i.e.* **Iterative Deepening DFS on a complete m-ary tree**.
 
-+ *Time Complexity:* where `h` is the maximal number of recursion that could happen. As one might notice, the above formula actually resembles the formula to calculate the number of nodes in a complete N-ary tree. Indeed, the trace of recursive calls in the algorithm form a N-ary tree, where N is the number of squares in `square_nums`, *i.e.* \sqrt{n}*n*. In the worst case, we might have to traverse the entire tree to find the solution.
-+ *Space Complexity:* 
++ *Time Complexity:* $\mathcal{O}(\frac{\sqrt{n}^{h+1}-1}{\sqrt{n}-1})=\mathcal{O}(n^{\frac{h}{2}})$ where `h` is the maximal number of recursion that could happen. As one might notice, the above formula actually resembles the formula to calculate the number of nodes in a complete $m$-ary tree. Indeed, the trace of recursive calls in the algorithm form a $m$-ary tree, where $m$ is the number of squares in `square_nums`, *i.e.* $\sqrt{n}$. In the worst case, we might have to traverse the entire tree to find the solution.
++ *Space Complexity:* $\mathcal{O}(\sqrt{n})$. We keep a list of `square_nums`, which is of $\sqrt{n}$ size. In addition, we would need additional space for the recursive call stack. But as we will learn later (==Lagrange's four-square theorem==), the size of the call track would not exceed 4. 
+
+==**数学做法：**==
+
++ 依据
+
+  + Lagrange's four-square theorem
+
+    also known as Bachet's conjecture, which states that every natural number can be represented as the sum of four integer squares: $p=a_0^2+a_1^2+a_2^2+a_3^2$  where the four numbers $a_0,a_1,a_2,a_3$ are integers.
+
+  + Adrien-Marie Legendre's three-square theorem
+
+    a positive integer can be expressed as the sum of three squares: $n \neq 4^k(8m+7) \iff n = a_0^2+a_1^2+a_2^2$ where $k$ and $m$ are integers.
+
++ 步骤：
+
+  + First, we check if the number `n` is of the form $n = 4^{k}(8m+7)$, if so we return 4 directly.
+
+    *解释：* 如果 $n$ 可以写成 $4^k(8m+7)$ 的形式，那么根据依据二，$n$ 一定不可分解为3个完全平方数相加。假如此时 $n$ 为2个完全平方数相加，即 $n=a_0^2+a_1^2$，那么 $n=a_0^2+a_1^2+0^2$ 也成立，而这与依据二相矛盾。故此时 $n$ 一定不可分解为2个完全平方数相加。同理，此时 $n$ 本身也不是完全平方数。结合依据一，此时的 $n$ 只可能是由4个完全平方数相加构成的。
+
+  + Otherwise, we further check if the number is of a square number itself or the number can be decomposed the sum of two squares.
+
+  + In the bottom case, the number can be decomposed into the sum of 3 squares, though we can also consider it decomposable by 4 squares by adding zero according to the four-square theorem. But we are asked to find the least number of squares.
+
+```java
+protected boolean isSquare(int n) {
+  int sq = (int) Math.sqrt(n);
+  return n == sq * sq;
+}
+
+public int numSquares(int n) {
+  // 判断n是否满足4^k(8m+7)的形式
+  while (n % 4 == 0)
+    n /= 4;
+  if (n % 8 == 7)
+    return 4;
+  // 判断n是否自身即为perfect square
+  if (this.isSquare(n))
+    return 1;
+  // 判断n是否为两个perfect square之和
+  for (int i = 1; i * i <= n; ++i) {      // 这一步用到了O(sqrt(n))个iteration
+    if (this.isSquare(n - i * i))
+      return 2;
+  }
+  // bottom case of three-square theorem.
+  return 3;
+}
+```
+
++ *Time Complexity:* $\mathcal{O}(\sqrt{n})$
++ *Space Complexity:* $\mathcal{O}(1)$
+
+******
+
+###### [0322] Coin Change
+
+> You are given an integer array `coins` representing coins of different denominations and an integer `amount` representing a total amount of money.
+>
+> Return *the fewest number of coins that you need to make up that amount*. If that amount of money cannot be made up by any combination of the coins, return `-1`.
+>
+> You may assume that you have an infinite number of each kind of coin.
+
+*思路：*与[0279]一模一样，唯一改动在于初始化dp数组。
+
+**当看到题目是给定一些「物品」，让从中进行选择，以达到「最大价值」或者「特定价值」时，应该联想到「背包问题」。**这本质上其实是一个组合问题：被选物品之间不需要满足特定关系，只需要选择物品，以达到「全局最优」或者「特定状态」即可。
+
+再根据物品的「选择次数限制」来判断是何种背包问题。本题每种硬币可以被选择「无限次」，直接套用「完全背包」的状态定义进行微调：
+
+**定义 $f[i][c]$ 为考虑前 $i$ 件物品，凑成总和为 $c$ 所需要的最少硬币数量。**
+
+==为了方便初始化，一般让 $i$ 代表不考虑任何物品的情况 —— 与[0279]的区别。==因此有显而易见的初始化条件：$f[0][0]=0$，其余 $f[0][x]=INF$ —— 代表当没有任何硬币的时候，存在凑成总和为 0 的方案，方案所使用的硬币为 0；凑成其他总和的方案不存在。
+
+由于要求的是「最少」硬币数量，因此不希望「无效值」参与转移，可设 $INF=INT\_MAX$。
+
+当「状态定义」与「基本初始化」有了之后，不失一般性的考虑 $f[i][c]$ 该如何转移。
+
+对于第 $i$ 个硬币，有两种决策方案：
+
+- 不使用该硬币：$f[i][c]=f[i-1][c]$
+- 使用该硬币，由于每种硬币可以被选择多次（容量允许的情况下），因此最优解应当是所有方案中的最小值。即 $f[i][c]=min(f[i-1][c-k*coin]+k)$
+
++ $dp[N+1][C]$ 解法
+
+  ```java
+  public int coinChange(int[] coins, int amount) {
+  
+  }
+  ```
+
+  + *Time Complexity:*
+  + *Space Complexity:*
+
++ 「一维空间优化」解法
 
 ******
 
