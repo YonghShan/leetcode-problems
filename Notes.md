@@ -3643,6 +3643,8 @@ f[i][c]=min(f[i-1][c-k*t]+k),0\le k*t \le c
 $$
 当然，能够选择 $k$ 个数字 $i$ 的前提是，剩余的数字 $c-k*t$ 也能够被其他「完全平方数」凑出，即 $f[i-1][c-k*t]$ 为有意义的值。<u>*本题只要将无法凑成的情况保留为数组初始的0，就不用担心数组内会有非法值*</u> 
 
+==本题不需要从「不考虑任何完全平方数」开始，而且不需要引入无效值的原因是因为，「第一个完全平方数」一定为1，故从「考虑第一个完全平方数」开始初始化。—— *与[0322]的区别*==
+
 + $dp[N][C+1]$ 解法
 
   ```java
@@ -3940,7 +3942,7 @@ public int numSquares(int n) {
 
 **定义 $f[i][c]$ 为考虑前 $i$ 件物品，凑成总和为 $c$ 所需要的最少硬币数量。**
 
-==为了方便初始化，一般让 $i$ 代表不考虑任何物品的情况 —— 与[0279]的区别。==因此有显而易见的初始化条件：$f[0][0]=0$，其余 $f[0][x]=INF$ —— 代表当没有任何硬币的时候，存在凑成总和为 0 的方案，方案所使用的硬币为 0；凑成其他总和的方案不存在。
+==为了方便初始化（「第一个硬币」的值不确定，不像[0279]中「第一个完全平方数」一定为1），一般让 $i$ 代表不考虑任何物品的情况 —— *与[0279]的区别*。==因此有显而易见的初始化条件：$f[0][0]=0$，其余 $f[0][x]=INF$ —— 代表当没有任何硬币的时候，存在凑成总和为 0 的方案，方案所使用的硬币为 0；凑成其他总和的方案不存在。
 
 由于要求的是「最少」硬币数量，因此不希望「无效值」参与转移，可设 $INF=INT\_MAX$。
 
@@ -3951,18 +3953,63 @@ public int numSquares(int n) {
 - 不使用该硬币：$f[i][c]=f[i-1][c]$
 - 使用该硬币，由于每种硬币可以被选择多次（容量允许的情况下），因此最优解应当是所有方案中的最小值。即 $f[i][c]=min(f[i-1][c-k*coin]+k)$
 
-+ $dp[N+1][C]$ 解法
++ $dp[N][C+1]$ 解法
 
   ```java
+  int INF = Integer.MAX_VALUE;
   public int coinChange(int[] coins, int amount) {
+    int n = coins.length;
+    int[][] f = new int[n+1][amount+1];
   
+    // 初始化（没有任何硬币的情况）：只有 f[0][0] = 0；其余情况均为无效值。
+    // 这是由「状态定义」决定的，当不考虑任何硬币的时候，只能凑出总和为 0 的方案，所使用的硬币数量为 0 
+    for (int c = 1; c <= amount; c++) f[0][c] = INF;
+  
+    // 从「第一枚硬币」开始讨论
+    for (int i = 1; i <= n; i++) {
+      int t = coins[i-1];
+      for (int c = 0; c <= amount; c++) {
+        // 「不选」：
+        f[i][c] = f[i-1][c];
+        // 「选」：
+        for (int k = 1; k * t <= c; k++) 
+          if (f[i-1][c-k*t] != INF) // 要想省略这个判断，可以将INF设为比INT_MAX小的较大数(e.g. 0x3f3f3f3f)
+            f[i][c] = Math.min(f[i][c], f[i-1][c-k*t]+k);
+      }
+    }
+  
+    return f[n][amount] != INF ? f[n][amount] : -1;
   }
   ```
 
-  + *Time Complexity:*
-  + *Space Complexity:*
+  + *Time Complexity:* $\mathcal{O}(n*amount^2)$
+  + *Space Complexity:* $\mathcal{O}(n*amount)$
 
 + 「一维空间优化」解法
+
+  ```java
+  int INF = 0x3f3f3f3f;
+  public int coinChange(int[] coins, int amount) {
+    int n = coins.length;
+    int[] f = new int[amount+1];
+  
+    // 初始化（没有任何硬币的情况）：只有 f[0] = 0；其余情况均为无效值。
+    // 这是由「状态定义」决定的，当不考虑任何硬币的时候，只能凑出总和为 0 的方案，所使用的硬币数量为 0 
+    for (int c = 1; c <= amount; c++) f[c] = INF;
+  
+    // 从「第一枚硬币」开始讨论
+    for (int i = 1; i <= n; i++) {
+      int t = coins[i-1];
+      for (int c = t; c <= amount; c++) {
+        f[c] = Math.min(f[c], f[c-t]+1);
+      }
+    }
+  
+    return f[amount] != INF ? f[amount] : -1;
+  }
+  ```
+
+  
 
 ******
 
