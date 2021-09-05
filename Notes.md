@@ -757,6 +757,8 @@ $$
 
 代码部分，分别提供对应两版「状态转移方程」的不同解法：
 
+==**只是已经推导到第二版「状态转移方程」后，完全可以直接写「一维空间优化」解法**==
+
 + $dp[N][C+1]$​ 解法：
 
   ```java
@@ -950,6 +952,67 @@ $$
 ********
 
 ###### 多重背包
+
+在 0-1 背包问题的基础上，增加了每件物品可以选择「有限次数」的特点（在容量允许的情况下）。
+
+> 有 $N$ 种物品和一个容量为 $C$ 的背包，每种物品**「数量有限」**。第 $i$ 件物品的体积是 $v[i]$，价值是 $w[i]$，数量为 $s[i]$。
+>
+> 问选择哪些物品，每件物品选择多少件，可使得总价值最大。
+
+*e.g.*
+
+```java
+Input: N = 2, C = 5, v = [1, 2], w = [1, 2], s = [2, 1]
+Output: 4
+Explanation: 选两件物品 1，再选一件物品 2，可使价值最大
+```
+
+**几乎所有的「背包问题」都是基于「01 背包」演变而来。**套用「01 背包」的「状态定义」来进行分析：**$dp[i][c]$ 代表考虑前 $i$ 件物品，且所选物品总体积不超过 $c$ 时获得的最大价值。**
+
+由于每件物品可以被选择「有限次」，因此对于某个 $i$ 而言，其值应该为以下所有可能方案中的最大值：
+
+- 选择 $0$ 件物品 $i$ 的最大价值，即 $dp[i][c]=dp[i-1][c]$
+
+- 选择 $1$ 件物品 $i$ 的最大价值，即 $dp[i][c]=dp[i-1][c-v[i]]+w[i]$
+
+- 选择 $2$ 件物品 $i$ 的最大价值，即 $dp[i][c]=dp[i-1][c-2*v[i]]+2*w[i]$
+
+  $\dots$
+
+- 选择 $s[i]$ 件物品 $i$ 的最大价值，即 $dp[i][c]=dp[i-1][c-s[i]*v[i]]+s[i]*w[i]$
+
+由此可以得出「状态转移方程」为：
+$$
+dp[i][c]=max(dp[i-1][c], dp[i-1][c-k*v[i]]+k*w[i]),\ 0< k\le s[i],\ 0< k*v[i]\le c
+$$
+可以发现其状态转移方程与「完全背包」完全一致，只是多了 $0<k\le s[i]$ 的条件。毕竟「完全背包」不限制物品数量，「多重背包」限制物品数量。
+
++ $dp[N][C+1]$ 解法：
+
+  ```java
+  public int maxValue(int N, int C, int[] s, int[] v, int[] w) {
+    int[][] dp = new int[N][C+1];
+    
+    // 先处理第一件物品：
+    for (int c = 0; c <= C; c++) {
+      int maxK = Math.min(s[0], c / v[0]);
+      dp[0][c] = maxK * w[0];
+    }
+    
+    // 处理剩余物品
+    for (int i = )
+  }
+  ```
+
+  
+
++ 「滚动数组」解法：
+
++ 「一维空间优化」解法：
+
+
+
+*****
 
 ###### 混合背包
 
@@ -3681,7 +3744,7 @@ $$
 
 + 「一维空间优化」
 
-  依旧是利用 $f[i][c]$ 的部分和 $f[i][c-t]$ (假设第 $i$ 个数字为 $t$) 之间的[等差特性](#「完全背包」一维方程推导)（总是相差1），将原「状态转移方程」修改为
+  依旧是利用 $f[i][c]$ 的部分和 $f[i][c-t]$ (假设第 $i$ 个数字为 $t$) 之间的[等差特性](#「完全背包」一维方程推导)（**总是相差1**），将原「状态转移方程」修改为
   $$
   f[i][c] = min(f[i-1][c],f[i][c-t]+1)
   $$
@@ -3985,7 +4048,45 @@ public int numSquares(int n) {
   + *Time Complexity:* $\mathcal{O}(n*amount^2)$
   + *Space Complexity:* $\mathcal{O}(n*amount)$
 
+  ```java
+  int INF = Integer.MAX_VALUE;
+  public int coinChange(int[] coins, int amount) {
+    int n = coins.length;
+    int[][] f = new int[n+1][amount+1];
+  
+    // 初始化（没有任何硬币的情况）：只有 f[0][0] = 0；其余情况均为无效值。
+    // 这是由「状态定义」决定的，当不考虑任何硬币的时候，只能凑出总和为 0 的方案，所使用的硬币数量为 0 
+    for (int c = 1; c <= amount; c++) f[0][c] = INF;
+  
+    // 从「第一枚硬币」开始讨论
+    for (int i = 1; i <= n; i++) {
+      int t = coins[i-1];
+      for (int c = 0; c <= amount; c++) {
+        // 「不选」：
+        int ns = f[i-1][c];
+        // 「选」：因为引入了无效值，所以也要增加f[i][c-t]的无效值判断
+        int s = c >= t && f[i][c-t] != INF ? f[i][c-t]+1: INF;
+        f[i][c] = Math.min(ns, s);
+      }
+    }
+  
+    return f[n][amount] != INF ? f[n][amount] : -1;
+  }
+  ```
+
+  + *Time Complexity:* $\mathcal{O}(n*amount)$
+  + *Space Complexity:* $\mathcal{O}(n*amount)$
+
 + 「一维空间优化」解法
+
+  依旧是利用 $f[i][c]$ 的部分和 $f[i][c-t]$ (假设第 $i$ 个数字为 $t$) 之间的[等差特性](#「完全背包」一维方程推导)（**总是相差1**），将原「状态转移方程」修改为
+  $$
+  f[i][c] = min(f[i-1][c],f[i][c-t]+1)
+  $$
+  再进行 $i$ 的维度消除，可得
+  $$
+  f[c]=min(f[c],f[c-t]+1)
+  $$
 
   ```java
   int INF = 0x3f3f3f3f;
@@ -4000,6 +4101,7 @@ public int numSquares(int n) {
     // 从「第一枚硬币」开始讨论
     for (int i = 1; i <= n; i++) {
       int t = coins[i-1];
+      // 「选」的前提是c>=t，而「不选」时不需要更改f数组，故c从t开始
       for (int c = t; c <= amount; c++) {
         f[c] = Math.min(f[c], f[c-t]+1);
       }
@@ -4009,7 +4111,77 @@ public int numSquares(int n) {
   }
   ```
 
-  
+  + *Time Complexity:* $\mathcal{O}(n*amount)$
+  + *Space Complexity:* $\mathcal{O}(amount)$
+
+*******
+
+###### [0518] Coin Change 2
+
+> You are given an integer array `coins` representing coins of different denominations and an integer `amount` representing a total amount of money.
+>
+> Return *the number of combinations that make up that amount*. If that amount of money cannot be made up by any combination of the coins, return `0`.
+>
+> You may assume that you have an infinite number of each kind of coin.
+>
+> The answer is **guaranteed** to fit into a signed **32-bit** integer.
+
+*思路：* [0322] 求「取得特定价值所需要的最小物品个数」，本题是「取得特定价值的方案数量」。
+
+将「完全背包」的状态定义搬过来进行“微调”：**定义 $f[i][c]$ 为考虑前 $i$ 件物品，凑成总和为 $c$ 的方案数量。**
+
+为了方便初始化，一般让 $f[0][x]$ 代表不考虑任何物品的情况。因此，有显而易见的初始化条件：$f[0][0]=1$，其余 $f[0][x]=0$ —— 代表当没有任何硬币的时候，存在凑成总和为 0 的方案数量为 1；凑成其他总和的方案不存在。
+
+当「状态定义」与「基本初始化」有了之后，不失一般性的考虑 $f[i][c]$ 该如何转移。
+
+对于第 $i$ 个硬币，有两种决策方案：
+
+- 不使用该硬币：$f[i][c]=f[i-1][c]$
+
+- 使用该硬币：由于每个硬币可以被选择多次（容量允许的情况下），因此方案数量应当是选择「任意个」该硬币的方案总和：$f[i][c]=\sum_{k=1}^{\lfloor c/val\rfloor}f[i-1][c-k*val],\ val=coins[i-1]$
+
+- $dp[N][C+1]$ 解法：
+
+  ```java
+  public int change(int amount, int[] coins) {
+    int n = coins.length;
+    int[][] f = new int[n+1][amount+1];
+    f[0][0] = 1;
+    for (int i = 1; i <= n; i++) {
+      int val = coins[i-1];
+      for (int c = 0; c <= amount; c++) {
+        // 「不选」：
+        f[i][c] = f[i-1][c];
+        // 「选」：
+        for (int k = 1; k * val <= c; k++)
+          f[i][c] += f[i-1][c-k*val];
+      }
+    }
+    return f[n][amount];
+  }
+  ```
+
+  + *Time Complexity:* $\mathcal{O}(n*amount^2)$
+  + *Space Complexity:* $\mathcal{O}(n*amount)$
+
+- 「一维空间优化」解法：
+
+  ```java
+  public int change(int amount, int[] coins) {
+    int n = coins.length;
+    int[] f = new int[amount+1];
+    f[0] = 1;
+    for (int i = 1; i <= n; i++) {
+      int val = coins[i-1];
+      for (int c = val; c <= amount; c++) 
+        f[c] += f[c-val];
+    }
+    return f[amount];
+  }
+  ```
+
+  + *Time Complexity:* $\mathcal{O}(n*amount)$
+  + *Space Complexity:* $\mathcal{O}(amount)$
 
 ******
 

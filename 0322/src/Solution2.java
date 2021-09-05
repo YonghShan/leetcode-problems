@@ -3,6 +3,11 @@
  * @date 9/3/21 - 23:49
  */
 public class Solution2 {
+    // 完全背包 + 「一维空间优化」
+    // 和[0279]一模一样，只是本题初始化从「不考虑任何硬币」开始
+    /* Runtime: 22ms (faster than 43.33%)    O(n*amount)
+       Memory: 41.8MB (less than 18.02%)     O(amount)
+     */
     int INF = 0x3f3f3f3f;
     public int coinChange(int[] coins, int amount) {
         int n = coins.length;
