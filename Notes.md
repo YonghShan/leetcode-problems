@@ -1000,15 +1000,84 @@ $$
     }
     
     // 处理剩余物品
-    for (int i = )
+    for (int i = 1; i < N; i++) {
+      for (int c = 0; c <= C; c++) {
+        // 「不选」：
+        int ns = dp[i-1][c];
+        // 「选」：
+        int s = 0;
+        for (int k = 1; k <= s[i] && k * v[i] <= c; k++) 
+          s = Math.max(s, dp[i-1][c-k*v[i]]+k*w[i]);
+        dp[i][c] = Math.max(ns, s);
+      }
+    }
+    
+    return dp[N-1][C];
   }
   ```
 
-  
+  + *Time Complexity:* 共有三层循环的运算量，即 $N*C*S$，其中 $N*S=\sum_{i=0}^{N-1}s[i]$。故整体复杂度为 $\mathcal{O}(\sum_{i=0}^{N-1}s[i]*C)$
+  + *Space Complexity:* $\mathcal{O}(N*C)$
 
 + 「滚动数组」解法：
 
+  通过观察「状态转移方程」可以发现，在更新某个 $dp[i][c]$ 时，只依赖于 $dp[i-1][]$。因此可以像「01背包」那样使用「滚动数组」的方式将空间优化到 $\mathcal{O}(C)$。
+
+  ```java
+  public int maxValue(int N, int C, int[] s, int[] v, int[] w) {
+    int[][] dp = new int[2][C+1];
+    
+    // 先处理第一件物品：
+    for (int c = 0; c <= C; c++) {
+      int maxK = Math.min(s[0], c / v[0]);
+      dp[0][c] = maxK * w[0];
+    }
+    
+    // 处理剩余物品
+    for (int i = 1; i < N; i++) {
+      for (int c = 0; c <= C; c++) {
+        // 「不选」：
+        int ns = dp[(i-1)&1][c];
+        // 「选」：
+        int s = 0;
+        for (int k = 1; k <= s[i] && k * v[i] <= c; k++) 
+          s = Math.max(s, dp[(i-1)&1][c-k*v[i]]+k*w[i]);
+        dp[i&1][c] = Math.max(ns, s);
+      }
+    }
+    
+    return dp[(N-1)&1][C];
+  }
+  ```
+
+  + *Time Complexity:* $\mathcal{O}(\sum_{i=0}^{N-1}s[i]*C)$
+  + *Space Complexity:* $\mathcal{O}(N*C)$
+
 + 「一维空间优化」解法：
+
+  **「多重背包」可以通过「一维空间优化」优化空间，但是不能降低时间复杂度。**因为当像「完全背包」那样只保留「容量维度」，并且「从小到大」遍历容量的话，在转移 $f[c]$ 时是无法直接知道所依赖的 $f[c-v[i]]$ 到底使用了多少件物品 $i$ 的。
+
+  这个问题在「完全背包」里面无须关心，因为每件物品可以被选择无限次，而在「多重背包」则是不能忽略，否则可能会违背物品件数有限的条件。
+
+  因此，「多重背包」问题的「一维空间优化」并不能像「完全背包」那样使复杂度降低。
+
+  ```java
+  public int maxValue(int N, int C, int[] s, int[] v, int[] w) {
+    int[] dp = new int[C+1];
+    
+    for (int i = 0; i < N; i++) {
+      for (int c = 0; c <= C; c++) {
+        for (int k = 1; k <= s[i] && k * v[i] <= c; k++) 
+          dp[c] = Math.max(dp[c, dp[c-k*v[i]]+k*w[i]);
+      }
+    }
+    
+    return dp[(N-1)&1][C];
+  }
+  ```
+
+  + *Time Complexity:* $\mathcal{O}(\sum_{i=0}^{N-1}s[i]*C)$
+  + *Space Complexity:* $\mathcal{O}(C)$
 
 
 
