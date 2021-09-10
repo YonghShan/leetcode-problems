@@ -600,7 +600,7 @@ $$
         int ns = dp[i-1][c];
         // 满足前提：选第i件物品
         int s = c >= v[i] ? dp[i-1][c-v[i]] + w[i] : 0;
-        dp[i][c] = Math.mac(ns, s);
+        dp[i][c] = Math.max(ns, s);
       }
     }
     return dp[N-1][C];
@@ -647,7 +647,7 @@ $$
         int ns = dp[(i-1)&1][c];
         // 满足前提：选第i件物品
         int s = c >= v[i] ? dp[(i-1)&1][c-v[i]] + w[i] : 0;
-        dp[i&1][c] = Math.mac(ns, s);
+        dp[i&1][c] = Math.max(ns, s);
       }
     }
     return dp[(N-1)&1][C];
@@ -677,22 +677,20 @@ $$
   ```java
   public int maxValue(int N, int C, int[] v, int[] w) {
   	int[] dp = new int[C+1];
-    // 初始化：先处理「考虑第一件物品」的情况（即dp数组的第一横行的初始值）
-    for (int c = 0; c <= C; i++) dp[c] = c >= v[0] ? w[0] : 0;
-    // 状态转移：再处理「考虑其余物品」的情况
-    for (int i = 1; i < N; i++) {
-      for (int c = C; c >= 0; c--) {
+    
+    for (int i = 0; i < N; i++) {
+      for (int c = C; c >= v[i]; c--) {
         // 不选第i件物品
         int ns = dp[c];
         // 选第i件物品
         int s = dp[c-v[i]] + w[i];
-        dp[c] = Math.mac(ns, s);
+        dp[c] = Math.max(ns, s);
       }
     }
     return dp[C];
   }
   ```
-
+  
   + *Time Complexity:* $\mathcal{O}(N*C)$​
 
   + *Space Complexity:* $\mathcal{O}(C)$​​
@@ -779,8 +777,7 @@ $$
         int ns = dp[i-1][c];
         // 「选」：
         int s = 0;
-        for (int k = 0; ; k++) { // 当v[i] = 1时，k可取到c
-          if (k * v[i] > c) break;
+        for (int k = 0; k * v[i] <= c; k++) { // 当v[i] = 1时，k可取到c
           s = Math.max(s, dp[i-1][c-k*v[i]] + k*w[i]); 
         }
         dp[i][c] = Math.max(ns, s);
@@ -790,11 +787,11 @@ $$
     return dp[N-1][C];
   }
   ```
-
+  
   + *Time Complexity:* $\mathcal{}(N*C*C)$​​​
-
+  
   + *Space Complexity:* $\mathcal{O}(N*C)$​​
-
+  
   ```java
   public int maxValue(int N, int C, int[] v, int[] w) {
     int[][] dp = new int[N][C+1];
@@ -820,11 +817,11 @@ $$
     return dp[N-1][C];
   }
   ```
-
+  
   + *Time Complexity:* $\mathcal{O}(N*C)$​​​​
-
+  
   + *Space Complexity:* $\mathcal{O}(N*C)$​
-
+  
 + 「滚动数组」：
 
   ```java
@@ -845,8 +842,7 @@ $$
         int ns = dp[(i-1)&1][c];
         // 「选」：
         int s = 0;
-        for (int k = 0; ; k++) { // 当v[i] = 1时，k可取到c
-          if (k * v[i] > c) break;
+        for (int k = 0; k * v[i] <= c; k++) { // 当v[i] = 1时，k可取到c
           s = Math.max(s, dp[(i-1)&1][c-k*v[i]] + k*w[i]); 
         }
         dp[i&1][c] = Math.max(ns, s);
@@ -856,11 +852,11 @@ $$
     return dp[(N-1)&1][C];
   }
   ```
-
+  
   + *Time Complexity:* $\mathcal{O}(N*C*C)$​​​
-
+  
   + *Space Complexity:* $\mathcal{O}(C)$​​​
-
+  
   ```java
   public int maxValue(int N, int C, int[] v, int[] w) {
     int[][] dp = new int[2][C+1];
@@ -886,11 +882,11 @@ $$
     return dp[(N-1)&1][C];
   }
   ```
-
+  
   + *Time Complexity:* $\mathcal{O}(N*C)$​​​
-
+  
   + *Space Complexity:* $\mathcal{O}(C)$​​
-
+  
 + 「一维空间优化」：**==重点==**
 
   虽然「完全背包」问题有两个版本的「状态转移方程」，但是对于「一维空间优化」解法，选择第二个化简后的「状态转移方程」进行 $i$ 维度的消除：
@@ -903,11 +899,11 @@ $$
     int[] dp = new int[C+1];
     
     for (int i = 0; i < N; i++) {
-      for (int c = 0; c <= C; c++) {  // 与「01背包」不同，依旧是从小到大遍历
+      for (int c = v[i]; c <= C; c++) {  // 与「01背包」不同，依旧是从小到大遍历
         // 「不选」：选择 0 件物品 i
         int ns = dp[c];
         // 「选」：
-        int s = c >= v[i] ? dp[c-v[i]] + w[i] : 0;
+        int s = dp[c-v[i]] + w[i];
         dp[c] = Math.max(ns, s);
       }
     }
@@ -987,7 +983,7 @@ dp[i][c]=max(dp[i-1][c], dp[i-1][c-k*v[i]]+k*w[i]),\ 0< k\le s[i],\ 0< k*v[i]\le
 $$
 可以发现其状态转移方程与「完全背包」完全一致，只是多了 $0<k\le s[i]$ 的条件。毕竟「完全背包」不限制物品数量，「多重背包」限制物品数量。
 
-+ $dp[N][C+1]$ 解法：
++ $dp[N][C+1]$ 解法：==和「完全背包」一样，除了最内层循环 $k$ 多了个判断条件：$k\le s[i]$==
 
   ```java
   public int maxValue(int N, int C, int[] s, int[] v, int[] w) {
@@ -1066,7 +1062,7 @@ $$
     int[] dp = new int[C+1];
     
     for (int i = 0; i < N; i++) {
-      for (int c = 0; c <= C; c++) {
+      for (int c = C; c >= v[i]; c--) {  // c「从大到小」
         for (int k = 1; k <= s[i] && k * v[i] <= c; k++) 
           dp[c] = Math.max(dp[c, dp[c-k*v[i]]+k*w[i]);
       }
@@ -1079,7 +1075,176 @@ $$
   + *Time Complexity:* $\mathcal{O}(\sum_{i=0}^{N-1}s[i]*C)$
   + *Space Complexity:* $\mathcal{O}(C)$
 
+==**与其他背包的内在关系：**==
 
++ **只有「完全背包」的「一维空间优化」是存在数学意义上的优化（能够有效降低算法时间复杂度）。**
+
+  **「01 背包」和「多重背包」的「一维空间优化」其实只是基于「朴素二维」解法做单纯的「滚动」操作而已（利用状态之间的依赖关系，配合遍历顺序，使得不再需要参与转移的空间能够被重新利用）。**
+
+  因此，一定程度上，可以将「多重背包」看做是一种特殊的「01 背包」。
+
++ 转换为「01背包」：
+
+  对「01 背包」中具有相同的价值 & 成本的物品进行计数，就成了对应物品的「限制件数」，「01 背包」也就转换成了「多重背包」。
+
+  同理，将「多重背包」的多件物品进行「扁平化展开」，就转换成了「01 背包」。
+
+  扁平化需要遍历所有物品，枚举每件物品的数量，将其添加到一个新的物品列表里。再套用「01 背包」的解决方案。
+
+  ```java
+  public int maxValue(int N, int C, int[] s, int[] v, int[] w) {
+    // 将多件数量的同一物品进行「扁平化」展开，以 [v, w] 形式存储
+    List<int[]> arr = new ArrayList<>(); 
+    for (int i = 0; i < N; i++) {
+      int cnt = s[i];
+      while (cnt-- > 0) 
+        arr.add(new int[]{v[i], w[i]});
+    }
+  
+    // 使用「01背包」进行求解
+    int[] dp = new int[C + 1];
+    for (int i = 0; i < arr.size(); i++) {
+      int vi = arr.get(i)[0], wi = arr.get(i)[1];
+      for (int j = C; j >= vi; j--) {
+        dp[j] = Math.max(dp[j], dp[j - vi] + wi);   
+      }
+    }
+    return dp[C];
+  }
+  ```
+
+  - *Time Complexity:* 扁平化的计算量取决于最终能展开成多少个物品（$\sum_{i=0}^{N-1}s[i]$）。共有 $\mathcal{O}(\sum_{i=0}^{N-1}s[i]*C)$ 个状态需要被转移，因此整体复杂度为 $\mathcal{O}(\sum_{i=0}^{N-1}s[i]*C)$
+  - *Space Complexity:* $\mathcal{O}(\sum_{i=0}^{N-1}s[i]+C)$
+
+  **可以发现，转换成「01 背包」之后，时间复杂度并没有发生变化。因此将「多重背包」简单的转换成「01 背包」并不能带来效率的提升。甚至说转换成「01 背包」之后效率上还要稍微差一点，因为额外增大了“常数”。**
+
+  扁平化操作并没有使得物品“变少”，仍然需要枚举所有的“组合”，从中选择最优，组合的数量没有发生变化，还额外增加了扁平化的操作。—— 这是将「多重背包」转换成「01 背包」进行求解没有“实际意义”（但可以帮助理解两者之间的联系）的原因。
+
+==**总结：**== 无论是「朴素二维」、「滚动数组」、「一维优化」还是「扁平化」都不能优化「多重背包」问题的时间复杂度。在各维度数量级同阶的情况下，时间复杂度是 $\mathcal{O}(n^3)$ 的。这意味着只能解决 $10^2$ 数量级的「多重背包」问题。
+
+==**「多重背包」的优化方法：**==
+
++ 「二进制优化」：使得能解决的多重背包问题数量级从 $n^2$ 上升为 $n^3$。
+
+  **所谓的「二进制优化」其实是指，如何将一个「多重背包」问题彻底转化为「01背包」问题，同时降低其复杂度。**
+
+  在「扁平化展开」的基础上，如果能将重复物品的数量变小，那么这样的「扁平化」就是有意义的。
+
+  Linux 的文件权限最高是 7，代表拥有读、写、执行的权限，但其实是采用了 3 个数来对应 8 种情况的“压缩”方法 —— 7 是对应了 1、2、4 三个数字的，也就是 `r:1`、`w:2`、`x:4` ，三种权限的组合共有 8 种可能性。
+
+  「二进制优化」就是借鉴这样的思路：**将原本数量为 $s[i]$ 的物品拆分成 $\lceil{log(s[i])}\rceil$ 件，从而降低算法复杂度。**
+
+  7 可以用 `1、2、4` 来代替，10 可以使用 `1、2、4、3` 来代替。不用 `1、2、4、6` 或者 `1、2、4、8`，是因为 `1、2、4、6` 可以表达的范围是 0~13，而 `1、2、4、8` 可以表达的范围是 0~15，而要求的是表达 10，大于 10 的范围是不能被选择的。所以可以在 `1、2、4` （表达的范围是 0~7）的基础上，增加一个数 3（由 10 - 7 而来），这样就能满足需要表达的范围 0~10。
+
+  *e.g.* 
+
+  + 原输入：
+    $$
+    \begin{aligned}
+    v&=[1,2,\color{red}{3}\color{black},4,5] \\
+    w&=[1,3,\color{red}2\color{black},5,4] \\
+    s&=[1,1,\color{red}10\color{black},1,1]
+    \end{aligned}
+    $$
+
+  + 「扁平化展开」$\rightarrow$ 「二进制优化」：
+    $$
+    \begin{aligned}
+    v_{扁平化}&=[1,2,\color{orange}\underline{3},\color{blue}\underline{3,3},\color{green}\underline{3,3,3,3},\color{pink}\underline{3,3,3}\color{black},4,5] \\
+    w_{扁平化}&=[1,3,\color{orange}\underline2,\color{blue}\underline{2,2},\color{green}\underline{2,2,2,2},\color{pink}\underline{2,2,2}\color{black},5,4] \\
+    s_{扁平化}&=[1,1,\color{orange}\underline{1},\color{blue}\underline{1,1},\color{green}\underline{1,1,1,1},\color{pink}\underline{1,1,1}\color{black},1,1] \\
+    \implies v_{二进制}&=[1,2,\color{orange}3,\ \ \color{blue}6,\quad\ \ \color{green}12,\quad\quad\ \color{pink}9\quad\color{black},4,5] \\
+    w_{二进制}&=[1,3,\color{orange}2,\ \ \color{blue}4,\quad\quad\color{green}8,\quad\quad\ \color{pink}6\quad\color{black},5,4] \\
+    s_{二进制}&=[1,1,\color{orange}1,\ \ \color{blue}1,\quad\quad\color{green}1,\quad\quad\ \color{pink}1\quad\color{black},1,1] 
+    \end{aligned}
+    $$
+
+  *解释：* 
+
+  |        $s$        |                         $s_{二进制}$                         |
+  | :---------------: | :----------------------------------------------------------: |
+  | 选 $0$ 件 $s[2]$  |                             不选                             |
+  | 选 $1$ 件 $s[2]$  |                      选 $s_{二进制}[2]$                      |
+  | 选 $2$ 件 $s[2]$  |                      选 $s_{二进制}[3]$                      |
+  | 选 $3$ 件 $s[2]$  |                      选 $s_{二进制}[5]$                      |
+  | 选 $4$ 件 $s[2]$  |                      选 $s_{二进制}[4]$                      |
+  | 选 $5$ 件 $s[2]$  |               选 $s_{二进制}[2],s_{二进制}[4]$               |
+  | 选 $6$ 件 $s[2]$  |               选 $s_{二进制}[3],s_{二进制}[4]$               |
+  | 选 $7$ 件 $s[2]$  |        选 $s_{二进制}[2],s_{二进制}[3],s_{二进制}[4]$        |
+  | 选 $8$ 件 $s[2]$  |        选 $s_{二进制}[2],s_{二进制}[4],s_{二进制}[5]$        |
+  | 选 $9$ 件 $s[2]$  |        选 $s_{二进制}[3],s_{二进制}[4],s_{二进制}[5]$        |
+  | 选 $10$ 件 $s[2]$ | 选 $s_{二进制}[2],s_{二进制}[3],s_{二进制}[4],s_{二进制}[5]$ |
+
+  ```java
+  public int maxValue(int N, int C, int[] s, int[] v, int[] w) {
+    List<Integer> worth = new ArrayList<>();
+    List<Integer> volume = new ArrayList<>();
+  
+    // 希望每件(重复的)物品都进行扁平化，所以遍历所有的物品
+    for (int i = 0; i < N; i++) {
+      // 获取每件物品的出现次数
+      int val = s[i];
+      // 进行扁平化：如果一件物品规定的使用次数为 7 次，我们将其扁平化为三件物品：1*重量&1*价值、2*重量&2*价值、4*重量&4*价值
+      for (int k = 1; k <= val; k *= 2) { 
+        val -= k;
+        worth.add(w[i] * k);
+        volume.add(v[i] * k);
+      }
+      if (val > 0) {
+        worth.add(w[i] * val);
+        volume.add(v[i] * val);
+      }
+    }
+  
+    // 使用「01背包」解决：
+    int[] dp = new int[C + 1];
+    for (int i = 0; i < worth.size(); i++) {
+      for (int j = C; j >= volume.get(i); j--) {
+        dp[j] = Math.max(dp[j], dp[j - volume.get(i)] + worth.get(i));
+      }
+    }
+    return dp[C];
+  }
+  ```
+
+  + *Time Complexity:* $\mathcal{O}(\sum_{i=0}^{n-1}\lceil{logs}[i]\rceil*C)$
+  + *Space Complexity:* $\mathcal{O}(\sum_{i=0}^{n-1}\lceil{logs}[i]\rceil+C)$
+
++ 「单调队列优化」
+
+  **与对「物品」做拆分的「二进制优化」不同，「单调队列优化」是对「状态」做拆分操作。**
+
+  首先，还是使用一维空间优化的定义：**$f[c]$ 代表容量不超过 $c$ 时的最大价值。**当遍历完所有的物品后，$f[C]$ 就是答案。
+
+  在朴素的「多重背包」解决方案中，当在处理某一个物品从 $f[0]$ 到 $f[C]$ 的状态时，每次都是通过遍历当前容量 $x$ 能够装多少件该物品，然后从所有遍历结果中取最优（根据题目，取最大或最小）。==**但事实上，转移只会发生在「对当前物品体积取余相同」的状态之间。**==
+
+  *e.g.* 假设当前处理到的物品**体积为 $2$** ，**数量为 $3$** ，而**背包容量为 $10$**，那么从 $f[0]$ 转移到 $f[10]$ 时，存在如下规律：
+
+  - $f[10]$ 只能由 $f[8],f[6],f[4]$ 转移而来
+
+  - $f[9]$ 只能由 $f[7],f[5],f[3]$ 转移而来
+
+    $\dots$
+
+  - $f[5]$ 只能由 $f[3],f[1]$ 转移而来
+
+  - $f[4]$ 只能由 $f[2],f[0]$ 转移而来
+
+  - $f[3]$ 只能由 $f[1]$ 转移而来
+
+  - $f[2]$ 只能由 $f[0]$ 转移而来
+
+  ==**即某个状态 $f[c]$ 只能由对 $v$ 取余和 $c\bmod v$（$v$ 为当前物品体积，$c$ 为当前背包容量）相同，比 $c$ 小，数量不超过「物品个数」的状态值所更新。**== *（10/8/6/4 对 2 取余结果相同，8/6/4 均比 10 小，8/6/4 共三个，不超过物品个数；5/3 对 2 取余结果相同，3 比 5 小，3 共一个，不超过物品个数...）*
+
+  因此这其实是一个「滑动窗口求最值」问题（窗口的大小最多不超过「物品个数」；最值指根据题意取窗口内元素的最大/小值）。
+
+  **如果能够在转移 $f[c]$ 时，以 $\mathcal{O}(1)$ 或者均摊 $\mathcal{O}(1)$ 的复杂度从「能够参与转移的状态」中（即窗口中）找到最大值，就能省掉朴素「多重背包」解决方案中最内层的“决策”循环，从而将整体复杂度降低到 $\mathcal{O}(N*C)$。**
+
+  具体地，定义一个数组 $g$ 来作为辅助队列，用来记录上一次物品的转移结果；定义一个数组 $q$ 来作为主队列，用来存放本次转移的结果。
+
+  由于希望在 $\mathcal{O}(1)$ 复杂度内取得「能够参与转移的状态」中的最大值，自然期望能够在队列头部或者尾部直接取得目标值来更新 。而如果希望始终从队头取值更新的话，需要维持「队列元素单调」和「特定的窗口大小」。
+
+  
 
 *****
 
@@ -3837,13 +4002,14 @@ $$
     for (int i = 1; i < len; i++) { // O(sqrt(n))
       int t = (i+1)*(i+1);
       // 「选」的前提是c>=t，而「不选」时不需要更改f数组，故c从t开始  O(n)
-      for (int c = t; c <= n; c++) f[c] = Math.min(f[c], f[c-t]+1);
+      for (int c = t; c <= n; c++) 
+        f[c] = Math.min(f[c], f[c-t]+1);
     }
   
     return f[n];
   }
   ```
-
+  
   + *Time Complexity:* $\mathcal{O}(n\sqrt{n})$      *Java `Math.sqrt()` TC为 $\mathcal{O}(logn)(<\mathcal{O}(\sqrt{n}))$，这里取 $\mathcal{O}(\sqrt{n})$*  
   
   + *Space Complexity:* $\mathcal{O}(n)$
