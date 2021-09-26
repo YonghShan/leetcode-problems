@@ -1333,6 +1333,8 @@ $$
 
 总的来说，三种背包问题都很经典（本质上都是组合优化问题），以至于「背包问题」直接成为了一类的动态规划模型。
 
+混合背包其实就是综合了「01 背包」、「完全背包」和「多重背包」三种传统背包问题。
+
 > 给定物品数量 $N$ 和背包容量 $C$。第 $i$ 件物品的体积是 $v[i]$，价值是 $w[i]$，可用数量为 $s[i]$：
 >
 > - 当 $s[i]$ 为 $-1$ 代表是该物品只能用一次
@@ -1341,11 +1343,72 @@ $$
 >
 > 求解将哪些物品装入背包可使这些物品的费用总和不超过背包容量，且价值总和最大。
 
+在一维空间优化方式中「01 背包」将当前容量 $j$ 按照“从大到小”进行遍历，而「完全背包」则是将当前容量 $j$ 按照“从小到大”进行遍历。同时「多重背包」可以通过「二进制优化」彻底转移成「01 背包」。所以，只需要根据第 $i$ 个物品是「01 背包」物品还是「完全背包」物品，选择不同的遍历顺序即可。
 
+```java
+public int maxValue(int N, int C, int[] w, int[] v, int[] s) {
+  // 构造出物品的「价值」和「体积」列表
+  List<Integer> worth = new ArrayList<>();
+  List<Integer> volume = new ArrayList<>();
+  for (int i = 0; i < N; i++) {
+    int type = s[i];
+
+    // 多重背包：应用「二进制优化」转换为 0-1 背包问题
+    if (type > 0) { 
+      for (int k = 1; k <= type; k *= 2) {
+        type -= k;
+        worth.add(w[i] * k);
+        volume.add(v[i] * k);
+      }
+      if (type > 0) {
+        worth.add(w[i] * type);
+        volume.add(v[i] * type);
+      }
+
+      // 01 背包：直接添加
+    } else if (type == -1) {
+      worth.add(w[i]);
+      volume.add(v[i]);
+
+      // 完全背包：对 worth 做翻转进行标记
+    } else {
+      worth.add(-w[i]);
+      volume.add(v[i]);
+    }
+  }
+
+  // 使用「一维空间优化」方式求解三种背包问题
+  int[] dp = new int[C + 1];
+  for (int i = 0; i < worth.size(); i++) {
+    int wor = worth.get(i);
+    int vol = volume.get(i);
+
+    // 完全背包：容量「从小到大」进行遍历
+    if (wor < 0) { 
+      for (int j = vol; j <= C; j++) 
+        // 同时记得将 worth 重新翻转为正整数
+        dp[j] = Math.max(dp[j], dp[j - vol] - wor); 
+
+      // 01 背包：包括「原本的 01 背包」和「经过二进制优化的完全背包」
+      // 容量「从大到小」进行遍历
+    } else { 
+      for (int j = C; j >= vol; j--) 
+        dp[j] = Math.max(dp[j], dp[j - vol] + wor);
+    }
+  }
+  return dp[C];
+}
+```
 
 ********
 
 ###### 分组背包
+
+> 给定 $N$ 个物品组，和容量为 $C$ 的背包。第 $i$ 个物品组共有 $S[i]$ 件物品，其中第 $i$ 组的第 $j$ 件物品的成本为 $v[i][j]$，价值为 $w[i][j]$。**每组有若干个物品，同一组内的物品最多只能选一个。**
+>
+> 求解将哪些物品装入背包可使这些物品的费用总和不超过背包容量，且价值总和最大。
+
+
 
 ###### 多维背包
 
