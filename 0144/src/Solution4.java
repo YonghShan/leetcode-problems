@@ -1,5 +1,4 @@
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author YonghShan
@@ -9,23 +8,17 @@ import java.util.List;
 class Solution4 {
     // Iteration3： 更简洁
     public List<Integer> preorderTraversal(TreeNode root) {
-        LinkedList<TreeNode> stack = new LinkedList<>(); // stack也可以改成Deque
-        LinkedList<Integer> output = new LinkedList<>();
-        if (root == null) {
-            return output;
-        }
+        List<Integer> res = new ArrayList<>();
+        if (root == null) return res;
 
-        stack.add(root);
+        Deque<TreeNode> stack = new ArrayDeque<>();
+        stack.addFirst(root);
         while (!stack.isEmpty()) {
-            TreeNode node = stack.pollLast(); // stack如果是Deque，则这里用pop()
-            output.add(node.val);
-            if (node.right != null) {
-                stack.add(node.right);
-            }
-            if (node.left != null) {
-                stack.add(node.left);
-            }
+            TreeNode tmp = stack.poll();
+            res.add(tmp.val);
+            if (tmp.right != null) stack.addFirst(tmp.right);
+            if (tmp.left != null) stack.addFirst(tmp.left);
         }
-        return output;
+        return res;
     }
 }

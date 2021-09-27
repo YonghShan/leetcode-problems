@@ -42,7 +42,7 @@ public class Solution2Advanced {
             char r = s.charAt(right);
 
             Integer index = chars[r];
-            if (index != null && index >= left) {  // 相对应上面method的left = Math.max(left, map.get(s.charAt(right)) + 1);
+            if (index != null && index >= left) {  // 此时，重复元素出现；相对应上面method的left = Math.max(left, map.get(s.charAt(right)) + 1);
                 left = index + 1;
             }
 

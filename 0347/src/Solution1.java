@@ -21,9 +21,9 @@ public class Solution1 {
             @Override
             public int compare(Map.Entry<Integer, Integer> o1, Map.Entry<Integer, Integer> o2) {
                 if (o1.getValue() != o2.getValue()) {
-                    return o1.getValue() > o2.getValue() ? -1 : 1;   // 降序
+                    return o2.getValue() - o1.getValue();   // 降序
                 } else {
-                    return o1.getKey() > o2.getKey() ? 1 : -1;   // 如果value相同，则依据key的值升序排列
+                    return o1.getKey() - o2.getKey();   // 如果value相同，则依据key的值升序排列
                 }
             }
         });
